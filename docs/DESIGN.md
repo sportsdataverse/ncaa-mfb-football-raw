@@ -78,7 +78,11 @@ score_offense, score_defense, players (rusher/passer/receiver/tackler...), play_
   distance/yard_line + raw play_text. 6 offline tests green. Note: rows include
   "drive start at" markers + the opening kickoff (Phase 3 classifies/filters).
 - **Phase 3 — structured field extraction. ✓ DONE** (`_decompose_play_text`).
-  **47-column** cfbfastR-style frame, verified on the fixture (18 tests):
+  **49-column** cfbfastR-style frame, cross-validated on **5 captured games**
+  (0 unknown play types across all; 20 tests). Adds `clock` (per-play, where the
+  game tags it), `two_point` conversions, `qb_scramble` (derived: a rush by a
+  player who also passes = QB run — NCAA text does NOT label true scrambles).
+  Original field set:
   play_type (12 kinds, 0 unknown) · yards_gained (signed) · formation ·
   passer/rusher/receiver/kicker/punter/returner · run_direction · pass_complete/
   depth/direction · tackler_1/tackler_2 (solo/assist, suffix-safe names) ·

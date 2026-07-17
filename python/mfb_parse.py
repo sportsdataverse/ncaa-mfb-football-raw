@@ -35,6 +35,9 @@ _DOWN = {"1st": 1, "2nd": 2, "3rd": 3, "4th": 4}
 _YL_SPLIT_RE = re.compile(r"^([A-Z]{1,4})(\d+)$")
 
 # --- play_text field regexes ----------------------------------------------
+_CLOCK_RE = re.compile(
+    r"^\((\d{1,2}:\d{2})\)\s*"
+)  # some games prefix each play with "(MM:SS)"
 _FORMATION_RE = re.compile(r"^(No Huddle(?:-Shotgun)?|Shotgun|Wildcat|Pistol)\s+")
 _YARDS_RE = re.compile(r"for (\d+) yards? (gain|loss)", re.I)
 _YARDS_PLAIN_RE = re.compile(
@@ -61,6 +64,13 @@ _PUNT_RE = re.compile(
 _SACK_RE = re.compile(rf"(?P<passer>{_NAME}) sacked", re.I)
 _FG_RE = re.compile(rf"(?P<kicker>{_NAME}) field goal", re.I)
 _XP_RE = re.compile(rf"(?P<kicker>{_NAME}) kick attempt", re.I)
+_POSSESSION_RE = re.compile(
+    r"^[A-Z]{2,4} ball on [A-Z]{1,4}\d+"
+)  # "AKR ball on AKR20." drive marker
+_TWOPT_RE = re.compile(
+    rf"(?P<player>{_NAME}) (?P<kind>pass|run|rush) attempt (?P<result>Successful|failed)",
+    re.I,
+)
 _KICK_YDS_RE = re.compile(r"kickoff (\d+) yards", re.I)
 _PUNT_YDS_RE = re.compile(r"punt (\d+) yards", re.I)
 _RET_YDS_RE = re.compile(r"return (\d+) yards", re.I)
@@ -75,6 +85,7 @@ _PENALTY_RE = re.compile(
 
 _DECOMP_KEYS = (
     "play_type",
+    "clock",
     "yards_gained",
     "formation",
     "passer",
@@ -145,6 +156,10 @@ def _tacklers(text: str) -> "tuple[str | None, str | None]":
 
 def _decompose_play_text(text: str) -> "dict":
     out: "dict" = dict.fromkeys(_DECOMP_KEYS)
+    cm = _CLOCK_RE.match(text)
+    if cm:
+        out["clock"] = cm.group(1)
+        text = text[cm.end() :]
     fm = _FORMATION_RE.match(text)
     if fm:
         out["formation"] = fm.group(1)
@@ -152,7 +167,7 @@ def _decompose_play_text(text: str) -> "dict":
     tl = text.lower()
 
     # non-play markers -- classify + return early (no per-play fields apply)
-    if "drive start at" in tl:
+    if "drive start at" in tl or _POSSESSION_RE.match(text):  # "AKR ball on AKR20."
         out["play_type"] = "drive_start"
         return out
     if re.search(
@@ -234,6 +249,15 @@ def _decompose_play_text(text: str) -> "dict":
         m = _XP_RE.search(text)
         if m:
             out["kicker"] = m.group("kicker")
+    elif "pass attempt" in tl or "run attempt" in tl or "rush attempt" in tl:
+        out["play_type"] = (
+            "two_point"  # 2-pt conversion ("... attempt Successful/failed")
+        )
+        tm = _TWOPT_RE.search(text)
+        if tm:
+            out["passer" if tm.group("kind").lower() == "pass" else "rusher"] = (
+                tm.group("player")
+            )
     elif "sacked" in tl:
         out["play_type"] = "sack"
         out["yards_gained"] = _yards_gained(text)
@@ -282,6 +306,7 @@ PBP_SCHEMA: "dict[str, pl.DataType]" = {
     "yard_line_side": pl.Utf8,
     "yard_line_number": pl.Int64,
     "play_type": pl.Utf8,
+    "clock": pl.Utf8,
     "yards_gained": pl.Int64,
     "formation": pl.Utf8,
     "passer": pl.Utf8,
@@ -291,6 +316,10 @@ PBP_SCHEMA: "dict[str, pl.DataType]" = {
     "punter": pl.Utf8,
     "returner": pl.Utf8,
     "run_direction": pl.Utf8,
+    # Derived post-parse (NCAA text does NOT label scrambles): a rush by a player
+    # who also throws passes in the game = a QB run (conflates designed keepers +
+    # true scrambles). Null on non-rush plays.
+    "qb_scramble": pl.Boolean,
     "pass_complete": pl.Boolean,
     "pass_depth": pl.Utf8,
     "pass_direction": pl.Utf8,
@@ -382,4 +411,19 @@ def parse_mfb_pbp(
         if rows
         else pl.DataFrame(schema=PBP_SCHEMA)
     )
+    if df.height:
+        # qb_scramble = a rush by a player who also passes in this game (QB run).
+        # Frame-level derivation because NCAA text does not label scrambles.
+        qbs = (
+            df.filter(pl.col("passer").is_not_null())
+            .get_column("passer")
+            .unique()
+            .to_list()
+        )
+        df = df.with_columns(
+            pl.when(pl.col("play_type") == "rush")
+            .then(pl.col("rusher").is_in(qbs))
+            .otherwise(None)
+            .alias("qb_scramble")
+        )
     return df.to_pandas() if return_as_pandas else df

@@ -206,3 +206,43 @@ def test_touchdown_runs_flagged() -> None:
     assert td.height >= 1
     # TD plays end at the goal line
     assert td.get_column("end_yard_line").str.contains("00").any()
+
+
+def test_qb_scramble_derived() -> None:
+    df = _df()
+    # null on non-rush plays; boolean on rushes
+    assert (
+        df.filter(pl.col("play_type") != "rush")
+        .get_column("qb_scramble")
+        .is_null()
+        .all()
+    )
+    assert (
+        df.filter(pl.col("play_type") == "rush")
+        .get_column("qb_scramble")
+        .is_not_null()
+        .all()
+    )
+    # anything flagged must be a passer (QB) in the game
+    qbs = set(df.filter(pl.col("passer").is_not_null()).get_column("passer").to_list())
+    flagged = df.filter(pl.col("qb_scramble") == True)  # noqa: E712
+    assert set(flagged.get_column("rusher").to_list()) <= qbs
+
+
+def test_parser_generalizes_across_fixtures() -> None:
+    files = sorted(FIX.parent.glob("mfb_pbp_*.html"))
+    assert len(files) >= 3, "need multiple captured games to test generalization"
+    for f in files:
+        d = parse_mfb_pbp(f.read_text(encoding="utf-8"))
+        assert d.height > 50, f.name  # a full game
+        assert d.filter(pl.col("play_type") == "unknown").height == 0, (
+            f.name
+        )  # 0 unknown
+        # a rush naming an individual carrier ("Last,First rush") must resolve a
+        # rusher; team-credited rushes ("Akron rush ... End Of Play") legitimately don't.
+        bad = d.filter(
+            (pl.col("play_type") == "rush")
+            & pl.col("rusher").is_null()
+            & pl.col("play_text").str.contains(r",[A-Z][\w.'\-]+ rush")
+        )
+        assert bad.height == 0, f.name
