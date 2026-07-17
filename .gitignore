@@ -1,0 +1,11 @@
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+/logs/
+.pytest_cache/
+.ruff_cache/
+.mypy_cache/
+# local-only proxy creds / canary output (mirrors ncaa-mbb-hoops-raw)
+/canary_vendors.toml
+/canary_out/
