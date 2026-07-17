@@ -69,9 +69,12 @@ score_offense, score_defense, players (rusher/passer/receiver/tackler...), play_
 
 ## Phased implementation plan
 
-- **Phase 1 — discovery + capture + 1 fixture.** MFB discovery (team list → contest
-  ids), capture module, and commit ONE real FBS game's raw pbp as the parser fixture.
-  Reuses the transport; lowest risk. *Deliverable: a captured `contests/{id}/play_by_play`.*
+- **Phase 1 — discovery + capture. ✓ DONE** (offline-tested; 11 tests).
+  `mfb_discover.py` (team list `sport_code=MFB` → team pages → deduped contest_ids;
+  pure parsers + injectable fetch), `mfb_capture.py` (idempotent, resumable, gzip
+  JSON bundle per contest, consecutive-failure breaker), `mfb_run.py` + `scripts/
+  run_mfb_capture.sh` (hold ONE browser session — no relaunch storm — proxy pool
+  from env). **Not yet run live at scale** (needs IP rotation, open risk #2).
 - **Phase 2 — drive/play structural parse. ✓ DONE** (`python/mfb_parse.py`,
   `parse_mfb_pbp`). Parses the FULL game (205 plays from fixture 5362535) → one
   row per play with drive_number/offense/drive_result/drive_scored + down/
