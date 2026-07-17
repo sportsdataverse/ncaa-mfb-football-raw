@@ -9,3 +9,6 @@ venv/
 # local-only proxy creds / canary output (mirrors ncaa-mbb-hoops-raw)
 /canary_vendors.toml
 /canary_out/
+
+# oh-my-claudecode tool artifacts
+.omc/
