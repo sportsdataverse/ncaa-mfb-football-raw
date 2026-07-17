@@ -77,15 +77,19 @@ score_offense, score_defense, players (rusher/passer/receiver/tackler...), play_
   row per play with drive_number/offense/drive_result/drive_scored + down/
   distance/yard_line + raw play_text. 6 offline tests green. Note: rows include
   "drive start at" markers + the opening kickoff (Phase 3 classifies/filters).
-- **Phase 3 — structured field extraction (NEXT).** Decompose `play_text` →
-  play_type / players / yards_gained / end_yard_line / formation, cfbfastR-style.
-  Grammar (from the fixture): names are `Last,First`; formation prefix like
-  `No Huddle-Shotgun`; verbs `rush {dir} for {n} yards {gain|loss} to the {yl}
-  ({tacklers})`, `pass complete {depth} {dir} to {recv} caught at {yl}, for {n}
-  yards to the {yl}`, `kickoff {n} yards to {yl} {returner} return {n} yards`,
-  `punt {n} yards to {yl} fair catch by {r}`, `field goal`, `PENALTY {team} ...`.
-  Tacklers in parens, multiple separated by `;`. Build the regex against the
-  committed fixture + add fixtures for pass/rush/punt/FG/penalty/scoring variety.
+- **Phase 3 — structured field extraction. ✓ DONE** (`_decompose_play_text`).
+  **47-column** cfbfastR-style frame, verified on the fixture (18 tests):
+  play_type (12 kinds, 0 unknown) · yards_gained (signed) · formation ·
+  passer/rusher/receiver/kicker/punter/returner · run_direction · pass_complete/
+  depth/direction · tackler_1/tackler_2 (solo/assist, suffix-safe names) ·
+  kick_yards/return_yards/punt_yards/fg_distance/fg_made · yard_line_side/number ·
+  flags is_first_down/is_touchdown/is_safety/is_fumble/is_turnover(+type)/
+  out_of_bounds/no_play/fair_catch · penalty_flag/team/type/player/yards ·
+  end_yard_line · raw play_text retained. Coverage on fixture: rusher 84/84,
+  passer 45/45, directions 100%, yard-line split 205/205.
+- **Phase 3b (later, needs more fixtures):** rarer play types (blocked kick,
+  muffed punt, lateral, 2-pt, kneel/spike edge cases), fumble recovery player,
+  defense team column, quarter assignment from period markers.
 - **Phase 4 — validation + scale.** Parity spot-check vs cfbfastR; season backfill
   with paced rotation; publish to `-data`.
 
