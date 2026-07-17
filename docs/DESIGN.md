@@ -72,10 +72,20 @@ score_offense, score_defense, players (rusher/passer/receiver/tackler...), play_
 - **Phase 1 — discovery + capture + 1 fixture.** MFB discovery (team list → contest
   ids), capture module, and commit ONE real FBS game's raw pbp as the parser fixture.
   Reuses the transport; lowest risk. *Deliverable: a captured `contests/{id}/play_by_play`.*
-- **Phase 2 — drive/play structural parse.** `div.drives` → per-play rows with
-  drive id, scoring flag, quarter/clock, raw play_text. *Deliverable: tidy frame, text intact.*
-- **Phase 3 — structured field extraction.** Parse play_text → down/distance/
-  yardline/play_type/yards/players (the cfbfastR-style regex/logic). *Deliverable: full columns.*
+- **Phase 2 — drive/play structural parse. ✓ DONE** (`python/mfb_parse.py`,
+  `parse_mfb_pbp`). Parses the FULL game (205 plays from fixture 5362535) → one
+  row per play with drive_number/offense/drive_result/drive_scored + down/
+  distance/yard_line + raw play_text. 6 offline tests green. Note: rows include
+  "drive start at" markers + the opening kickoff (Phase 3 classifies/filters).
+- **Phase 3 — structured field extraction (NEXT).** Decompose `play_text` →
+  play_type / players / yards_gained / end_yard_line / formation, cfbfastR-style.
+  Grammar (from the fixture): names are `Last,First`; formation prefix like
+  `No Huddle-Shotgun`; verbs `rush {dir} for {n} yards {gain|loss} to the {yl}
+  ({tacklers})`, `pass complete {depth} {dir} to {recv} caught at {yl}, for {n}
+  yards to the {yl}`, `kickoff {n} yards to {yl} {returner} return {n} yards`,
+  `punt {n} yards to {yl} fair catch by {r}`, `field goal`, `PENALTY {team} ...`.
+  Tacklers in parens, multiple separated by `;`. Build the regex against the
+  committed fixture + add fixtures for pass/rush/punt/FG/penalty/scoring variety.
 - **Phase 4 — validation + scale.** Parity spot-check vs cfbfastR; season backfill
   with paced rotation; publish to `-data`.
 
