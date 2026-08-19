@@ -1,36 +1,66 @@
-# ncaa-mfb-hoops-raw
+# ncaa-mfb-football-raw
 
-Raw scraper + captured play-by-play for **NCAA Men's Football (MFB)** from
+Raw scraper + captured game data for **NCAA Men's Football (MFB)** from
 `stats.ncaa.org`, in the SportsDataverse Python stack. Mirrors
-`ncaa-mbb-hoops-raw` (discover → capture → parse) and reuses the working
-Akamai bm-verify transport shipped in sportsdataverse-py #271
-(`NcaaFetcher.with_browser` — patchright + `--headless=new` + real Chrome UA +
-US residential proxy).
+`ncaa-mbb-hoops-raw` (discover → capture → parse → datasets) and rides the
+canary-proven `decodo_patchright` transport (patchright + `--headless=new` +
+Decodo US sticky residential; see `canary_vendors.toml.example`).
 
-**Status:** design locked, Phase 1 in progress. See [docs/DESIGN.md](docs/DESIGN.md)
-for the full design, phased plan, and decision log.
+**Status:** live capture running for the 2025 season (`academic_year=2026`).
+Discovery, schedules, rosters, and 6-tab game bundles are wired end-to-end;
+parsing graduates to sdv-py (`cfb_ncaa_pbp` / `cfb_ncaa_box`), with the
+cfbfastR column-parity mapping prototyped here (`mfb_cfbfastr.py`, 102
+cfbfastR-named columns incl. parity-tested running scores). See
+[docs/DESIGN.md](docs/DESIGN.md) for the phased plan and decision log.
 
-## Layout (planned)
+## Layout
 
 ```
 python/
   mfb_discover.py   # team list (sport_code=MFB) -> team pages -> contest_ids
-  mfb_capture.py    # NcaaFetcher.with_browser -> raw /contests/{id}/play_by_play
-  mfb_parse.py      # div.drives -> scoring/non_scoring plays -> structured frame
-tests/fixtures/     # real captured games (parser ground truth)
-mfb/                # committed raw pbp bundles (the -data ingest reads these)
+                    # + persisted teams/schedules HTML + roster sweep
+  mfb_capture.py    # 6-tab gzip JSON bundle per contest -> mfb/json/
+  mfb_run.py        # live runner: discovery + rosters + game bundles
+  mfb_parse.py      # (superseded by sdv-py cfb_ncaa_pbp; kept for history)
+  mfb_cfbfastr.py   # NCAA structural pbp -> cfbfastR-named columns (prototype)
+  mfb_datasets.py   # offline: HTML + bundles -> tidy season parquet
+tests/fixtures/     # real captured pages (parser ground truth)
+mfb/
+  teams/{html,parquet}/         # team lists per (ay, division)
+  schedules/{html,parquet}/     # team pages + schedule master
+  rosters/html/{ay}/            # team roster pages
+  json/                         # gzip game bundles (pbp + 5 detail tabs)
+  datasets/{ay}/                # built parquet (pbp, pbp_cfbfastr, boxes, ...)
 docs/DESIGN.md
 ```
 
-## Fixture
+## Running
 
-`tests/fixtures/mfb_pbp_5362535.html` — a real FBS `play_by_play` page captured
-live 2026-07-16 (team 589002, 2025 season), ~99 KB, drive-based
-(`div.drives` → `div.scoring_play` / `div.non_scoring_play`). Ground truth for
-the parser.
+```sh
+NCAA_VENDOR=decodo_patchright ./scripts/run_mfb_capture.sh \
+    --academic-year 2026 --division 11 --rosters --max-contests 100
+# watch: tail -f logs/mfb_capture_*.log
+```
+
+`academic_year` is the ENDING year (2026 = fall-2025 season). Division 11 =
+FBS, 12 = FCS. All stages are file-exists resumable; a consecutive-failure
+breaker hard-stops ban storms. Offline dataset build (no network):
+
+```sh
+PYTHONPATH=/mnt/sdv_repos/sdv-py:python \
+  /mnt/sdv_repos/sdv-py/.venv/bin/python python/mfb_datasets.py --academic-year 2026
+```
+
+## Game-detail tabs
+
+Each bundle captures `play_by_play` (validity gate) plus `box_score`,
+`team_stats`, `individual_stats`, `drives`, `officials`. There is **no
+participation tab** on stats.ncaa.org football pages — `individual_stats`
+(anyone credited with a stat) is the closest surface.
 
 ## Runtime
 
-Requires a **real-GPU host** + a **US residential** proxy pool (datacenter gets an
-edge 403). Capture must **pace rotation** — a rapid browser-relaunch storm across
-proxies crashes the patchright driver (EPIPE); hold an IP, rotate on real failure.
+Requires a US residential transport — datacenter IPs get an instant Akamai
+edge 403. Capture holds ONE browser session (a rapid relaunch storm across
+proxies crashes the patchright driver with EPIPE); sticky session ids are
+re-minted per run by the sdv-py vendor seam.
