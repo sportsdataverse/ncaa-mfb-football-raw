@@ -24,6 +24,14 @@ python/
   mfb_parse.py      # (superseded by sdv-py cfb_ncaa_pbp; kept for history)
   mfb_cfbfastr.py   # NCAA structural pbp -> cfbfastR-named columns (prototype)
   mfb_datasets.py   # offline: HTML + bundles -> tidy season parquet
+  ncaa_mfb_01_schedules_scrape.py  # numbered stage shims (see RUNBOOK.md):
+  ncaa_mfb_02_games_scrape.py      #   thin argparse wrappers over mfb_run /
+  ncaa_mfb_04_rosters_scrape.py    #   mfb_datasets; 03 (parse) is a hole --
+  ncaa_mfb_05_datasets_build.py    #   parsing lives in sdv-py, runs in 05
+scripts/
+  _env.sh           # sourced by every launcher: venv, transport, logging
+  run_01_schedules.sh  run_02_games.sh  run_04_rosters.sh  run_05_datasets.sh
+  run_mfb_capture.sh   # combined one-session runner (01 + 04 + 02)
 tests/fixtures/     # real captured pages (parser ground truth)
 mfb/
   teams/{html,parquet}/         # team lists per (ay, division)
@@ -36,20 +44,23 @@ docs/DESIGN.md
 
 ## Running
 
+Numbered stages (full table, resumability, backfill: [RUNBOOK.md](RUNBOOK.md)):
+
 ```sh
-NCAA_VENDOR=decodo_patchright ./scripts/run_mfb_capture.sh \
-    --academic-year 2026 --division 11 --rosters --max-contests 100
-# watch: tail -f logs/mfb_capture_*.log
+export NCAA_VENDOR=decodo_patchright                                  # canary_vendors.toml creds
+./scripts/run_01_schedules.sh --academic-year 2026 --division 11     # discovery (team pages)
+./scripts/run_04_rosters.sh   --academic-year 2026 --division 11     # roster pages
+./scripts/run_02_games.sh     --academic-year 2026 --division 11 --max-contests 200   # game bundles
+./scripts/run_05_datasets.sh  --academic-year 2026                   # OFFLINE: tidy parquet
+# watch: tail -f logs/<schedules|rosters|games|datasets>_<ts>.log
 ```
 
 `academic_year` is the ENDING year (2026 = fall-2025 season). Division 11 =
-FBS, 12 = FCS. All stages are file-exists resumable; a consecutive-failure
-breaker hard-stops ban storms. Offline dataset build (no network):
-
-```sh
-PYTHONPATH=/mnt/sdv_repos/sdv-py:python \
-  /mnt/sdv_repos/sdv-py/.venv/bin/python python/mfb_datasets.py --academic-year 2026
-```
+FBS, 12 = FCS (run the online stages once per division). All stages are
+file-exists resumable; a consecutive-failure breaker hard-stops ban storms.
+`./scripts/run_mfb_capture.sh` is the combined one-session runner (01 + 04 +
+02) for chunked one-shot runs. Backfill = the same stages with a different
+`--academic-year`.
 
 ## Known source gaps (2025 season)
 

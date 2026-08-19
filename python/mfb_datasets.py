@@ -415,13 +415,14 @@ def build_game_datasets(
     return written
 
 
-if __name__ == "__main__":
+def main(argv: "Optional[list[str]]" = None) -> int:
+    """CLI: build teams -> rosters -> schedule master -> game datasets for one season."""
     import argparse
 
     ap = argparse.ArgumentParser(description=__doc__)
     ap.add_argument("--academic-year", type=int, default=2026)
     ap.add_argument("--root", default=str(Path(__file__).resolve().parents[1]))
-    args = ap.parse_args()
+    args = ap.parse_args(argv)
     teams = build_teams(args.root, args.academic_year)
     print(f"teams: {teams.height}")
     rosters = build_rosters(args.root, args.academic_year)
@@ -434,3 +435,8 @@ if __name__ == "__main__":
         f"{master.get_column('contest_id').drop_nulls().n_unique()} unique contests"
     )
     print(f"game datasets: {build_game_datasets(args.root, args.academic_year)}")
+    return 0
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())
