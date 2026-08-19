@@ -51,6 +51,19 @@ PYTHONPATH=/mnt/sdv_repos/sdv-py:python \
   /mnt/sdv_repos/sdv-py/.venv/bin/python python/mfb_datasets.py --academic-year 2026
 ```
 
+## Known source gaps (2025 season)
+
+* **No pbp published** for 2 of 1,687 contests — Furman @ Campbell
+  (`6419926`, 09/13) and Bethune-Cookman @ Grambling (`6400590`, 11/08):
+  stats.ncaa.org serves a ~21 KB stub. Finals live in the schedule master.
+* **OT drives are omitted from pbp pages** — reconstructed one-row-per-drive
+  from the drives tab + scoring-summary checkpoints, flagged
+  `ot_synthesized=True` in `pbp_cfbfastr`.
+* Some FCS pages label drive h5 titles with the DEFENSE and/or misalign drive
+  numbers across tabs; both are auto-corrected (drive-start-marker vote,
+  score-based OT alignment). QA: `datasets/{ay}/qa_pbp_vs_linescore.parquet`
+  — 1,685/1,685 exact finals for 2025.
+
 ## Game-detail tabs
 
 Each bundle captures `play_by_play` (validity gate) plus `box_score`,
