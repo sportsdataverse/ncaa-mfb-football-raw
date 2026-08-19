@@ -1,0 +1,55 @@
+# NCAA proxy canary config -- copy to canary_vendors.toml (gitignored) and fill
+# in whichever trial creds you have. Vendors with placeholder/empty values are
+# skipped, so add trials one at a time and re-run scripts/run_canary.sh.
+#
+# Goal: measure real bm-verify solve rate on stats.ncaa.org. The current pool is
+# ASN-confirmed DATACENTER (defeated by Akamai). Trial one of each IP class.
+#
+# Rule for every vendor: use STICKY sessions, not per-request rotation -- the
+# _abck cookie is bound to the solving IP.
+
+# Optional: override the default 10 known-good MBB contests.
+# contest_ids = ["6388769", "6388905", "6388907", "6388965", "6388997"]
+
+# --- Class 1: raw residential/ISP proxy + our Playwright solver -------------
+# NetNut (ISP/static residential) -- top pick for sticky Akamai sessions.
+# Put your sticky-session gateway URL(s) here. For a residential gateway you get
+# ONE host:port and pick/stick the IP via the username (per-vendor docs vary).
+[[vendor]]
+name = "netnut"
+type = "proxy_browser"
+proxies = ["http://<USER-SESSION>:<PASS>@gw.netnut.io:5959"]
+
+# Decodo (ex-Smartproxy) rotating residential w/ sticky option.
+[[vendor]]
+name = "decodo"
+type = "proxy_browser"
+proxies = ["http://<USER>:<PASS>@gate.decodo.com:7000"]
+
+# --- Class 2: managed unblocker (solves Akamai server-side) -----------------
+# Zyte API -- URL in, solved HTML out. Easiest self-serve ($5 free credit).
+# render = "browserHtml" (JS-rendered) or "httpResponseBody" (raw bytes).
+[[vendor]]
+name = "zyte"
+type = "unblocker_zyte"
+api_key = "<YOUR_ZYTE_API_KEY>"
+render = "browserHtml"
+
+# Bright Data Web Unlocker / Oxylabs Web Unblocker -- proxy endpoint that returns
+# already-solved HTML for a plain GET (no browser needed on our side).
+[[vendor]]
+name = "brightdata_webunlocker"
+type = "unblocker_proxy"
+proxy = "http://brd-customer-<ID>-zone-web_unlocker:<PASS>@brd.superproxy.io:22225"
+
+# --- Class 3: managed remote browser over CDP (RECOMMENDED) -----------------
+# The canary PROVED no local browser (vanilla Playwright OR anti-detect
+# patchright) clears stats.ncaa.org bm-verify anymore, even from a clean US
+# residential IP. A managed browser (provider owns fingerprint + residential
+# egress + solve) is the reliable path. Give the CDP wss:// endpoint URL.
+#   Bright Data Scraping Browser: wss://brd-customer-<ID>-zone-<zone>:<PASS>@brd.superproxy.io:9222
+#   Browserbase:                  wss://connect.browserbase.com?apiKey=<KEY>
+[[vendor]]
+name = "brightdata_scraping_browser"
+type = "managed_cdp"
+cdp_url = "wss://brd-customer-<ID>-zone-scraping_browser:<PASS>@brd.superproxy.io:9222"

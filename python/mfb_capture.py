@@ -28,7 +28,8 @@ _EXTRA_TABS = ("box_score", "team_stats", "individual_stats", "drives", "officia
 
 
 def bundle_path(contest_id: "str | int", out_dir: "str | Path") -> Path:
-    return Path(out_dir) / "json" / f"{contest_id}.json.gz"
+    # mfb/json/ mirrors the mbb/wbb sibling layout ({lg}/json/{id}.json.gz).
+    return Path(out_dir) / "mfb" / "json" / f"{contest_id}.json.gz"
 
 
 def is_captured(contest_id: "str | int", out_dir: "str | Path") -> bool:
@@ -40,7 +41,9 @@ def _looks_real(html: "Optional[str]") -> bool:
     return bool(html) and len(html) >= _MIN_PBP_BYTES and "drives" in html.lower()
 
 
-def capture_contest(fetch_fn: FetchFn, contest_id: "str | int", out_dir: "str | Path") -> str:
+def capture_contest(
+    fetch_fn: FetchFn, contest_id: "str | int", out_dir: "str | Path"
+) -> str:
     """Fetch + persist one contest bundle.
 
     Returns ``"skipped"`` (already captured), ``"captured"``, or ``"failed"``
@@ -75,6 +78,7 @@ def capture_season(
     *,
     max_contests: "Optional[int]" = None,
     max_consecutive_failures: int = 25,
+    log_every: int = 10,
 ) -> "dict[str, int]":
     """Capture every not-yet-captured contest. Idempotent; hard-stops on a storm.
 
@@ -100,6 +104,12 @@ def capture_season(
         result = capture_contest(fetch_fn, contest_id, out_dir)
         stats[result] += 1
         consecutive = consecutive + 1 if result == "failed" else 0
+        if (
+            log_every
+            and result != "skipped"
+            and (stats["captured"] + stats["failed"]) % log_every == 0
+        ):
+            print(f"games: {stats}", flush=True)
         if consecutive >= max_consecutive_failures:
             raise RuntimeError(
                 f"{consecutive} consecutive failures -- breaker tripped "

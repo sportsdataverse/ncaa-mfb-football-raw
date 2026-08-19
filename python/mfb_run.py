@@ -1,12 +1,21 @@
-"""Live end-to-end runner: discover an MFB season -> capture raw pbp bundles.
+"""Live end-to-end runner: discover an MFB season -> capture rosters + raw bundles.
 
-Holds ONE browser session (no per-call relaunch -> avoids the patchright EPIPE
-relaunch storm). Proxy pool comes from ``MFB_PROXY_POOL`` (comma-separated US
-residential sticky sessions). Chunk with ``--max-contests`` until IP rotation at
-scale is hardened (see docs/DESIGN.md open risks).
+Holds ONE transport session (no per-call relaunch -> avoids the patchright EPIPE
+relaunch storm). Transport preference order:
 
-    MFB_PROXY_POOL="http://user:pass@us.decodo.com:10001,...:10002" \\
-        python mfb_run.py --academic-year 2025 --division 11 --out .. --max-contests 20
+1. ``NCAA_VENDOR`` (e.g. ``decodo_patchright``) -- the canary-proven transport
+   from ``canary_vendors.toml`` at the repo root (Decodo US sticky residential;
+   sticky session ids re-minted per run). This is what the mbb/wbb sweeps ride.
+2. ``MFB_PROXY_POOL`` (comma-separated US residential proxy URLs) driving a
+   plain ``NcaaFetcher.with_browser`` session.
+
+    NCAA_VENDOR=decodo_patchright \\
+        python mfb_run.py --academic-year 2026 --division 11 --out .. --max-contests 20
+
+Discovery persists the team list (``mfb/teams/html/``) and every team page
+(``mfb/schedules/html/{ay}/`` -- the schedule source) as a side effect;
+``--rosters`` additionally sweeps ``teams/{id}/roster`` pages. All stages are
+file-exists resumable.
 """
 
 from __future__ import annotations
@@ -16,13 +25,22 @@ import os
 import sys
 
 from mfb_capture import capture_season
-from mfb_discover import browser_fetch_fn, discover_season
+from mfb_discover import (
+    browser_fetch_fn,
+    capture_rosters,
+    discover_season,
+    discover_teams,
+    vendor_fetch_fn,
+)
 
 
 def main(argv: "list[str] | None" = None) -> int:
     ap = argparse.ArgumentParser(description=__doc__)
     ap.add_argument(
-        "--academic-year", type=int, default=2025, help="2025 = fall-2024 season"
+        "--academic-year",
+        type=int,
+        default=2026,
+        help="ENDING year: 2026 = fall-2025 season",
     )
     ap.add_argument("--division", type=int, default=11, help="11 = FBS, 12 = FCS")
     ap.add_argument("--out", default="..", help="repo root for the mfb/ raw tree")
@@ -32,22 +50,50 @@ def main(argv: "list[str] | None" = None) -> int:
         default=None,
         help="stop after N new captures (chunk)",
     )
+    ap.add_argument(
+        "--rosters", action="store_true", help="also sweep teams/{id}/roster pages"
+    )
+    ap.add_argument(
+        "--skip-games",
+        action="store_true",
+        help="discovery (+ rosters) only; no game bundles",
+    )
     args = ap.parse_args(argv)
 
-    pool = [p for p in os.environ.get("MFB_PROXY_POOL", "").split(",") if p.strip()]
-    if not pool:
+    if os.environ.get("NCAA_VENDOR"):
         print(
-            "WARNING: MFB_PROXY_POOL empty -- capture needs a US residential proxy pool",
-            file=sys.stderr,
+            f"transport: NCAA_VENDOR={os.environ['NCAA_VENDOR']} (canary_vendors.toml)",
+            flush=True,
         )
-    fetch = browser_fetch_fn(proxy_pool=pool or None)
+        fetch = vendor_fetch_fn(args.out)
+    else:
+        pool = [p for p in os.environ.get("MFB_PROXY_POOL", "").split(",") if p.strip()]
+        if not pool:
+            print(
+                "WARNING: no NCAA_VENDOR and MFB_PROXY_POOL empty -- capture needs a "
+                "US residential transport",
+                file=sys.stderr,
+            )
+        fetch = browser_fetch_fn(proxy_pool=pool or None)
 
-    ids = discover_season(args.academic_year, args.division, fetch_fn=fetch)
+    teams = discover_teams(
+        args.academic_year, args.division, fetch_fn=fetch, save_dir=args.out
+    )
     print(
-        f"discovered {len(ids)} MFB contests (ay={args.academic_year} div={args.division})",
+        f"discovered {len(teams)} MFB teams (ay={args.academic_year} div={args.division})",
         flush=True,
     )
+    ids = discover_season(
+        args.academic_year, args.division, fetch_fn=fetch, save_dir=args.out
+    )
+    print(f"discovered {len(ids)} MFB contests", flush=True)
 
+    if args.rosters:
+        rstats = capture_rosters(teams, fetch, args.out, args.academic_year)
+        print(f"rosters: {rstats}", flush=True)
+
+    if args.skip_games:
+        return 0
     stats = capture_season(ids, fetch, args.out, max_contests=args.max_contests)
     print(f"capture: {stats}", flush=True)
     # non-zero only if nothing captured AND something failed (a real ban), so a
