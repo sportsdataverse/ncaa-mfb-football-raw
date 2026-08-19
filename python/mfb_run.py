@@ -58,14 +58,22 @@ def main(argv: "list[str] | None" = None) -> int:
         action="store_true",
         help="discovery (+ rosters) only; no game bundles",
     )
+    ap.add_argument(
+        "--shard",
+        default="0/1",
+        help="i/N parallel-worker shard: worker i of N takes contests[i::N] and a "
+        "disjoint slice of the sticky-port pool (run N separate PROCESSES)",
+    )
     args = ap.parse_args(argv)
+    shard_i, shard_n = (int(x) for x in args.shard.split("/", 1))
 
     if os.environ.get("NCAA_VENDOR"):
         print(
-            f"transport: NCAA_VENDOR={os.environ['NCAA_VENDOR']} (canary_vendors.toml)",
+            f"transport: NCAA_VENDOR={os.environ['NCAA_VENDOR']} (canary_vendors.toml) "
+            f"shard {shard_i}/{shard_n}",
             flush=True,
         )
-        fetch = vendor_fetch_fn(args.out)
+        fetch = vendor_fetch_fn(args.out, shard_i=shard_i, shard_n=shard_n)
     else:
         pool = [p for p in os.environ.get("MFB_PROXY_POOL", "").split(",") if p.strip()]
         if not pool:
@@ -94,6 +102,9 @@ def main(argv: "list[str] | None" = None) -> int:
 
     if args.skip_games:
         return 0
+    if shard_n > 1:
+        ids = ids[shard_i::shard_n]
+        print(f"shard {shard_i}/{shard_n}: {len(ids)} contests", flush=True)
     stats = capture_season(ids, fetch, args.out, max_contests=args.max_contests)
     print(f"capture: {stats}", flush=True)
     # non-zero only if nothing captured AND something failed (a real ban), so a
