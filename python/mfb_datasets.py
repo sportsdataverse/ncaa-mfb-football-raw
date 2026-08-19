@@ -268,7 +268,12 @@ def build_game_datasets(
     sdv_py = "/mnt/sdv_repos/sdv-py"
     if sdv_py not in sys.path:
         sys.path.insert(0, sdv_py)
-    from mfb_cfbfastr import parse_drive_titles, to_cfbfastr
+    from mfb_cfbfastr import (
+        parse_drive_titles,
+        parse_ot_drives,
+        parse_scoring_summary,
+        to_cfbfastr,
+    )
     from sportsdataverse.cfb.cfb_ncaa_box import (
         parse_cfb_ncaa_drives,
         parse_cfb_ncaa_linescore,
@@ -311,6 +316,10 @@ def build_game_datasets(
                     drives=drives,
                     linescore=linescore,
                     drive_titles=parse_drive_titles(bundle.get("play_by_play") or ""),
+                    ot_drives=parse_ot_drives(bundle.get("drives") or ""),
+                    scoring_summary=parse_scoring_summary(
+                        bundle.get("box_score") or ""
+                    ),
                 )
             )
             acc.setdefault("drives", []).append(drives)

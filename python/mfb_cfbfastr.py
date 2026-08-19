@@ -41,7 +41,7 @@ _DRIVE_TITLE_RE = re.compile(
     r"^(?P<team>.+?)(?:\s+(?P<result>[A-Z/]{2,10}))?\s+"
     # side codes can be MIXED case ("Ric25" for Rice) -- [A-Z]-only drops
     # every such team's drives (the graduated parser shares this bug).
-    r"(?P<start_clock>\d+:\d+),(?P<start_yard_line>[A-Za-z]{1,4}\d+),\s+"
+    r"(?P<start_clock>\d+:\d+),(?P<start_yard_line>[A-Za-z&]{1,4}\d+),\s+"
     r"(?P<n_plays>\d+)\s+plays?,\s+(?P<yards>-?\d+)\s+yards?,\s+"
     r"(?P<top>\d+:\d+)\s+(?P<score_away>\d+)\s*-\s*(?P<score_home>\d+)\s*$"
 )
@@ -99,6 +99,138 @@ def parse_drive_titles(html: str) -> pl.DataFrame:
 #: play rows that are game furniture, not plays (dropped from the cfbfastR frame
 #: after they've fed the stateful pass).
 _MARKER_TYPES = {"drive_start", "coin_toss"}
+
+
+_OT_PERIOD_RE = re.compile(r"^(\d+)OT$")
+
+
+def _period_num(s: "str | None") -> "int | None":
+    """'3' -> 3, '1OT' -> 5, '2OT' -> 6."""
+    if not s:
+        return None
+    m = _OT_PERIOD_RE.match(s)
+    if m:
+        return 4 + int(m.group(1))
+    return int(s) if s.isdigit() else None
+
+
+def parse_scoring_summary(box_html: str) -> pl.DataFrame:
+    """box_score ``scoring_summary_table`` -> one row per score.
+
+    Columns: ``period`` (int, OT -> 5+), ``clock``, ``team`` ("Has Ball" --
+    often empty), ``play_text`` (real description; empty for some OT rows),
+    ``n_plays``, ``yards``, ``top``, ``score_away``/``score_home`` (running).
+    The table's ``tr``s concatenate logical rows, so cells are re-chunked by 9.
+    """
+    from bs4 import BeautifulSoup
+
+    schema = {
+        "period": pl.Int64,
+        "clock": pl.Utf8,
+        "team": pl.Utf8,
+        "play_text": pl.Utf8,
+        "n_plays": pl.Int64,
+        "yards": pl.Int64,
+        "top": pl.Utf8,
+        "score_away": pl.Int64,
+        "score_home": pl.Int64,
+    }
+    soup = BeautifulSoup(box_html or "", "html.parser")
+    table = soup.find("table", id="scoring_summary_table")
+    rows: "list[dict]" = []
+    if table is not None:
+        cells = [c.get_text(" ", strip=True) for c in table.find_all(["th", "td"])]
+        # drop the title cell + the 9-cell header, then chunk by 9
+        flat = [c for c in cells if c != "Scoring Summary"]
+        if len(flat) >= 9 and flat[0] == "Period":
+            flat = flat[9:]
+        for i in range(0, len(flat) - 8, 9):
+            chunk = flat[i : i + 9]
+            period = _period_num(chunk[0])
+            if period is None:
+                continue
+            rows.append(
+                {
+                    "period": period,
+                    "clock": chunk[1] or None,
+                    "team": chunk[2] or None,
+                    "play_text": chunk[3] or None,
+                    "n_plays": int(chunk[4]) if chunk[4].isdigit() else None,
+                    "yards": int(chunk[5].lstrip("-"))
+                    * (-1 if chunk[5].startswith("-") else 1)
+                    if chunk[5].lstrip("-").isdigit()
+                    else None,
+                    "top": chunk[6] or None,
+                    "score_away": int(chunk[7]) if chunk[7].isdigit() else None,
+                    "score_home": int(chunk[8]) if chunk[8].isdigit() else None,
+                }
+            )
+    # the tr-concatenation duplicates rows; dedup preserving order
+    df = pl.DataFrame(rows, schema=schema) if rows else pl.DataFrame(schema=schema)
+    return df.unique(maintain_order=True)
+
+
+def parse_ot_drives(drives_html: str) -> pl.DataFrame:
+    """drives-tab rows whose Quarter is ``NOT`` a digit (``1OT``/``2OT``/...).
+
+    The graduated ``parse_cfb_ncaa_drives`` nulls the OT quarter, so this
+    re-reads the raw table keeping the true OT period number.
+    """
+    from bs4 import BeautifulSoup
+
+    schema = {
+        "drive_number": pl.Int64,
+        "period": pl.Int64,
+        "team": pl.Utf8,
+        "start_how": pl.Utf8,
+        "start_yard_line": pl.Utf8,
+        "end_how": pl.Utf8,
+        "end_yard_line": pl.Utf8,
+        "n_plays": pl.Int64,
+        "yards": pl.Int64,
+    }
+    soup = BeautifulSoup(drives_html or "", "html.parser")
+    table = soup.find("table", id="public_game_drives_data_table")
+    rows: "list[dict]" = []
+    if table is not None:
+        for tr in table.find_all("tr")[1:]:
+            r = [c.get_text(" ", strip=True) for c in tr.find_all(["th", "td"])]
+            if len(r) < 13 or not (r[0] or "").isdigit():
+                continue
+            period = _period_num(r[1])
+            if period is None or period <= 4:
+                continue
+            rows.append(
+                {
+                    "drive_number": int(r[0]),
+                    "period": period,
+                    "team": r[2] or None,
+                    "start_how": r[4] or None,
+                    "start_yard_line": r[6] or None,
+                    "end_how": r[8] or None,
+                    "end_yard_line": r[10] or None,
+                    "n_plays": int(r[11]) if r[11].isdigit() else None,
+                    "yards": int(r[12].lstrip("-"))
+                    * (-1 if r[12].startswith("-") else 1)
+                    if r[12].lstrip("-").isdigit()
+                    else None,
+                }
+            )
+    return pl.DataFrame(rows, schema=schema) if rows else pl.DataFrame(schema=schema)
+
+
+#: end_how -> approximate cfbfastR play_type label for synthesized OT rows.
+_OT_END_HOW_LABEL = {
+    "TD": "Touchdown",
+    "FG": "Field Goal Good",
+    "FGA": "Field Goal Missed",
+    "PUNT": "Punt",
+    "INT": "Pass Interception Return",
+    "FUMB": "Fumble Recovery (Opponent)",
+    "DOWNS": "Turnover on Downs",
+    "HALF": "End of Game",
+    "END": "End of Game",
+}
 
 
 def _first_last(name: "str | None") -> "str | None":
@@ -188,6 +320,8 @@ def to_cfbfastr(
     drives: "Optional[pl.DataFrame]" = None,
     linescore: "Optional[pl.DataFrame]" = None,
     drive_titles: "Optional[pl.DataFrame]" = None,
+    ot_drives: "Optional[pl.DataFrame]" = None,
+    scoring_summary: "Optional[pl.DataFrame]" = None,
 ) -> pl.DataFrame:
     """cfbfastR-named play frame from the NCAA structural pbp frame.
 
@@ -384,7 +518,7 @@ def to_cfbfastr(
             ytg = 100 - num if own_side[offense] == side else num
         end_ytg = None
         eyl = r["end_yard_line"] or ""
-        em = re.match(r"([A-Za-z]{1,4})(\d+)$", eyl)
+        em = re.match(r"([A-Za-z&]{1,4})(\d+)$", eyl)
         if em and offense in own_side:
             end_ytg = (
                 100 - int(em.group(2))
@@ -533,8 +667,99 @@ def to_cfbfastr(
                 "yds_fg": r["fg_distance"],
                 "drive_result": r["drive_result"],
                 "drive_scoring": r["drive_scored"],
+                "ot_synthesized": False,
             }
         )
+
+    # --- OT synthesis: stats.ncaa.org pbp pages omit OT drives. Rebuild them
+    # (one row per drive) from the drives tab, with scores walked through the
+    # scoring-summary running-score checkpoints. Rows are flagged
+    # ot_synthesized=True; play_text is the summary's real description when it
+    # ships one, else an honest synthesized descriptor.
+    max_pbp_drive = max(
+        (r["drive_number"] for r in rows if r["drive_number"]), default=0
+    )
+    if rows and ot_drives is not None and ot_drives.height:
+        ot_checkpoints = (
+            scoring_summary.filter(pl.col("period") > 4).to_dicts()
+            if scoring_summary is not None and scoring_summary.height
+            else []
+        )
+        template = dict.fromkeys(rows[-1].keys())
+        for od in sorted(ot_drives.to_dicts(), key=lambda d: d["drive_number"]):
+            if od["drive_number"] <= max_pbp_drive:
+                continue  # this OT drive IS on the pbp page already
+            offense = od["team"]
+            defense = next((t for t in teams if t != offense), None)
+            scoring = od["end_how"] in ("TD", "FG", "SAF")
+            summary_text = None
+            if scoring and ot_checkpoints:
+                cp = ot_checkpoints.pop(0)
+                summary_text = cp["play_text"]
+                if away in score and home in score and cp["score_away"] is not None:
+                    score[away], score[home] = cp["score_away"], cp["score_home"]
+            elif scoring and offense in score:
+                score[offense] += 3 if od["end_how"] == "FG" else 6
+            game_play_number += 1
+            half_play_number += 1
+            pos_s = score.get(offense) if offense else None
+            def_s = score.get(defense) if defense else None
+            row = dict(template)
+            row.update(
+                {
+                    "game_id": gid,
+                    "id_play": gid * 10_000 + game_play_number if gid else None,
+                    "drive_id": gid * 100 + od["drive_number"] if gid else None,
+                    "game_play_number": game_play_number,
+                    "half_play_number": half_play_number,
+                    "drive_play_number": 1,
+                    "drive_number": od["drive_number"],
+                    "season": season,
+                    "year": season,
+                    "week": week,
+                    "period": od["period"],
+                    "half": 3,
+                    "pos_team": offense,
+                    "def_pos_team": defense,
+                    "offense_play": offense,
+                    "defense_play": defense,
+                    "home": home,
+                    "away": away,
+                    "pos_team_score": pos_s,
+                    "def_pos_team_score": def_s,
+                    "offense_score": pos_s,
+                    "defense_score": def_s,
+                    "pos_score_diff": pos_s - def_s
+                    if pos_s is not None and def_s is not None
+                    else None,
+                    "scoring_play": scoring,
+                    "scoring": scoring,
+                    "yard_line": od["start_yard_line"],
+                    "play_type": _OT_END_HOW_LABEL.get(od["end_how"], od["end_how"]),
+                    "orig_play_type": "ot_drive",
+                    "play_text": summary_text
+                    or (
+                        f"{offense} OT drive ({od['end_how']}): "
+                        f"{od['n_plays']} plays, {od['yards']} yards, "
+                        f"{od['start_yard_line']} to {od['end_yard_line']}"
+                    ),
+                    "touchdown": od["end_how"] == "TD",
+                    "td_play": od["end_how"] == "TD",
+                    "fg_inds": od["end_how"] in ("FG", "FGA"),
+                    "fg_made": od["end_how"] == "FG"
+                    if od["end_how"] in ("FG", "FGA")
+                    else None,
+                    "punt": od["end_how"] == "PUNT",
+                    "punt_play": od["end_how"] == "PUNT",
+                    "int": od["end_how"] == "INT",
+                    "turnover_vec": od["end_how"] in ("INT", "FUMB", "DOWNS"),
+                    "downs_turnover": od["end_how"] == "DOWNS",
+                    "drive_result": od["end_how"],
+                    "drive_scoring": scoring,
+                    "ot_synthesized": True,
+                }
+            )
+            rows.append(row)
 
     df = pl.DataFrame(rows, infer_schema_length=None)
     # window/lag bookkeeping over the ordered game
