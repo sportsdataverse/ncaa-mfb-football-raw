@@ -297,33 +297,40 @@ def build_game_datasets(
         with gzip.open(p, "rt", encoding="utf-8") as fh:
             bundle = json.load(fh)
         n += 1
-        pbp = parse_cfb_ncaa_pbp(bundle.get("play_by_play") or "", contest_id=cid)
-        drives = parse_cfb_ncaa_drives(bundle.get("drives") or "", contest_id=cid)
-        linescore = parse_cfb_ncaa_linescore(
-            bundle.get("box_score") or "", contest_id=cid
-        )
-        acc.setdefault("pbp", []).append(pbp)
-        acc.setdefault("pbp_cfbfastr", []).append(
-            to_cfbfastr(
-                pbp,
-                season=season,
-                drives=drives,
-                linescore=linescore,
-                drive_titles=parse_drive_titles(bundle.get("play_by_play") or ""),
+        try:
+            pbp = parse_cfb_ncaa_pbp(bundle.get("play_by_play") or "", contest_id=cid)
+            drives = parse_cfb_ncaa_drives(bundle.get("drives") or "", contest_id=cid)
+            linescore = parse_cfb_ncaa_linescore(
+                bundle.get("box_score") or "", contest_id=cid
             )
-        )
-        acc.setdefault("drives", []).append(drives)
-        acc.setdefault("linescore", []).append(linescore)
-        acc.setdefault("team_stats", []).append(
-            parse_cfb_ncaa_team_stats(bundle.get("team_stats") or "", contest_id=cid)
-        )
-        acc.setdefault("officials", []).append(
-            parse_cfb_ncaa_officials(bundle.get("officials") or "", contest_id=cid)
-        )
-        for cat, frame in parse_cfb_ncaa_player_stats(
-            bundle.get("individual_stats") or "", contest_id=cid
-        ).items():
-            player_acc.setdefault(cat, []).append(frame)
+            acc.setdefault("pbp", []).append(pbp)
+            acc.setdefault("pbp_cfbfastr", []).append(
+                to_cfbfastr(
+                    pbp,
+                    season=season,
+                    drives=drives,
+                    linescore=linescore,
+                    drive_titles=parse_drive_titles(bundle.get("play_by_play") or ""),
+                )
+            )
+            acc.setdefault("drives", []).append(drives)
+            acc.setdefault("linescore", []).append(linescore)
+            acc.setdefault("team_stats", []).append(
+                parse_cfb_ncaa_team_stats(
+                    bundle.get("team_stats") or "", contest_id=cid
+                )
+            )
+            acc.setdefault("officials", []).append(
+                parse_cfb_ncaa_officials(bundle.get("officials") or "", contest_id=cid)
+            )
+            for cat, frame in parse_cfb_ncaa_player_stats(
+                bundle.get("individual_stats") or "", contest_id=cid
+            ).items():
+                player_acc.setdefault(cat, []).append(frame)
+        except Exception as exc:  # noqa: BLE001 - one weird game must not sink the season build
+            print(
+                f"PARSE FAILED contest {cid}: {type(exc).__name__}: {exc}", flush=True
+            )
 
     out_dir = root / "mfb" / "datasets" / str(academic_year)
     out_dir.mkdir(parents=True, exist_ok=True)
@@ -346,10 +353,14 @@ def build_game_datasets(
                 "def_pos_team_score",
             )
         )
-        official = (
-            pl.concat(ls_frames, how="diagonal_relaxed")
-            .group_by("contest_id", "team")
-            .agg(pl.col("final").max())
+        ls_all = pl.concat(ls_frames, how="diagonal_relaxed")
+        official = ls_all.group_by("contest_id", "team").agg(pl.col("final").max())
+        # stats.ncaa.org pbp pages OMIT overtime drives -- a mismatch on a game
+        # whose linescore shows OT periods is that known source gap, not a bug.
+        ot_games = set(
+            ls_all.filter(pl.col("period").str.contains("OT"))
+            .get_column("contest_id")
+            .to_list()
         )
         qa_rows = []
         for r in last.to_dicts():
@@ -370,6 +381,7 @@ def build_game_datasets(
                     "official_final": ", ".join(f"{t} {s}" for t, s in o.items()),
                     "final_score_match": bool(o)
                     and all(o.get(t) == s for t, s in comp.items()),
+                    "ot_game": str(r["game_id"]) in ot_games,
                 }
             )
         qa = pl.DataFrame(qa_rows)

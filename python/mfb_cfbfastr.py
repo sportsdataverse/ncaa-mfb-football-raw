@@ -39,7 +39,9 @@ _KICK_GOOD_RE = re.compile(r"(?<!no )good", re.I)
 # result token is missing, truncating "East Carolina" to "East").
 _DRIVE_TITLE_RE = re.compile(
     r"^(?P<team>.+?)(?:\s+(?P<result>[A-Z/]{2,10}))?\s+"
-    r"(?P<start_clock>\d+:\d+),(?P<start_yard_line>[A-Z]{1,4}\d+),\s+"
+    # side codes can be MIXED case ("Ric25" for Rice) -- [A-Z]-only drops
+    # every such team's drives (the graduated parser shares this bug).
+    r"(?P<start_clock>\d+:\d+),(?P<start_yard_line>[A-Za-z]{1,4}\d+),\s+"
     r"(?P<n_plays>\d+)\s+plays?,\s+(?P<yards>-?\d+)\s+yards?,\s+"
     r"(?P<top>\d+:\d+)\s+(?P<score_away>\d+)\s*-\s*(?P<score_home>\d+)\s*$"
 )
@@ -249,8 +251,8 @@ def to_cfbfastr(
         for dn in sorted(checkpoint):
             ca, ch = checkpoint[dn]
             team = title_team.get(dn)
-            if team in teams:
-                other = next(t for t in teams if t != team)
+            other = next((t for t in teams if t != team), None)
+            if team in teams and other is not None:
                 if (
                     ca > prev[0]
                     and ch == prev[1]
@@ -382,7 +384,7 @@ def to_cfbfastr(
             ytg = 100 - num if own_side[offense] == side else num
         end_ytg = None
         eyl = r["end_yard_line"] or ""
-        em = re.match(r"([A-Z]{1,4})(\d+)$", eyl)
+        em = re.match(r"([A-Za-z]{1,4})(\d+)$", eyl)
         if em and offense in own_side:
             end_ytg = (
                 100 - int(em.group(2))
