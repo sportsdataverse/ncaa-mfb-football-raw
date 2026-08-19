@@ -32,68 +32,17 @@ _RET_YDS_RE = re.compile(r"return (\d+) yards", re.I)
 # XP/FG result: "good" appears in both cases and "NO GOOD"/"no good" must not match.
 _KICK_GOOD_RE = re.compile(r"(?<!no )good", re.I)
 
-# Drive h5 title: "{team} {RESULT} {clock},{yardline}, {n} plays, {yards} yards,
-# {top} {away} - {home}". RESULT is an ALL-CAPS token (TD/FG/FGA/PUNT/INT/FUMB/
-# DOWNS/HALF/...) -- anchoring on that keeps multi-word mixed-case team names
-# intact (the graduated parser's lazy .+? donates "Carolina" to result when the
-# result token is missing, truncating "East Carolina" to "East").
-_DRIVE_TITLE_RE = re.compile(
-    r"^(?P<team>.+?)(?:\s+(?P<result>[A-Z/]{2,10}))?\s+"
-    # side codes can be MIXED case ("Ric25" for Rice) -- [A-Z]-only drops
-    # every such team's drives (the graduated parser shares this bug).
-    r"(?P<start_clock>\d+:\d+),(?P<start_yard_line>[A-Za-z&]{1,4}\d+),\s+"
-    r"(?P<n_plays>\d+)\s+plays?,\s+(?P<yards>-?\d+)\s+yards?,\s+"
-    r"(?P<top>\d+:\d+)\s+(?P<score_away>\d+)\s*-\s*(?P<score_home>\d+)\s*$"
+# Drive-title + scoring-summary parsing GRADUATED to sdv-py (PR #375, merged
+# 3e643594). The local implementations are gone; these aliases keep this
+# repo's call/import surface (parse_drive_titles / parse_scoring_summary)
+# stable. Both graduated frames add a leading contest_id column (null when not
+# passed) that downstream consumers ignore by name.
+from sportsdataverse.cfb.cfb_ncaa_box import (  # noqa: E402
+    parse_cfb_ncaa_scoring_summary as parse_scoring_summary,
 )
-
-
-def parse_drive_titles(html: str) -> pl.DataFrame:
-    """Drive ``h5`` titles -> one row per drive with the running-score checkpoint.
-
-    Columns: ``drive_number``, ``team``, ``result``, ``start_clock``,
-    ``start_yard_line``, ``n_plays``, ``yards``, ``top`` (time of possession),
-    ``score_away``/``score_home`` (the game score AFTER the drive -- an
-    authoritative checkpoint the play-level running score snaps to).
-    """
-    from bs4 import BeautifulSoup
-
-    schema = {
-        "drive_number": pl.Int64,
-        "team": pl.Utf8,
-        "result": pl.Utf8,
-        "start_clock": pl.Utf8,
-        "start_yard_line": pl.Utf8,
-        "n_plays": pl.Int64,
-        "yards": pl.Int64,
-        "top": pl.Utf8,
-        "score_away": pl.Int64,
-        "score_home": pl.Int64,
-    }
-    soup = BeautifulSoup(html or "", "html.parser")
-    rows = []
-    n = 0
-    for container in soup.select("div.drives"):
-        for h5 in container.find_all("h5", recursive=False):
-            classes = h5.get("class") or []
-            if not ("scoring_play" in classes or "non_scoring_play" in classes):
-                continue
-            n += 1
-            m = _DRIVE_TITLE_RE.match(" ".join(h5.get_text(" ", strip=True).split()))
-            rows.append(
-                {
-                    "drive_number": n,
-                    "team": m.group("team") if m else None,
-                    "result": m.group("result") if m else None,
-                    "start_clock": m.group("start_clock") if m else None,
-                    "start_yard_line": m.group("start_yard_line") if m else None,
-                    "n_plays": int(m.group("n_plays")) if m else None,
-                    "yards": int(m.group("yards")) if m else None,
-                    "top": m.group("top") if m else None,
-                    "score_away": int(m.group("score_away")) if m else None,
-                    "score_home": int(m.group("score_home")) if m else None,
-                }
-            )
-    return pl.DataFrame(rows, schema=schema) if rows else pl.DataFrame(schema=schema)
+from sportsdataverse.cfb.cfb_ncaa_pbp import (  # noqa: E402
+    parse_cfb_ncaa_drive_titles as parse_drive_titles,
+)
 
 
 #: play rows that are game furniture, not plays (dropped from the cfbfastR frame
@@ -114,67 +63,12 @@ def _period_num(s: "str | None") -> "int | None":
     return int(s) if s.isdigit() else None
 
 
-def parse_scoring_summary(box_html: str) -> pl.DataFrame:
-    """box_score ``scoring_summary_table`` -> one row per score.
-
-    Columns: ``period`` (int, OT -> 5+), ``clock``, ``team`` ("Has Ball" --
-    often empty), ``play_text`` (real description; empty for some OT rows),
-    ``n_plays``, ``yards``, ``top``, ``score_away``/``score_home`` (running).
-    The table's ``tr``s concatenate logical rows, so cells are re-chunked by 9.
-    """
-    from bs4 import BeautifulSoup
-
-    schema = {
-        "period": pl.Int64,
-        "clock": pl.Utf8,
-        "team": pl.Utf8,
-        "play_text": pl.Utf8,
-        "n_plays": pl.Int64,
-        "yards": pl.Int64,
-        "top": pl.Utf8,
-        "score_away": pl.Int64,
-        "score_home": pl.Int64,
-    }
-    soup = BeautifulSoup(box_html or "", "html.parser")
-    table = soup.find("table", id="scoring_summary_table")
-    rows: "list[dict]" = []
-    if table is not None:
-        cells = [c.get_text(" ", strip=True) for c in table.find_all(["th", "td"])]
-        # drop the title cell + the 9-cell header, then chunk by 9
-        flat = [c for c in cells if c != "Scoring Summary"]
-        if len(flat) >= 9 and flat[0] == "Period":
-            flat = flat[9:]
-        for i in range(0, len(flat) - 8, 9):
-            chunk = flat[i : i + 9]
-            period = _period_num(chunk[0])
-            if period is None:
-                continue
-            rows.append(
-                {
-                    "period": period,
-                    "clock": chunk[1] or None,
-                    "team": chunk[2] or None,
-                    "play_text": chunk[3] or None,
-                    "n_plays": int(chunk[4]) if chunk[4].isdigit() else None,
-                    "yards": int(chunk[5].lstrip("-"))
-                    * (-1 if chunk[5].startswith("-") else 1)
-                    if chunk[5].lstrip("-").isdigit()
-                    else None,
-                    "top": chunk[6] or None,
-                    "score_away": int(chunk[7]) if chunk[7].isdigit() else None,
-                    "score_home": int(chunk[8]) if chunk[8].isdigit() else None,
-                }
-            )
-    # the tr-concatenation duplicates rows; dedup preserving order
-    df = pl.DataFrame(rows, schema=schema) if rows else pl.DataFrame(schema=schema)
-    return df.unique(maintain_order=True)
-
-
 def parse_ot_drives(drives_html: str) -> pl.DataFrame:
     """drives-tab rows whose Quarter is ``NOT`` a digit (``1OT``/``2OT``/...).
 
-    The graduated ``parse_cfb_ncaa_drives`` nulls the OT quarter, so this
-    re-reads the raw table keeping the true OT period number.
+    Still local: the graduated ``parse_cfb_ncaa_drives`` now carries ``period``
+    but NOT the ``# Plays``/``Yards`` columns the synthesized OT play_text
+    needs -- graduate this too once DRIVES_SCHEMA grows n_plays/yards.
     """
     from bs4 import BeautifulSoup
 
