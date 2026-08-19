@@ -32,6 +32,68 @@ _RET_YDS_RE = re.compile(r"return (\d+) yards", re.I)
 # XP/FG result: "good" appears in both cases and "NO GOOD"/"no good" must not match.
 _KICK_GOOD_RE = re.compile(r"(?<!no )good", re.I)
 
+# Drive h5 title: "{team} {RESULT} {clock},{yardline}, {n} plays, {yards} yards,
+# {top} {away} - {home}". RESULT is an ALL-CAPS token (TD/FG/FGA/PUNT/INT/FUMB/
+# DOWNS/HALF/...) -- anchoring on that keeps multi-word mixed-case team names
+# intact (the graduated parser's lazy .+? donates "Carolina" to result when the
+# result token is missing, truncating "East Carolina" to "East").
+_DRIVE_TITLE_RE = re.compile(
+    r"^(?P<team>.+?)(?:\s+(?P<result>[A-Z/]{2,10}))?\s+"
+    r"(?P<start_clock>\d+:\d+),(?P<start_yard_line>[A-Z]{1,4}\d+),\s+"
+    r"(?P<n_plays>\d+)\s+plays?,\s+(?P<yards>-?\d+)\s+yards?,\s+"
+    r"(?P<top>\d+:\d+)\s+(?P<score_away>\d+)\s*-\s*(?P<score_home>\d+)\s*$"
+)
+
+
+def parse_drive_titles(html: str) -> pl.DataFrame:
+    """Drive ``h5`` titles -> one row per drive with the running-score checkpoint.
+
+    Columns: ``drive_number``, ``team``, ``result``, ``start_clock``,
+    ``start_yard_line``, ``n_plays``, ``yards``, ``top`` (time of possession),
+    ``score_away``/``score_home`` (the game score AFTER the drive -- an
+    authoritative checkpoint the play-level running score snaps to).
+    """
+    from bs4 import BeautifulSoup
+
+    schema = {
+        "drive_number": pl.Int64,
+        "team": pl.Utf8,
+        "result": pl.Utf8,
+        "start_clock": pl.Utf8,
+        "start_yard_line": pl.Utf8,
+        "n_plays": pl.Int64,
+        "yards": pl.Int64,
+        "top": pl.Utf8,
+        "score_away": pl.Int64,
+        "score_home": pl.Int64,
+    }
+    soup = BeautifulSoup(html or "", "html.parser")
+    rows = []
+    n = 0
+    for container in soup.select("div.drives"):
+        for h5 in container.find_all("h5", recursive=False):
+            classes = h5.get("class") or []
+            if not ("scoring_play" in classes or "non_scoring_play" in classes):
+                continue
+            n += 1
+            m = _DRIVE_TITLE_RE.match(" ".join(h5.get_text(" ", strip=True).split()))
+            rows.append(
+                {
+                    "drive_number": n,
+                    "team": m.group("team") if m else None,
+                    "result": m.group("result") if m else None,
+                    "start_clock": m.group("start_clock") if m else None,
+                    "start_yard_line": m.group("start_yard_line") if m else None,
+                    "n_plays": int(m.group("n_plays")) if m else None,
+                    "yards": int(m.group("yards")) if m else None,
+                    "top": m.group("top") if m else None,
+                    "score_away": int(m.group("score_away")) if m else None,
+                    "score_home": int(m.group("score_home")) if m else None,
+                }
+            )
+    return pl.DataFrame(rows, schema=schema) if rows else pl.DataFrame(schema=schema)
+
+
 #: play rows that are game furniture, not plays (dropped from the cfbfastR frame
 #: after they've fed the stateful pass).
 _MARKER_TYPES = {"drive_start", "coin_toss"}
@@ -123,6 +185,7 @@ def to_cfbfastr(
     week: "Optional[int]" = None,
     drives: "Optional[pl.DataFrame]" = None,
     linescore: "Optional[pl.DataFrame]" = None,
+    drive_titles: "Optional[pl.DataFrame]" = None,
 ) -> pl.DataFrame:
     """cfbfastR-named play frame from the NCAA structural pbp frame.
 
@@ -134,14 +197,42 @@ def to_cfbfastr(
             per drive when quarter markers are missing from the pbp page.
         linescore: optional ``parse_cfb_ncaa_linescore`` frame -- provides
             ``home``/``away`` team names.
+        drive_titles: optional :func:`parse_drive_titles` frame -- authoritative
+            per-drive team labels (fixes graduated-parser team truncation) and
+            running-score checkpoints the play-level score snaps to at each
+            drive boundary (self-heals OT scoring rules + missed events).
 
     Returns:
         One row per play (markers/furniture dropped) with cfbfastR-named columns.
     """
     if pbp.height == 0:
         return pl.DataFrame()
+    title_team: "dict[int, str]" = {}
+    checkpoint: "dict[int, tuple[int, int]]" = {}  # drive -> (score_away, score_home)
+    title_result: "dict[int, str]" = {}
+    if drive_titles is not None and drive_titles.height:
+        for t in drive_titles.to_dicts():
+            dn = t["drive_number"]
+            if t["team"]:
+                title_team[dn] = t["team"]
+            if t["result"]:
+                title_result[dn] = t["result"]
+            if t["score_away"] is not None and t["score_home"] is not None:
+                checkpoint[dn] = (t["score_away"], t["score_home"])
+    if title_team:
+        # authoritative per-drive team labels fix truncated offense values
+        pbp = pbp.with_columns(
+            pl.col("drive_number")
+            .replace_strict(title_team, default=None, return_dtype=pl.Utf8)
+            .fill_null(pl.col("offense"))
+            .alias("offense")
+        )
     own_side = _own_side(pbp)
-    teams = [t for t in pbp.get_column("offense").unique().to_list() if t]
+    teams = (
+        sorted(set(title_team.values()))
+        if len(set(title_team.values())) == 2
+        else [t for t in pbp.get_column("offense").unique().to_list() if t]
+    )
     home = away = None
     if linescore is not None and linescore.height:
         ls = linescore.group_by("team", "home_away").len()
@@ -150,6 +241,31 @@ def to_cfbfastr(
                 home = r["team"]
             elif r["home_away"] == "away":
                 away = r["team"]
+    # away/home slot inference from checkpoints when the linescore is absent or
+    # its names don't match the drive-title labels: the first scoring drive
+    # whose checkpoint moved exactly one slot pins its team to that slot.
+    if checkpoint and (away not in teams or home not in teams):
+        prev = (0, 0)
+        for dn in sorted(checkpoint):
+            ca, ch = checkpoint[dn]
+            team = title_team.get(dn)
+            if team in teams:
+                other = next(t for t in teams if t != team)
+                if (
+                    ca > prev[0]
+                    and ch == prev[1]
+                    and title_result.get(dn) in ("TD", "FG")
+                ):
+                    away, home = team, other
+                    break
+                if (
+                    ch > prev[1]
+                    and ca == prev[0]
+                    and title_result.get(dn) in ("TD", "FG")
+                ):
+                    home, away = team, other
+                    break
+            prev = (ca, ch)
     drive_period: "dict[int, int]" = {}
     if drives is not None and drives.height:
         drive_period = {
@@ -167,10 +283,25 @@ def to_cfbfastr(
     game_play_number = 0
     half_play_number = 0
     prev_half = 1
+    prev_drive: "Optional[int]" = None
     rows: "list[dict]" = []
     drive_play_counter: "dict[int, int]" = {}
 
-    for r in pbp.to_dicts():
+    def _snap(drive: "Optional[int]") -> None:
+        """Snap the running score to the title checkpoint of a finished drive."""
+        if drive in checkpoint and away in score and home in score:
+            score[away], score[home] = checkpoint[drive]
+
+    all_rows = pbp.to_dicts()
+    # the checkpoint is the score AFTER a drive, so the drive's LAST play must
+    # emit exactly it (event-sourcing can't see OT-shootout scoring rules).
+    last_play_of_drive: "dict[int, int]" = {
+        r["drive_number"]: i
+        for i, r in enumerate(all_rows)
+        if r["drive_number"] is not None
+    }
+
+    for i, r in enumerate(all_rows):
         text = r["play_text"] or ""
         qm = _QTR_MARKER_RE.search(text.lower())
         if qm:
@@ -182,7 +313,11 @@ def to_cfbfastr(
             half_play_number = 0
             prev_half = half
 
-        offense = r["offense"]
+        if r["drive_number"] != prev_drive:
+            _snap(prev_drive)
+            prev_drive = r["drive_number"]
+
+        offense = title_team.get(r["drive_number"]) or r["offense"]
         defense = next((t for t in teams if t != offense), None) if offense else None
 
         # running score -- award points to the right side of the ball
@@ -222,6 +357,8 @@ def to_cfbfastr(
             score[offense] = score.get(offense, 0) + pts_off
         if defense and pts_def:
             score[defense] = score.get(defense, 0) + pts_def
+        if last_play_of_drive.get(r["drive_number"]) == i:
+            _snap(r["drive_number"])
 
         if r["play_type"] in _MARKER_TYPES:
             continue
