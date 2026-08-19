@@ -355,6 +355,38 @@ def to_cfbfastr(
                 title_result[dn] = t["result"]
             if t["score_away"] is not None and t["score_home"] is not None:
                 checkpoint[dn] = (t["score_away"], t["score_home"])
+    # Some (FCS) pages label every drive h5 with the DEFENSE. The per-drive
+    # "X drive start at MM:SS" markers name the true offense, so majority-vote
+    # the markers against the titles (prefix-matched -- markers use name
+    # variants like "Southern (La.)" for title "Southern U.") and flip the
+    # whole page's title assignment when the majority disagree.
+    if title_team and len(set(title_team.values())) == 2:
+        two = sorted(set(title_team.values()))
+
+        def _match(marker: str) -> "Optional[str]":
+            scores = {t: 0 for t in two}
+            for t in two:
+                n = 0
+                for a, b in zip(marker.lower(), t.lower()):
+                    if a != b:
+                        break
+                    n += 1
+                scores[t] = n
+            best = max(two, key=lambda t: scores[t])
+            other = next(t for t in two if t != best)
+            return best if scores[best] >= 4 and scores[best] > scores[other] else None
+
+        agree = disagree = 0
+        for r in pbp.filter(pl.col("play_type") == "drive_start").to_dicts():
+            m = re.match(r"^(.+?) drive start at", r["play_text"] or "")
+            marker_team = _match(m.group(1)) if m else None
+            titled = title_team.get(r["drive_number"])
+            if marker_team and titled in two:
+                agree += marker_team == titled
+                disagree += marker_team != titled
+        if disagree > agree:
+            flip = {two[0]: two[1], two[1]: two[0]}
+            title_team = {dn: flip[t] for dn, t in title_team.items()}
     if title_team:
         # authoritative per-drive team labels fix truncated offense values
         pbp = pbp.with_columns(
@@ -377,31 +409,31 @@ def to_cfbfastr(
                 home = r["team"]
             elif r["home_away"] == "away":
                 away = r["team"]
-    # away/home slot inference from checkpoints when the linescore is absent or
-    # its names don't match the drive-title labels: the first scoring drive
-    # whose checkpoint moved exactly one slot pins its team to that slot.
-    if checkpoint and (away not in teams or home not in teams):
+    # Checkpoint slot -> team mapping. The title score pair is USUALLY
+    # "away - home", but some (mostly FCS) pages emit it "home - away", so
+    # trusting the linescore's away/home for SNAPPING swaps the whole game.
+    # MAJORITY VOTE over every scoring drive whose checkpoint moved exactly one
+    # slot (the mover is almost always the drive's own team; defensive TDs are
+    # rare) decides which team owns the first slot. The linescore still
+    # supplies the emitted home/away columns.
+    snap_first, snap_second = away, home
+    if checkpoint and len(teams) == 2:
+        tally = dict.fromkeys(teams, 0)
         prev = (0, 0)
         for dn in sorted(checkpoint):
             ca, ch = checkpoint[dn]
             team = title_team.get(dn)
-            other = next((t for t in teams if t != team), None)
-            if team in teams and other is not None:
-                if (
-                    ca > prev[0]
-                    and ch == prev[1]
-                    and title_result.get(dn) in ("TD", "FG")
-                ):
-                    away, home = team, other
-                    break
-                if (
-                    ch > prev[1]
-                    and ca == prev[0]
-                    and title_result.get(dn) in ("TD", "FG")
-                ):
-                    home, away = team, other
-                    break
+            if team in teams and title_result.get(dn) in ("TD", "FG"):
+                if ca > prev[0] and ch == prev[1]:
+                    tally[team] += 1
+                elif ch > prev[1] and ca == prev[0]:
+                    tally[team] -= 1
             prev = (ca, ch)
+        if any(tally.values()):
+            snap_first = max(teams, key=lambda t: tally[t])
+            snap_second = next(t for t in teams if t != snap_first)
+    if away not in teams or home not in teams:
+        away, home = snap_first, snap_second
     drive_period: "dict[int, int]" = {}
     if drives is not None and drives.height:
         drive_period = {
@@ -423,10 +455,33 @@ def to_cfbfastr(
     rows: "list[dict]" = []
     drive_play_counter: "dict[int, int]" = {}
 
+    # the scoring summary is a SUPERSET of the drive-title checkpoints (some
+    # pages score plays the final drive title never checkpoints -- e.g. a late
+    # TD after the last titled drive), so the game's last drive snaps to its
+    # final regulation running-score instead.
+    last_reg_summary: "Optional[tuple[int, int]]" = None
+    if scoring_summary is not None and scoring_summary.height:
+        reg = scoring_summary.filter(
+            (pl.col("period") <= 4)
+            & pl.col("score_away").is_not_null()
+            & pl.col("score_home").is_not_null()
+        )
+        if reg.height:
+            last_reg_summary = (reg["score_away"][-1], reg["score_home"][-1])
+    last_drive_number = max(checkpoint) if checkpoint else None
+
     def _snap(drive: "Optional[int]") -> None:
-        """Snap the running score to the title checkpoint of a finished drive."""
-        if drive in checkpoint and away in score and home in score:
-            score[away], score[home] = checkpoint[drive]
+        """Snap the running score to the checkpoint of a finished drive."""
+        if snap_first not in score or snap_second not in score:
+            return
+        if drive == last_drive_number and last_reg_summary is not None:
+            cp = checkpoint.get(drive, (0, 0))
+            # take whichever is further along (summary can trail on OT pages)
+            if sum(last_reg_summary) >= sum(cp):
+                score[snap_first], score[snap_second] = last_reg_summary
+                return
+        if drive in checkpoint:
+            score[snap_first], score[snap_second] = checkpoint[drive]
 
     all_rows = pbp.to_dicts()
     # the checkpoint is the score AFTER a drive, so the drive's LAST play must
@@ -679,16 +734,37 @@ def to_cfbfastr(
     max_pbp_drive = max(
         (r["drive_number"] for r in rows if r["drive_number"]), default=0
     )
-    if rows and ot_drives is not None and ot_drives.height:
+    # official per-team finals (linescore) -- the mop-up for OT tails no other
+    # surface checkpoints (2-pt shootouts, walk-off fumble-return TDs).
+    official_final: "dict[str, int]" = {}
+    if linescore is not None and linescore.height:
+        official_final = {
+            r["team"]: r["final"]
+            for r in linescore.group_by("team").agg(pl.col("final").max()).to_dicts()
+            if r["team"] in teams and r["final"] is not None
+        }
+    # Page-wise: does the pbp already reach the final (its titles include OT,
+    # like some FBS pages do)? Then synthesize nothing. Drive numbers can NOT
+    # be compared across the pbp and drives tabs (they misalign by one on some
+    # pages), so the decision is score-based and synthesized drives renumber
+    # from max_pbp_drive + 1.
+    pbp_reaches_final = bool(
+        checkpoint
+        and official_final
+        and sum(checkpoint[max(checkpoint)]) >= sum(official_final.values())
+    )
+    if rows and not pbp_reaches_final and ot_drives is not None and ot_drives.height:
         ot_checkpoints = (
             scoring_summary.filter(pl.col("period") > 4).to_dicts()
             if scoring_summary is not None and scoring_summary.height
             else []
         )
         template = dict.fromkeys(rows[-1].keys())
+        n_synth = 0
         for od in sorted(ot_drives.to_dicts(), key=lambda d: d["drive_number"]):
-            if od["drive_number"] <= max_pbp_drive:
-                continue  # this OT drive IS on the pbp page already
+            n_synth += 1
+            od = dict(od)
+            od["drive_number"] = max_pbp_drive + n_synth
             offense = od["team"]
             defense = next((t for t in teams if t != offense), None)
             scoring = od["end_how"] in ("TD", "FG", "SAF")
@@ -696,8 +772,16 @@ def to_cfbfastr(
             if scoring and ot_checkpoints:
                 cp = ot_checkpoints.pop(0)
                 summary_text = cp["play_text"]
-                if away in score and home in score and cp["score_away"] is not None:
-                    score[away], score[home] = cp["score_away"], cp["score_home"]
+                if (
+                    snap_first in score
+                    and snap_second in score
+                    and cp["score_away"] is not None
+                ):
+                    # scoring-summary slots follow the same per-page order
+                    score[snap_first], score[snap_second] = (
+                        cp["score_away"],
+                        cp["score_home"],
+                    )
             elif scoring and offense in score:
                 score[offense] += 3 if od["end_how"] == "FG" else 6
             game_play_number += 1
@@ -760,6 +844,30 @@ def to_cfbfastr(
                 }
             )
             rows.append(row)
+
+        # mop-up: OT tails no surface checkpoints (3OT+ two-point shootouts,
+        # walk-off return TDs) leave the last synthesized row short of the
+        # official final -- reconcile it against the linescore per-team finals.
+        if (
+            rows
+            and rows[-1].get("ot_synthesized")
+            and official_final
+            and rows[-1]["pos_team"] in official_final
+            and rows[-1]["def_pos_team"] in official_final
+        ):
+            last = rows[-1]
+            want_pos = official_final[last["pos_team"]]
+            want_def = official_final[last["def_pos_team"]]
+            if (last["pos_team_score"], last["def_pos_team_score"]) != (
+                want_pos,
+                want_def,
+            ):
+                last["pos_team_score"], last["def_pos_team_score"] = want_pos, want_def
+                last["offense_score"], last["defense_score"] = want_pos, want_def
+                last["pos_score_diff"] = want_pos - want_def
+                last["scoring_play"] = last["scoring"] = True
+                score[last["pos_team"]] = want_pos
+                score[last["def_pos_team"]] = want_def
 
     df = pl.DataFrame(rows, infer_schema_length=None)
     # window/lag bookkeeping over the ordered game
