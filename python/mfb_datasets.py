@@ -371,25 +371,31 @@ def build_game_datasets(
             .get_column("contest_id")
             .to_list()
         )
+        from mfb_cfbfastr import _norm_team
+
         qa_rows = []
         for r in last.to_dicts():
             o = {
-                x["team"]: x["final"]
+                _norm_team(x["team"]): x["final"]
                 for x in official.filter(
                     pl.col("contest_id") == str(r["game_id"])
                 ).to_dicts()
+                if x["team"]
             }
             comp = {
                 r["pos_team"]: r["pos_team_score"],
                 r["def_pos_team"]: r["def_pos_team_score"],
             }
+            # no linescore -> unverifiable (null), not a mismatch
+            match = (
+                all(o.get(_norm_team(t)) == s for t, s in comp.items()) if o else None
+            )
             qa_rows.append(
                 {
                     "game_id": r["game_id"],
                     "computed_final": ", ".join(f"{t} {s}" for t, s in comp.items()),
                     "official_final": ", ".join(f"{t} {s}" for t, s in o.items()),
-                    "final_score_match": bool(o)
-                    and all(o.get(t) == s for t, s in comp.items()),
+                    "final_score_match": match,
                     "ot_game": str(r["game_id"]) in ot_games,
                 }
             )

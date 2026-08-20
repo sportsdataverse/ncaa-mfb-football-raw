@@ -127,6 +127,15 @@ _OT_END_HOW_LABEL = {
 }
 
 
+def _norm_team(name: "str | None") -> str:
+    """Normalize a team label for cross-surface matching: the linescore and the
+    drive titles can disagree on variant spellings ('Saint Anselm' vs
+    'St. Anselm')."""
+    s = (name or "").lower().strip()
+    s = re.sub(r"\bsaint\b", "st.", s)
+    return re.sub(r"[^a-z0-9&]+", " ", s).strip()
+
+
 def _first_last(name: "str | None") -> "str | None":
     """NCAA 'Last[ Suffix],First' -> cfbfastR 'First Last[ Suffix]'."""
     if not name or "," not in name:
@@ -363,15 +372,48 @@ def to_cfbfastr(
         if reg.height:
             last_reg_summary = (reg["score_away"][-1], reg["score_home"][-1])
     last_drive_number = max(checkpoint) if checkpoint else None
+    # official per-team finals from the linescore (name-normalized onto the
+    # title team labels) -- the arbiter when the titles and the scoring
+    # summary disagree at game end (source self-inconsistencies exist:
+    # Mercyhurst 5366186 titles say 55, the official book says 48).
+    official_final: "dict[str, int]" = {}
+    if linescore is not None and linescore.height and len(teams) == 2:
+        for r in linescore.group_by("team").agg(pl.col("final").max()).to_dicts():
+            if r["final"] is None or not r["team"]:
+                continue
+            match = next(
+                (t for t in teams if _norm_team(t) == _norm_team(r["team"])), None
+            )
+            if match:
+                official_final[match] = r["final"]
+        if len(official_final) != 2:
+            official_final = {}
+
+    def _final_matches(cand: "tuple[int, int]") -> bool:
+        return (
+            bool(official_final)
+            and (
+                official_final.get(snap_first),
+                official_final.get(snap_second),
+            )
+            == cand
+        )
 
     def _snap(drive: "Optional[int]") -> None:
         """Snap the running score to the checkpoint of a finished drive."""
         if snap_first not in score or snap_second not in score:
             return
         if drive == last_drive_number and last_reg_summary is not None:
-            cp = checkpoint.get(drive, (0, 0))
-            # take whichever is further along (summary can trail on OT pages)
-            if sum(last_reg_summary) >= sum(cp):
+            cp = checkpoint.get(drive)
+            # candidates: title checkpoint vs summary final. The official
+            # linescore arbitrates; without its vote, take the further-along
+            # one (the summary trails on OT pages).
+            if cp is not None and _final_matches(cp):
+                score[snap_first], score[snap_second] = cp
+                return
+            if _final_matches(last_reg_summary) or sum(last_reg_summary) >= sum(
+                cp or (0, 0)
+            ):
                 score[snap_first], score[snap_second] = last_reg_summary
                 return
         if drive in checkpoint:
@@ -628,15 +670,8 @@ def to_cfbfastr(
     max_pbp_drive = max(
         (r["drive_number"] for r in rows if r["drive_number"]), default=0
     )
-    # official per-team finals (linescore) -- the mop-up for OT tails no other
-    # surface checkpoints (2-pt shootouts, walk-off fumble-return TDs).
-    official_final: "dict[str, int]" = {}
-    if linescore is not None and linescore.height:
-        official_final = {
-            r["team"]: r["final"]
-            for r in linescore.group_by("team").agg(pl.col("final").max()).to_dicts()
-            if r["team"] in teams and r["final"] is not None
-        }
+    # official_final (built above, name-normalized) also serves as the mop-up
+    # for OT tails no surface checkpoints (2-pt shootouts, walk-off return TDs).
     # Page-wise: does the pbp already reach the final (its titles include OT,
     # like some FBS pages do)? Then synthesize nothing. Drive numbers can NOT
     # be compared across the pbp and drives tabs (they misalign by one on some
