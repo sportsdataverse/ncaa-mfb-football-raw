@@ -21,6 +21,15 @@ mkdir -p logs
 for ay in $(seq "$START" -1 "$END"); do
   fall=$((ay - 1))
   echo "=== SEASON ay${ay} (fall ${fall}) $(date -u +%FT%TZ) ==="
+  # breaker-tripped/killed browsers leak Chromium profiles under /tmp; over a
+  # multi-day run they can fill the ROOT disk (2026-08-21: / hit 100% and
+  # every fetch failed until swept). Sweep between seasons; guard at 5G free.
+  rm -rf /tmp/.org.chromium.* 2>/dev/null || true
+  free_kb=$(df --output=avail / | tail -1 | tr -d ' ')
+  if [ "${free_kb:-0}" -lt 5242880 ]; then
+    echo "ROOT DISK LOW (<5G free) -- stopping before ay${ay}; free space and rerun"
+    exit 1
+  fi
   # 1) discovery + rosters per division (single session; resumable)
   for div in 11 12; do
     "$PY" python/mfb_run.py --out "$ROOT" --academic-year "$ay" --division "$div" \
