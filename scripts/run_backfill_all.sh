@@ -16,15 +16,19 @@ export NCAA_VENDOR="${NCAA_VENDOR:-decodo_patchright}"
 SDV_PY="${SDV_PY:-/mnt/sdv_repos/sdv-py}"
 PY="${SDV_PY}/.venv/bin/python"
 export PYTHONPATH="${SDV_PY}:${ROOT}/python" PYTHONUNBUFFERED=1 PYTHONIOENCODING=utf-8
-mkdir -p logs
+# Chromium writes its temp profiles to $TMPDIR; keep them on the block storage,
+# not the small root disk (2026-08-21: leaked profiles filled /).
+export TMPDIR=/mnt/sdv_repos/tmp
+mkdir -p logs "$TMPDIR"
+SHARDS="${SHARDS:-24}"
 
 for ay in $(seq "$START" -1 "$END"); do
   fall=$((ay - 1))
   echo "=== SEASON ay${ay} (fall ${fall}) $(date -u +%FT%TZ) ==="
-  # breaker-tripped/killed browsers leak Chromium profiles under /tmp; over a
-  # multi-day run they can fill the ROOT disk (2026-08-21: / hit 100% and
-  # every fetch failed until swept). Sweep between seasons; guard at 5G free.
-  rm -rf /tmp/.org.chromium.* 2>/dev/null || true
+  # breaker-tripped/killed browsers leak Chromium profiles under $TMPDIR; sweep
+  # between seasons (and legacy /tmp leftovers). Root guard stays: syslog etc.
+  # still lives on / (2026-08-21: / hit 100% and every fetch failed).
+  rm -rf "$TMPDIR"/.org.chromium.* /tmp/.org.chromium.* 2>/dev/null || true
   free_kb=$(df --output=avail / | tail -1 | tr -d ' ')
   if [ "${free_kb:-0}" -lt 5242880 ]; then
     echo "ROOT DISK LOW (<5G free) -- stopping before ay${ay}; free space and rerun"
@@ -50,11 +54,11 @@ for ay in $(seq "$START" -1 "$END"); do
   git commit -q -m "feat(data): ay${ay} (fall ${fall}) discovery -- team pages + rosters" \
     && git push -q origin main || true
 
-  # 2) games: 8 shard workers, each div 11 then div 12
-  for i in 0 1 2 3 4 5 6 7; do
-    ( "$PY" python/mfb_run.py --out "$ROOT" --academic-year "$ay" --division 11 --shard "$i/8" \
+  # 2) games: $SHARDS shard workers, each div 11 then div 12
+  for i in $(seq 0 $((SHARDS - 1))); do
+    ( "$PY" python/mfb_run.py --out "$ROOT" --academic-year "$ay" --division 11 --shard "$i/$SHARDS" \
         >  "logs/bf_${ay}_02_shard${i}.log" 2>&1
-      "$PY" python/mfb_run.py --out "$ROOT" --academic-year "$ay" --division 12 --shard "$i/8" \
+      "$PY" python/mfb_run.py --out "$ROOT" --academic-year "$ay" --division 12 --shard "$i/$SHARDS" \
         >> "logs/bf_${ay}_02_shard${i}.log" 2>&1 ) &
     sleep 3
   done
