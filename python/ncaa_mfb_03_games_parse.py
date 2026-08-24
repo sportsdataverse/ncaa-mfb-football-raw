@@ -90,7 +90,10 @@ def parse_contest(
         parse_cfb_ncaa_scoring_summary,
         parse_cfb_ncaa_team_stats,
     )
-    from sportsdataverse.cfb.cfb_ncaa_pbp import parse_cfb_ncaa_pbp
+    from sportsdataverse.cfb.cfb_ncaa_pbp import (
+        parse_cfb_ncaa_drive_titles,
+        parse_cfb_ncaa_pbp,
+    )
 
     try:
         with gzip.open(raw, "rt", encoding="utf-8") as fh:
@@ -107,6 +110,10 @@ def parse_contest(
                 linescore, ncaa_ids.get(cid, {}), team_map, game_index.get(cid)
             ),
             "pbp": parse_cfb_ncaa_pbp(pbp_html, contest_id=cid).to_dicts(),
+            # per-drive running-score checkpoints from the pbp page's h5 drive
+            # titles -- the one to_cfbfastr input not derivable from the other
+            # frames, so downstream (-data) never needs the raw HTML.
+            "drive_titles": parse_cfb_ncaa_drive_titles(pbp_html).to_dicts(),
             "drives": parse_cfb_ncaa_drives(
                 bundle.get("drives") or "", contest_id=cid
             ).to_dicts(),
