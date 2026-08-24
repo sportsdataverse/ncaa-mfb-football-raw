@@ -32,7 +32,7 @@ from __future__ import annotations
 import argparse
 import gzip
 import json
-from multiprocessing import Pool
+from multiprocessing import get_context
 from pathlib import Path
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
@@ -181,7 +181,10 @@ def run_season(root: Path, ay: int, workers: int, force: bool) -> "dict[str, int
     cids, game_index, team_map, ncaa_ids = _season_inputs(root, ay)
     jobs = [(str(root), cid, ay, game_index, team_map, ncaa_ids, force) for cid in cids]
     stats: "dict[str, int]" = {}
-    with Pool(workers) as pool:
+    # spawn, not fork: the parent has polars (Rayon threads) loaded by the time
+    # the pool starts, and forked children inherit its lock state and deadlock
+    # at 0% CPU. Spawned children import everything fresh.
+    with get_context("spawn").Pool(workers) as pool:
         for cid, status in pool.imap_unordered(parse_contest, jobs, chunksize=16):
             key = status.split(":")[0]
             stats[key] = stats.get(key, 0) + 1
