@@ -30,7 +30,7 @@ python/
   ncaa_mfb_05_datasets_build.py    #   parsing lives in sdv-py, runs in 05
 scripts/
   _env.sh           # sourced by every launcher: venv, transport, logging
-  run_01_schedules.sh  run_02_games.sh  run_04_rosters.sh  run_05_datasets.sh
+  run_01_schedules.sh  run_02_games.sh  run_04_rosters.sh  run_05_datasets.sh  run_06_xwalk.sh
   run_mfb_capture.sh   # combined one-session runner (01 + 04 + 02)
 tests/fixtures/     # real captured pages (parser ground truth)
 mfb/
@@ -52,6 +52,7 @@ export NCAA_VENDOR=decodo_patchright                                  # canary_v
 ./scripts/run_04_rosters.sh   --academic-year 2026 --division 11     # roster pages
 ./scripts/run_02_games.sh     --academic-year 2026 --division 11 --max-contests 200   # game bundles
 ./scripts/run_05_datasets.sh  --academic-year 2026                   # OFFLINE: tidy parquet
+./scripts/run_06_xwalk.sh     --academic-year 2026                   # OFFLINE: NCAA<->ESPN game crosswalk -> mfb/xwalk/
 # watch: tail -f logs/<schedules|rosters|games|datasets>_<ts>.log
 ```
 
