@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # User-run launcher (stage 02): capture the 6-tab bundle for a season's
-# not-yet-captured contests -> mfb/json/{contest_id}.json.gz.
+# not-yet-captured contests -> mfb/raw/{ay}/{contest_id}.json.gz.
 # ONLINE. CHUNK it (--max-contests) and fan out with disjoint --shard i/N as
 # separate PROCESSES; a ban hard-stops the run (rc=1) -- cool down, re-run,
 # it resumes (captured contests are skipped).

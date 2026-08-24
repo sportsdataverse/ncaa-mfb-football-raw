@@ -64,7 +64,7 @@ for ay in $(seq "$START" -1 "$END"); do
   done
   wait
   grep -h 'capture:' logs/bf_${ay}_02_shard*.log || true
-  git add mfb/json 2>/dev/null || true
+  git add mfb/raw mfb/json mfb/xwalk 2>/dev/null || true
   git commit -q -m "feat(data): ay${ay} (fall ${fall}) season game bundles (FBS+FCS)" \
     && git push -q origin main || true
 

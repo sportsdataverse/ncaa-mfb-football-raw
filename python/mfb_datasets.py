@@ -269,7 +269,7 @@ def build_game_datasets(root: "str | Path", academic_year: int, *, season: "Opti
     acc: "dict[str, list[pl.DataFrame]]" = {}
     player_acc: "dict[str, list[pl.DataFrame]]" = {}
     n = 0
-    for p in sorted((root / "mfb" / "json").glob("*.json.gz")):
+    for p in sorted((root / "mfb" / "raw" / str(academic_year)).glob("*.json.gz")):
         cid = p.stem.split(".")[0]
         if season_ids is not None and cid not in season_ids:
             continue

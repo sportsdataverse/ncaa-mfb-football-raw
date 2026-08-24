@@ -2,7 +2,7 @@
 
 Thin shim over :func:`mfb_run.main` (no forced flags): discovery re-reads the
 persisted team pages from stage 01 (zero HTTP when they exist), then
-``capture_season`` writes ``mfb/json/{contest_id}.json.gz``. Same flags as
+``capture_season`` writes ``mfb/raw/{ay}/{contest_id}.json.gz``. Same flags as
 ``mfb_run.py``; chunk with ``--max-contests N`` and fan out with ``--shard i/N``
 (one PROCESS per shard). Resumable: captured contests are skipped; a ban
 hard-stops the run with rc=1.

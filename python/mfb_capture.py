@@ -4,7 +4,7 @@ Fetches all game-detail tabs -- ``/contests/{id}/play_by_play`` plus
 ``box_score``, ``team_stats``, ``individual_stats``, ``drives`` and
 ``officials`` -- via an injectable ``fetch_fn`` (live: a held
 ``NcaaFetcher.with_browser`` session) and writes one gzipped JSON bundle per
-contest to ``{out_dir}/json/{id}.json.gz`` -- the tree the ``-data`` ingest +
+contest to ``{out_dir}/mfb/raw/{ay}/{id}.json.gz`` -- the tree stage 03 +
 the sdv-py ``cfb_ncaa_*`` parsers read. ``play_by_play`` is the validity gate;
 the other tabs are best-effort (stored as ``null`` if a fetch fails). Resume is
 file-exists based (Ctrl-C safe). A consecutive-failure breaker hard-stops a
@@ -27,14 +27,19 @@ _MIN_PBP_BYTES = 40_000  # a real MFB pbp page is ~100 KB; a stub/ban is < 2 KB
 _EXTRA_TABS = ("box_score", "team_stats", "individual_stats", "drives", "officials")
 
 
-def bundle_path(contest_id: "str | int", out_dir: "str | Path") -> Path:
-    # mfb/json/ mirrors the mbb/wbb sibling layout ({lg}/json/{id}.json.gz).
-    return Path(out_dir) / "mfb" / "json" / f"{contest_id}.json.gz"
+def bundle_path(
+    contest_id: "str | int", out_dir: "str | Path", academic_year: int
+) -> Path:
+    # mfb/raw/{ay}/ mirrors the mbb/wbb sibling layout ({lg}/raw/{season}/{id}.json.gz);
+    # the parsed+enriched tree lives at mfb/json/ (stage 03).
+    return Path(out_dir) / "mfb" / "raw" / str(academic_year) / f"{contest_id}.json.gz"
 
 
-def is_captured(contest_id: "str | int", out_dir: "str | Path") -> bool:
+def is_captured(
+    contest_id: "str | int", out_dir: "str | Path", academic_year: int
+) -> bool:
     """Resume predicate -- a bundle already on disk is skipped."""
-    return bundle_path(contest_id, out_dir).exists()
+    return bundle_path(contest_id, out_dir, academic_year).exists()
 
 
 def _looks_real(html: "Optional[str]") -> bool:
@@ -42,14 +47,14 @@ def _looks_real(html: "Optional[str]") -> bool:
 
 
 def capture_contest(
-    fetch_fn: FetchFn, contest_id: "str | int", out_dir: "str | Path"
+    fetch_fn: FetchFn, contest_id: "str | int", out_dir: "str | Path", academic_year: int
 ) -> str:
     """Fetch + persist one contest bundle.
 
     Returns ``"skipped"`` (already captured), ``"captured"``, or ``"failed"``
     (fetch raised, or the pbp page was not real content).
     """
-    if is_captured(contest_id, out_dir):
+    if is_captured(contest_id, out_dir, academic_year):
         return "skipped"
     try:
         pbp = fetch_fn(f"contests/{contest_id}/play_by_play")
@@ -64,7 +69,7 @@ def capture_contest(
         except Exception:  # noqa: BLE001
             bundle[tab] = None
     bundle["captured_at"] = datetime.now(timezone.utc).isoformat()
-    path = bundle_path(contest_id, out_dir)
+    path = bundle_path(contest_id, out_dir, academic_year)
     path.parent.mkdir(parents=True, exist_ok=True)
     with gzip.open(path, "wt", encoding="utf-8") as fh:
         json.dump(bundle, fh)
@@ -75,6 +80,7 @@ def capture_season(
     contest_ids: Iterable["str | int"],
     fetch_fn: FetchFn,
     out_dir: "str | Path",
+    academic_year: int,
     *,
     max_contests: "Optional[int]" = None,
     max_consecutive_failures: int = 25,
@@ -101,7 +107,7 @@ def capture_season(
     for contest_id in contest_ids:
         if max_contests is not None and stats["captured"] >= max_contests:
             break
-        result = capture_contest(fetch_fn, contest_id, out_dir)
+        result = capture_contest(fetch_fn, contest_id, out_dir, academic_year)
         stats[result] += 1
         consecutive = consecutive + 1 if result == "failed" else 0
         if (

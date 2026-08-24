@@ -19,7 +19,7 @@ cfbfastR-named columns incl. parity-tested running scores). See
 python/
   mfb_discover.py   # team list (sport_code=MFB) -> team pages -> contest_ids
                     # + persisted teams/schedules HTML + roster sweep
-  mfb_capture.py    # 6-tab gzip JSON bundle per contest -> mfb/json/
+  mfb_capture.py    # 6-tab gzip JSON bundle per contest -> mfb/raw/{ay}/
   mfb_run.py        # live runner: discovery + rosters + game bundles
   mfb_parse.py      # (superseded by sdv-py cfb_ncaa_pbp; kept for history)
   mfb_cfbfastr.py   # NCAA structural pbp -> cfbfastR-named columns (prototype)
@@ -30,14 +30,17 @@ python/
   ncaa_mfb_05_datasets_build.py    #   parsing lives in sdv-py, runs in 05
 scripts/
   _env.sh           # sourced by every launcher: venv, transport, logging
-  run_01_schedules.sh  run_02_games.sh  run_04_rosters.sh  run_05_datasets.sh  run_06_xwalk.sh
+  run_01_schedules.sh  run_02_games.sh  run_03_parse.sh  run_04_rosters.sh
+  run_05_datasets.sh  run_06_xwalk.sh
   run_mfb_capture.sh   # combined one-session runner (01 + 04 + 02)
 tests/fixtures/     # real captured pages (parser ground truth)
 mfb/
   teams/{html,parquet}/         # team lists per (ay, division)
   schedules/{html,parquet}/     # team pages + schedule master
   rosters/html/{ay}/            # team roster pages
-  json/                         # gzip game bundles (pbp + 5 detail tabs)
+  raw/{ay}/                     # gzip 6-tab HTML bundles (capture output)
+  json/                         # parsed + enriched per-game JSON (stage 03; espn_game_id)
+  xwalk/                        # NCAA<->ESPN game + team crosswalks (stage 06)
   datasets/{ay}/                # built parquet (pbp, pbp_cfbfastr, boxes, ...)
 docs/DESIGN.md
 ```

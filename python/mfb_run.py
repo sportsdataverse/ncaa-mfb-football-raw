@@ -105,7 +105,7 @@ def main(argv: "list[str] | None" = None) -> int:
     if shard_n > 1:
         ids = ids[shard_i::shard_n]
         print(f"shard {shard_i}/{shard_n}: {len(ids)} contests", flush=True)
-    stats = capture_season(ids, fetch, args.out, max_contests=args.max_contests)
+    stats = capture_season(ids, fetch, args.out, args.academic_year, max_contests=args.max_contests)
     print(f"capture: {stats}", flush=True)
     # non-zero only if nothing captured AND something failed (a real ban), so a
     # fully-resumed run (all skipped) still exits 0.
