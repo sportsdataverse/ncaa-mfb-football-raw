@@ -76,7 +76,9 @@ def parse_team_schedule(html: str, team_id: "Optional[str]" = None) -> pl.DataFr
     header = soup.select_one("div.card-header")
     team_name = None
     if header:
-        team_name = re.sub(r"\s*\([\d\-]+\)\s*$", "", header.get_text(" ", strip=True)) or None
+        team_name = (
+            re.sub(r"\s*\([\d\-]+\)\s*$", "", header.get_text(" ", strip=True)) or None
+        )
     table = soup.find("table")
     rows: "list[dict]" = []
     if table is not None:
@@ -90,7 +92,9 @@ def parse_team_schedule(html: str, team_id: "Optional[str]" = None) -> pl.DataFr
             con_m = _CONTEST_HREF_RE.search(res_a.get("href") or "") if res_a else None
             result = cells[2].get_text(" ", strip=True) or None
             rm = _RESULT_RE.match(result or "")
-            att = (cells[3].get_text(strip=True) if len(cells) > 3 else "").replace(",", "")
+            att = (cells[3].get_text(strip=True) if len(cells) > 3 else "").replace(
+                ",", ""
+            )
             rows.append(
                 {
                     "team_id": team_id,
@@ -153,7 +157,9 @@ def parse_team_roster(html: str, team_id: "Optional[str]" = None) -> pl.DataFram
     header = soup.select_one("div.card-header")
     team_name = None
     if header:
-        team_name = re.sub(r"\s*\([\d\-]+\).*$", "", header.get_text(" ", strip=True)) or None
+        team_name = (
+            re.sub(r"\s*\([\d\-]+\).*$", "", header.get_text(" ", strip=True)) or None
+        )
     table = soup.find("table", id=re.compile(r"^rosters_form_players_.*_data_table$"))
     rows: "list[dict]" = []
     if table is not None:
@@ -170,7 +176,9 @@ def parse_team_roster(html: str, team_id: "Optional[str]" = None) -> pl.DataFram
                     if key:
                         rec[key] = c.get_text(" ", strip=True) or None
                 a = tr.find("a", href=_PLAYER_HREF_RE)
-                rec["player_id"] = _PLAYER_HREF_RE.search(a["href"]).group(1) if a else None
+                rec["player_id"] = (
+                    _PLAYER_HREF_RE.search(a["href"]).group(1) if a else None
+                )
                 for k in ("weight", "games_played", "games_started"):
                     v = rec.get(k)
                     rec[k] = int(v) if isinstance(v, str) and v.isdigit() else None
@@ -183,7 +191,9 @@ def build_rosters(root: "str | Path", academic_year: int) -> pl.DataFrame:
     """All persisted roster pages for a season -> one rosters parquet."""
     root = Path(root)
     frames = []
-    for p in sorted((root / "mfb" / "rosters" / "html" / str(academic_year)).glob("*.html")):
+    for p in sorted(
+        (root / "mfb" / "rosters" / "html" / str(academic_year)).glob("*.html")
+    ):
         df = parse_team_roster(p.read_text(encoding="utf-8"), team_id=p.stem)
         if df.height:
             frames.append(df)
@@ -199,12 +209,25 @@ def build_schedule_master(root: "str | Path", academic_year: int) -> pl.DataFram
     """All persisted team pages for a season -> one schedule-master parquet."""
     root = Path(root)
     frames = []
-    for p in sorted((root / "mfb" / "schedules" / "html" / str(academic_year)).glob("*.html")):
+    for p in sorted(
+        (root / "mfb" / "schedules" / "html" / str(academic_year)).glob("*.html")
+    ):
         df = parse_team_schedule(p.read_text(encoding="utf-8"), team_id=p.stem)
         if df.height:
             frames.append(df)
     master = pl.concat(frames) if frames else parse_team_schedule("")
     master = master.with_columns(pl.lit(academic_year).alias("academic_year"))
+    # espn_game_id from stage 06's crosswalk (null when unmatched / not yet built)
+    from ncaa_mfb_06_xwalk_build import load_espn_game_index
+
+    espn_idx = load_espn_game_index(root, academic_year)
+    if espn_idx and "contest_id" in master.columns:
+        master = master.with_columns(
+            pl.col("contest_id")
+            .cast(pl.Utf8)
+            .replace_strict(espn_idx, default=None, return_dtype=pl.Utf8)
+            .alias("espn_game_id")
+        )
     out = root / "mfb" / "schedules" / "parquet" / f"{academic_year}.parquet"
     out.parent.mkdir(parents=True, exist_ok=True)
     master.write_parquet(out)
@@ -215,7 +238,9 @@ def build_teams(root: "str | Path", academic_year: int) -> pl.DataFrame:
     """Persisted team-list pages -> teams parquet (one file per division found)."""
     root = Path(root)
     frames = []
-    for p in sorted((root / "mfb" / "teams" / "html").glob(f"{academic_year}_div*.html")):
+    for p in sorted(
+        (root / "mfb" / "teams" / "html").glob(f"{academic_year}_div*.html")
+    ):
         division = int(p.stem.split("div")[-1])
         df = parse_team_list(p.read_text(encoding="utf-8")).with_columns(
             pl.lit(academic_year).alias("academic_year"),
@@ -223,17 +248,27 @@ def build_teams(root: "str | Path", academic_year: int) -> pl.DataFrame:
         )
         if df.height:
             frames.append(df)
-            out = root / "mfb" / "teams" / "parquet" / f"{academic_year}_div{division}.parquet"
+            out = (
+                root
+                / "mfb"
+                / "teams"
+                / "parquet"
+                / f"{academic_year}_div{division}.parquet"
+            )
             out.parent.mkdir(parents=True, exist_ok=True)
             df.write_parquet(out)
     return (
         pl.concat(frames)
         if frames
-        else parse_team_list("").with_columns(pl.lit(academic_year).alias("academic_year"), pl.lit(0).alias("division"))
+        else parse_team_list("").with_columns(
+            pl.lit(academic_year).alias("academic_year"), pl.lit(0).alias("division")
+        )
     )
 
 
-def build_game_datasets(root: "str | Path", academic_year: int, *, season: "Optional[int]" = None) -> "dict[str, int]":
+def build_game_datasets(
+    root: "str | Path", academic_year: int, *, season: "Optional[int]" = None
+) -> "dict[str, int]":
     """Every captured bundle -> per-dataset season parquet under ``mfb/datasets/{ay}/``.
 
     ``season`` (fall year, e.g. 2025 for ay 2026) is written into the cfbfastR
@@ -265,7 +300,9 @@ def build_game_datasets(root: "str | Path", academic_year: int, *, season: "Opti
     sched_path = root / "mfb" / "schedules" / "parquet" / f"{academic_year}.parquet"
     season_ids = None
     if sched_path.exists():
-        season_ids = set(pl.read_parquet(sched_path).get_column("contest_id").drop_nulls().to_list())
+        season_ids = set(
+            pl.read_parquet(sched_path).get_column("contest_id").drop_nulls().to_list()
+        )
     acc: "dict[str, list[pl.DataFrame]]" = {}
     player_acc: "dict[str, list[pl.DataFrame]]" = {}
     n = 0
@@ -279,7 +316,9 @@ def build_game_datasets(root: "str | Path", academic_year: int, *, season: "Opti
         try:
             pbp = parse_cfb_ncaa_pbp(bundle.get("play_by_play") or "", contest_id=cid)
             drives = parse_cfb_ncaa_drives(bundle.get("drives") or "", contest_id=cid)
-            linescore = parse_cfb_ncaa_linescore(bundle.get("box_score") or "", contest_id=cid)
+            linescore = parse_cfb_ncaa_linescore(
+                bundle.get("box_score") or "", contest_id=cid
+            )
             acc.setdefault("pbp", []).append(pbp)
             acc.setdefault("pbp_cfbfastr", []).append(
                 to_cfbfastr(
@@ -289,21 +328,29 @@ def build_game_datasets(root: "str | Path", academic_year: int, *, season: "Opti
                     linescore=linescore,
                     drive_titles=parse_drive_titles(bundle.get("play_by_play") or ""),
                     ot_drives=parse_ot_drives(bundle.get("drives") or ""),
-                    scoring_summary=parse_scoring_summary(bundle.get("box_score") or ""),
+                    scoring_summary=parse_scoring_summary(
+                        bundle.get("box_score") or ""
+                    ),
                 )
             )
             acc.setdefault("drives", []).append(drives)
             acc.setdefault("linescore", []).append(linescore)
             acc.setdefault("team_stats", []).append(
-                parse_cfb_ncaa_team_stats(bundle.get("team_stats") or "", contest_id=cid)
+                parse_cfb_ncaa_team_stats(
+                    bundle.get("team_stats") or "", contest_id=cid
+                )
             )
             acc.setdefault("officials", []).append(
                 parse_cfb_ncaa_officials(bundle.get("officials") or "", contest_id=cid)
             )
-            for cat, frame in parse_cfb_ncaa_player_stats(bundle.get("individual_stats") or "", contest_id=cid).items():
+            for cat, frame in parse_cfb_ncaa_player_stats(
+                bundle.get("individual_stats") or "", contest_id=cid
+            ).items():
                 player_acc.setdefault(cat, []).append(frame)
         except Exception as exc:  # noqa: BLE001 - one weird game must not sink the season build
-            print(f"PARSE FAILED contest {cid}: {type(exc).__name__}: {exc}", flush=True)
+            print(
+                f"PARSE FAILED contest {cid}: {type(exc).__name__}: {exc}", flush=True
+            )
 
     out_dir = root / "mfb" / "datasets" / str(academic_year)
     out_dir.mkdir(parents=True, exist_ok=True)
@@ -330,14 +377,20 @@ def build_game_datasets(root: "str | Path", academic_year: int, *, season: "Opti
         official = ls_all.group_by("contest_id", "team").agg(pl.col("final").max())
         # stats.ncaa.org pbp pages OMIT overtime drives -- a mismatch on a game
         # whose linescore shows OT periods is that known source gap, not a bug.
-        ot_games = set(ls_all.filter(pl.col("period").str.contains("OT")).get_column("contest_id").to_list())
+        ot_games = set(
+            ls_all.filter(pl.col("period").str.contains("OT"))
+            .get_column("contest_id")
+            .to_list()
+        )
         from mfb_cfbfastr import _norm_team
 
         qa_rows = []
         for r in last.to_dicts():
             o = {
                 _norm_team(x["team"]): x["final"]
-                for x in official.filter(pl.col("contest_id") == str(r["game_id"])).to_dicts()
+                for x in official.filter(
+                    pl.col("contest_id") == str(r["game_id"])
+                ).to_dicts()
                 if x["team"]
             }
             comp = {
@@ -345,7 +398,9 @@ def build_game_datasets(root: "str | Path", academic_year: int, *, season: "Opti
                 r["def_pos_team"]: r["def_pos_team_score"],
             }
             # no linescore -> unverifiable (null), not a mismatch
-            match = all(o.get(_norm_team(t)) == s for t, s in comp.items()) if o else None
+            match = (
+                all(o.get(_norm_team(t)) == s for t, s in comp.items()) if o else None
+            )
             # Name-blind score check: the two tabs can carry different name
             # variants for the same school ("Mississippi Christian" on pbp vs
             # "Mississippi Col." on linescore), and the drive-title vote can
@@ -366,11 +421,30 @@ def build_game_datasets(root: "str | Path", academic_year: int, *, season: "Opti
         qa = pl.DataFrame(qa_rows)
         qa.write_parquet(out_dir / "qa_pbp_vs_linescore.parquet")
         written["qa_final_score_match"] = qa.get_column("final_score_match").sum()
+    # ESPN enrichment: stage 06's crosswalk, joined per game at write time so
+    # every game-grain dataset carries espn_game_id (null when unmatched --
+    # ESPN doesn't list many FCS-vs-non-D1 games). pbp_cfbfastr keys on the
+    # cfbfastR-named game_id; everything else on contest_id.
+    from ncaa_mfb_06_xwalk_build import load_espn_game_index
+
+    espn_idx = load_espn_game_index(root, academic_year)
+
+    def _with_espn(df: pl.DataFrame, key: str) -> pl.DataFrame:
+        if not espn_idx or key not in df.columns:
+            return df
+        return df.with_columns(
+            pl.col(key)
+            .cast(pl.Utf8)
+            .replace_strict(espn_idx, default=None, return_dtype=pl.Utf8)
+            .alias("espn_game_id")
+        )
+
     for name, frames in acc.items():
         frames = [f for f in frames if f.height]
         if not frames:
             continue
         df = pl.concat(frames, how="diagonal_relaxed")
+        df = _with_espn(df, "game_id" if name == "pbp_cfbfastr" else "contest_id")
         df.write_parquet(out_dir / f"{name}.parquet")
         written[name] = df.height
     for cat, frames in player_acc.items():
@@ -379,6 +453,7 @@ def build_game_datasets(root: "str | Path", academic_year: int, *, season: "Opti
             continue
         slug = re.sub(r"\W+", "_", cat.lower()).strip("_")
         df = pl.concat(frames, how="diagonal_relaxed")
+        df = _with_espn(df, "contest_id")
         df.write_parquet(out_dir / f"player_stats_{slug}.parquet")
         written[f"player_stats_{slug}"] = df.height
     written["games"] = n
@@ -396,7 +471,9 @@ def main(argv: "Optional[list[str]]" = None) -> int:
     teams = build_teams(args.root, args.academic_year)
     print(f"teams: {teams.height}")
     rosters = build_rosters(args.root, args.academic_year)
-    print(f"rosters: {rosters.height} players, {rosters.get_column('team_id').n_unique()} teams")
+    print(
+        f"rosters: {rosters.height} players, {rosters.get_column('team_id').n_unique()} teams"
+    )
     master = build_schedule_master(args.root, args.academic_year)
     print(
         f"schedule master: {master.height} team-games, "
