@@ -68,23 +68,11 @@ for ay in $(seq "$START" -1 "$END"); do
   git commit -q -m "feat(data): ay${ay} (fall ${fall}) season game bundles (FBS+FCS)" \
     && git push -q origin main || true
 
-  # 3) datasets build + QA summary (offline)
+  # 3) reference datasets build (offline). Game-grain season datasets + QA
+  # moved to ncaa-mfb-football-data (built from this repo's parsed mfb/json/).
   "$PY" python/mfb_datasets.py --academic-year "$ay" > "logs/bf_${ay}_05.log" 2>&1 || true
-  "$PY" - "$ay" <<'PYEOF' 2>&1 | tee -a "logs/bf_${ay}_05.log"
-import sys
-import polars as pl
-ay = sys.argv[1]
-try:
-    qa = pl.read_parquet(f"mfb/datasets/{ay}/qa_pbp_vs_linescore.parquet")
-    n = qa.height
-    ok = (qa["final_score_match"] == True).sum()  # noqa: E712
-    unv = qa["final_score_match"].null_count()
-    print(f"ay{ay} QA: {ok}/{n} exact, {unv} unverifiable, {n - ok - unv} flagged")
-except Exception as exc:  # noqa: BLE001
-    print(f"ay{ay} QA: unavailable ({exc})")
-PYEOF
-  git add "mfb/datasets/${ay}" mfb/schedules/parquet mfb/rosters/parquet mfb/teams/parquet 2>/dev/null || true
-  git commit -q -m "feat(data): built ay${ay} (fall ${fall}) season datasets (QA line in logs/bf_${ay}_05.log)" \
+  git add mfb/schedules/parquet mfb/rosters/parquet mfb/teams/parquet 2>/dev/null || true
+  git commit -q -m "feat(data): built ay${ay} (fall ${fall}) reference frames" \
     && git push -q origin main || true
   echo "=== ay${ay} complete $(date -u +%FT%TZ) ==="
 done

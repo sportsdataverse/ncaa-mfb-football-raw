@@ -2,7 +2,7 @@
 
 Thin shim over :func:`mfb_datasets.main`. FULLY OFFLINE (no proxy, no network):
 builds ``mfb/teams/parquet/``, ``mfb/rosters/parquet/``,
-``mfb/schedules/parquet/{ay}.parquet`` and ``mfb/datasets/{ay}/*.parquet`` from
+``mfb/{teams,rosters,schedules}/parquet/`` reference frames from
 what stages 01/02/04 already captured. Flags: ``--academic-year``, ``--root``.
 Not sharded -- one output file per kind, so run it once after the sweeps.
 """

@@ -6,23 +6,17 @@ Outputs (``{root}/mfb/...``, ``{ay}`` = academic year, ending-year convention):
 
 * ``teams/parquet/{ay}_div{d}.parquet``      -- team id/name per division
 * ``schedules/parquet/{ay}.parquet``          -- schedule master (one row per
-  team-game: date, opponent, result, contest_id, attendance)
-* ``datasets/{ay}/pbp.parquet``               -- structural NCAA pbp (49 cols)
-* ``datasets/{ay}/pbp_cfbfastr.parquet``      -- cfbfastR-named play frame
-* ``datasets/{ay}/team_stats.parquet``        -- per-quarter team box
-* ``datasets/{ay}/player_stats_{cat}.parquet``-- individual box, one per category
-* ``datasets/{ay}/drives.parquet``            -- drive chart
-* ``datasets/{ay}/officials.parquet``         -- officiating crews
-* ``datasets/{ay}/linescore.parquet``         -- linescore + game info
+  team-game: date, opponent, result, contest_id, attendance, espn_game_id)
+* ``rosters/parquet/{ay}.parquet``            -- per-team season rosters
 
-Parsers come from sdv-py (``cfb_ncaa_pbp`` / ``cfb_ncaa_box``); the
-cfbfastR-name mapping is the local prototype (:mod:`mfb_cfbfastr`).
+REFERENCE frames only. Game-grain season datasets (pbp, drives, box, ...)
+moved to ``ncaa-mfb-football-data``, which reshapes this repo's parsed
+``mfb/json/{contest_id}.json.gz`` payloads (stage 03) -- the -raw/-data
+split the MBB/WBB twins use.
 """
 
 from __future__ import annotations
 
-import gzip
-import json
 import re
 from pathlib import Path
 from typing import Optional
@@ -266,202 +260,12 @@ def build_teams(root: "str | Path", academic_year: int) -> pl.DataFrame:
     )
 
 
-def build_game_datasets(
-    root: "str | Path", academic_year: int, *, season: "Optional[int]" = None
-) -> "dict[str, int]":
-    """Every captured bundle -> per-dataset season parquet under ``mfb/datasets/{ay}/``.
-
-    ``season`` (fall year, e.g. 2025 for ay 2026) is written into the cfbfastR
-    frame; defaults to ``academic_year - 1``.
-    """
-    import sys
-
-    sdv_py = "/mnt/sdv_repos/sdv-py"
-    if sdv_py not in sys.path:
-        sys.path.insert(0, sdv_py)
-    from mfb_cfbfastr import (
-        parse_drive_titles,
-        parse_ot_drives,
-        parse_scoring_summary,
-        to_cfbfastr,
-    )
-    from sportsdataverse.cfb.cfb_ncaa_box import (
-        parse_cfb_ncaa_drives,
-        parse_cfb_ncaa_linescore,
-        parse_cfb_ncaa_officials,
-        parse_cfb_ncaa_player_stats,
-        parse_cfb_ncaa_team_stats,
-    )
-    from sportsdataverse.cfb.cfb_ncaa_pbp import parse_cfb_ncaa_pbp
-
-    root = Path(root)
-    season = season if season is not None else academic_year - 1
-    # season scoping: only bundles whose contest_id is in this season's schedule master
-    sched_path = root / "mfb" / "schedules" / "parquet" / f"{academic_year}.parquet"
-    season_ids = None
-    if sched_path.exists():
-        season_ids = set(
-            pl.read_parquet(sched_path).get_column("contest_id").drop_nulls().to_list()
-        )
-    acc: "dict[str, list[pl.DataFrame]]" = {}
-    player_acc: "dict[str, list[pl.DataFrame]]" = {}
-    n = 0
-    for p in sorted((root / "mfb" / "raw" / str(academic_year)).glob("*.json.gz")):
-        cid = p.stem.split(".")[0]
-        if season_ids is not None and cid not in season_ids:
-            continue
-        with gzip.open(p, "rt", encoding="utf-8") as fh:
-            bundle = json.load(fh)
-        n += 1
-        try:
-            pbp = parse_cfb_ncaa_pbp(bundle.get("play_by_play") or "", contest_id=cid)
-            drives = parse_cfb_ncaa_drives(bundle.get("drives") or "", contest_id=cid)
-            linescore = parse_cfb_ncaa_linescore(
-                bundle.get("box_score") or "", contest_id=cid
-            )
-            acc.setdefault("pbp", []).append(pbp)
-            acc.setdefault("pbp_cfbfastr", []).append(
-                to_cfbfastr(
-                    pbp,
-                    season=season,
-                    drives=drives,
-                    linescore=linescore,
-                    drive_titles=parse_drive_titles(bundle.get("play_by_play") or ""),
-                    ot_drives=parse_ot_drives(bundle.get("drives") or ""),
-                    scoring_summary=parse_scoring_summary(
-                        bundle.get("box_score") or ""
-                    ),
-                )
-            )
-            acc.setdefault("drives", []).append(drives)
-            acc.setdefault("linescore", []).append(linescore)
-            acc.setdefault("team_stats", []).append(
-                parse_cfb_ncaa_team_stats(
-                    bundle.get("team_stats") or "", contest_id=cid
-                )
-            )
-            acc.setdefault("officials", []).append(
-                parse_cfb_ncaa_officials(bundle.get("officials") or "", contest_id=cid)
-            )
-            for cat, frame in parse_cfb_ncaa_player_stats(
-                bundle.get("individual_stats") or "", contest_id=cid
-            ).items():
-                player_acc.setdefault(cat, []).append(frame)
-        except Exception as exc:  # noqa: BLE001 - one weird game must not sink the season build
-            print(
-                f"PARSE FAILED contest {cid}: {type(exc).__name__}: {exc}", flush=True
-            )
-
-    out_dir = root / "mfb" / "datasets" / str(academic_year)
-    out_dir.mkdir(parents=True, exist_ok=True)
-    written = {}
-    # QA: computed pbp final vs official linescore final, one row per game.
-    # A mismatch usually means the pbp page is INCOMPLETE at the source (e.g.
-    # stats.ncaa.org omitting OT drives), not a parser bug.
-    cf_frames = [f for f in acc.get("pbp_cfbfastr", []) if f.height]
-    ls_frames = [f for f in acc.get("linescore", []) if f.height]
-    if cf_frames and ls_frames:
-        last = (
-            pl.concat(cf_frames, how="diagonal_relaxed")
-            .group_by("game_id", maintain_order=True)
-            .last()
-            .select(
-                "game_id",
-                "pos_team",
-                "pos_team_score",
-                "def_pos_team",
-                "def_pos_team_score",
-            )
-        )
-        ls_all = pl.concat(ls_frames, how="diagonal_relaxed")
-        official = ls_all.group_by("contest_id", "team").agg(pl.col("final").max())
-        # stats.ncaa.org pbp pages OMIT overtime drives -- a mismatch on a game
-        # whose linescore shows OT periods is that known source gap, not a bug.
-        ot_games = set(
-            ls_all.filter(pl.col("period").str.contains("OT"))
-            .get_column("contest_id")
-            .to_list()
-        )
-        from mfb_cfbfastr import _norm_team
-
-        qa_rows = []
-        for r in last.to_dicts():
-            o = {
-                _norm_team(x["team"]): x["final"]
-                for x in official.filter(
-                    pl.col("contest_id") == str(r["game_id"])
-                ).to_dicts()
-                if x["team"]
-            }
-            comp = {
-                r["pos_team"]: r["pos_team_score"],
-                r["def_pos_team"]: r["def_pos_team_score"],
-            }
-            # no linescore -> unverifiable (null), not a mismatch
-            match = (
-                all(o.get(_norm_team(t)) == s for t, s in comp.items()) if o else None
-            )
-            # Name-blind score check: the two tabs can carry different name
-            # variants for the same school ("Mississippi Christian" on pbp vs
-            # "Mississippi Col." on linescore), and the drive-title vote can
-            # swap home/away attribution -- in both cases the score PAIR is
-            # still right. final_score_match=False + scores_match=True is that
-            # signature; scores_match=False is a genuine score derivation gap.
-            scores_match = sorted(comp.values()) == sorted(o.values()) if o else None
-            qa_rows.append(
-                {
-                    "game_id": r["game_id"],
-                    "computed_final": ", ".join(f"{t} {s}" for t, s in comp.items()),
-                    "official_final": ", ".join(f"{t} {s}" for t, s in o.items()),
-                    "final_score_match": match,
-                    "scores_match": scores_match,
-                    "ot_game": str(r["game_id"]) in ot_games,
-                }
-            )
-        qa = pl.DataFrame(qa_rows)
-        qa.write_parquet(out_dir / "qa_pbp_vs_linescore.parquet")
-        written["qa_final_score_match"] = qa.get_column("final_score_match").sum()
-    # ESPN enrichment: stage 06's crosswalk, joined per game at write time so
-    # every game-grain dataset carries espn_game_id (null when unmatched --
-    # ESPN doesn't list many FCS-vs-non-D1 games). pbp_cfbfastr keys on the
-    # cfbfastR-named game_id; everything else on contest_id.
-    from ncaa_mfb_06_xwalk_build import load_espn_game_index
-
-    espn_idx = load_espn_game_index(root, academic_year)
-
-    def _with_espn(df: pl.DataFrame, key: str) -> pl.DataFrame:
-        if not espn_idx or key not in df.columns:
-            return df
-        return df.with_columns(
-            pl.col(key)
-            .cast(pl.Utf8)
-            .replace_strict(espn_idx, default=None, return_dtype=pl.Utf8)
-            .alias("espn_game_id")
-        )
-
-    for name, frames in acc.items():
-        frames = [f for f in frames if f.height]
-        if not frames:
-            continue
-        df = pl.concat(frames, how="diagonal_relaxed")
-        df = _with_espn(df, "game_id" if name == "pbp_cfbfastr" else "contest_id")
-        df.write_parquet(out_dir / f"{name}.parquet")
-        written[name] = df.height
-    for cat, frames in player_acc.items():
-        frames = [f for f in frames if f.height]
-        if not frames:
-            continue
-        slug = re.sub(r"\W+", "_", cat.lower()).strip("_")
-        df = pl.concat(frames, how="diagonal_relaxed")
-        df = _with_espn(df, "contest_id")
-        df.write_parquet(out_dir / f"player_stats_{slug}.parquet")
-        written[f"player_stats_{slug}"] = df.height
-    written["games"] = n
-    return written
-
-
 def main(argv: "Optional[list[str]]" = None) -> int:
-    """CLI: build teams -> rosters -> schedule master -> game datasets for one season."""
+    """CLI: build the REFERENCE frames (teams, rosters, schedule master) for one season.
+
+    Game-grain season datasets moved to ncaa-mfb-football-data (the reshape
+    stage), which builds them from this repo's parsed ``mfb/json/`` payloads.
+    """
     import argparse
 
     ap = argparse.ArgumentParser(description=__doc__)
@@ -479,7 +283,6 @@ def main(argv: "Optional[list[str]]" = None) -> int:
         f"schedule master: {master.height} team-games, "
         f"{master.get_column('contest_id').drop_nulls().n_unique()} unique contests"
     )
-    print(f"game datasets: {build_game_datasets(args.root, args.academic_year)}")
     return 0
 
 

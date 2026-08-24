@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # User-run launcher (stage 05): persisted HTML + bundles -> tidy season parquet
-# (mfb/teams|rosters|schedules/parquet/, mfb/datasets/{ay}/*.parquet).
+# (mfb/teams|rosters|schedules/parquet/ -- reference frames only).
 # FULLY OFFLINE -- no proxy creds, no network, safe to run any time. Not
 # sharded (one output file per kind); run once after the sweeps finish.
 #   ./scripts/run_05_datasets.sh --academic-year 2026
