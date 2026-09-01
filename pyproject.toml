@@ -1,0 +1,33 @@
+[project]
+name = "ncaa-mfb-football-raw-scrape"
+version = "0.1.0"
+description = "stats.ncaa.org MFB raw-page capture + parse pipeline"
+requires-python = ">=3.10"
+dependencies = [
+    "sportsdataverse",
+    "polars>=1.0,<2.0",
+    "pyarrow>=15.0",
+    "beautifulsoup4>=4.12",
+]
+
+[dependency-groups]
+dev = ["pytest>=8.0", "ruff>=0.6"]
+
+# The parsers import sportsdataverse.cfb (cfb_ncaa_* engine), which lands on
+# main ahead of PyPI.
+[tool.uv.sources]
+sportsdataverse = { git = "https://github.com/sportsdataverse/sportsdataverse-py", branch = "main" }
+
+[tool.uv]
+package = false
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["python"]
+
+[tool.ruff]
+line-length = 120
+
+[tool.ruff.lint]
+select = ["E4", "E7", "E9", "F", "I"]
+ignore = ["E712"]
