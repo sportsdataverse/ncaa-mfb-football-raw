@@ -87,37 +87,49 @@ build order, not run order.
 
 [cfbfastR-cfb-data repository (source: ESPN)](https://github.com/sportsdataverse/cfbfastR-cfb-data)
 
-## Layout
+## Repository layout
+
+<!-- BEGIN GENERATED: layout -->
 
 ```
-python/
-  mfb_discover.py   # team list (sport_code=MFB) -> team pages -> contest_ids
-                    # + persisted teams/schedules HTML + roster sweep
-  mfb_capture.py    # 6-tab gzip JSON bundle per contest -> mfb/raw/{ay}/
-  mfb_run.py        # live runner: discovery + rosters + game bundles
-  mfb_parse.py      # (superseded by sdv-py cfb_ncaa_pbp; kept for history)
-  mfb_cfbfastr.py   # NCAA structural pbp -> cfbfastR-named columns (prototype)
-  mfb_datasets.py   # offline: HTML + bundles -> tidy season parquet
-  ncaa_mfb_01_schedules_scrape.py  # numbered stage shims (see RUNBOOK.md):
-  ncaa_mfb_02_games_scrape.py      #   thin argparse wrappers over mfb_run /
-  ncaa_mfb_04_rosters_scrape.py    #   mfb_datasets; 03 (parse) is a hole --
-  ncaa_mfb_05_datasets_build.py    #   parsing lives in sdv-py, runs in 05
-scripts/
-  _env.sh           # sourced by every launcher: venv, transport, logging
-  run_01_schedules.sh  run_02_games.sh  run_03_parse.sh  run_04_rosters.sh
-  run_05_datasets.sh  run_06_xwalk.sh
-  run_mfb_capture.sh   # combined one-session runner (01 + 04 + 02)
-tests/fixtures/     # real captured pages (parser ground truth)
-mfb/
-  teams/{html,parquet}/         # team lists per (ay, division)
-  schedules/{html,parquet}/     # team pages + schedule master
-  rosters/html/{ay}/            # team roster pages
-  raw/{ay}/                     # gzip 6-tab HTML bundles (capture output)
-  json/                         # parsed + enriched per-game JSON (stage 03; espn_game_id)
-  xwalk/                        # NCAA<->ESPN game + team crosswalks (stage 06)
-  datasets/{ay}/                # built parquet (pbp, pbp_cfbfastr, boxes, ...)
-docs/DESIGN.md
+ncaa-mfb-football-raw/
+├── docs/   # explainers, model reports and dataset docs
+├── mfb/
+│   ├── json/
+│   ├── raw/
+│   ├── rosters/
+│   ├── schedules/
+│   ├── teams/
+│   └── xwalk/
+├── python/   # Python pipeline stages, numbered in build order
+│   ├── ncaa_mfb_raw_scrape/
+│   ├── ncaa_mfb_01_schedules_scrape.py
+│   ├── ncaa_mfb_02_games_scrape.py
+│   ├── ncaa_mfb_03_games_parse.py
+│   ├── ncaa_mfb_04_rosters_scrape.py
+│   ├── ncaa_mfb_05_datasets_build.py
+│   └── ncaa_mfb_06_xwalk_build.py
+├── scripts/   # bash drivers (the daily/weekly entry points)
+│   ├── _env.sh
+│   ├── run_01_schedules.sh
+│   ├── run_02_games.sh
+│   ├── run_03_parse.sh
+│   ├── run_04_rosters.sh
+│   ├── run_05_datasets.sh
+│   ├── run_06_xwalk.sh
+│   ├── run_backfill_all.sh
+│   └── run_mfb_capture.sh
+└── tests/   # test suite
+    ├── fixtures/
+    ├── test_mfb_capture.py
+    ├── test_mfb_cfbfastr.py
+    ├── test_mfb_datasets.py
+    ├── test_mfb_discover.py
+    ├── test_mfb_parse.py
+    └── test_mfb_stages.py
 ```
+
+<!-- END GENERATED: layout -->
 
 ## Running
 
