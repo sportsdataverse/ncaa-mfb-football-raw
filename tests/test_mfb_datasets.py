@@ -8,7 +8,7 @@ import pytest
 
 pl = pytest.importorskip("polars")
 
-from mfb_datasets import parse_team_list, parse_team_schedule  # noqa: E402
+from ncaa_mfb_raw_scrape.mfb_datasets import parse_team_list, parse_team_schedule  # noqa: E402
 
 FIXTURES = Path(__file__).resolve().parents[1] / "tests" / "fixtures"
 

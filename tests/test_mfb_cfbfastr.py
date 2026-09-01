@@ -14,7 +14,7 @@ import pytest
 pl = pytest.importorskip("polars")
 sdv = pytest.importorskip("sportsdataverse.cfb.cfb_ncaa_pbp")
 
-from mfb_cfbfastr import _first_last, to_cfbfastr  # noqa: E402
+from ncaa_mfb_raw_scrape.mfb_cfbfastr import _first_last, to_cfbfastr  # noqa: E402
 
 FIXTURES = Path(__file__).resolve().parents[1] / "tests" / "fixtures"
 

@@ -6,7 +6,7 @@ from __future__ import annotations
 from pathlib import Path
 
 import pytest
-from mfb_discover import (
+from ncaa_mfb_raw_scrape.mfb_discover import (
     discover_season,
     parse_contest_ids,
     parse_team_ids,

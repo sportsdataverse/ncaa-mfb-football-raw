@@ -11,4 +11,4 @@
 # falls back to building MFB_PROXY_POOL from .Renviron Decodo creds (_env.sh).
 set -uo pipefail
 source "$(dirname "$0")/_env.sh"
-run_stage mfb_capture python/mfb_run.py --out "${ROOT}" "$@"
+run_stage mfb_capture python/ncaa_mfb_raw_scrape/mfb_run.py --out "${ROOT}" "$@"

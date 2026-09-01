@@ -36,7 +36,7 @@ for ay in $(seq "$START" -1 "$END"); do
   fi
   # 1) discovery + rosters per division (single session; resumable)
   for div in 11 12; do
-    "$PY" python/mfb_run.py --out "$ROOT" --academic-year "$ay" --division "$div" \
+    "$PY" python/ncaa_mfb_raw_scrape/mfb_run.py --out "$ROOT" --academic-year "$ay" --division "$div" \
       --rosters --skip-games > "logs/bf_${ay}_01_div${div}.log" 2>&1
     rc=$?
     if [ $rc -ne 0 ] && grep -q "no MFB teams" "logs/bf_${ay}_01_div${div}.log"; then
@@ -56,9 +56,9 @@ for ay in $(seq "$START" -1 "$END"); do
 
   # 2) games: $SHARDS shard workers, each div 11 then div 12
   for i in $(seq 0 $((SHARDS - 1))); do
-    ( "$PY" python/mfb_run.py --out "$ROOT" --academic-year "$ay" --division 11 --shard "$i/$SHARDS" \
+    ( "$PY" python/ncaa_mfb_raw_scrape/mfb_run.py --out "$ROOT" --academic-year "$ay" --division 11 --shard "$i/$SHARDS" \
         >  "logs/bf_${ay}_02_shard${i}.log" 2>&1
-      "$PY" python/mfb_run.py --out "$ROOT" --academic-year "$ay" --division 12 --shard "$i/$SHARDS" \
+      "$PY" python/ncaa_mfb_raw_scrape/mfb_run.py --out "$ROOT" --academic-year "$ay" --division 12 --shard "$i/$SHARDS" \
         >> "logs/bf_${ay}_02_shard${i}.log" 2>&1 ) &
     sleep 3
   done
@@ -70,7 +70,7 @@ for ay in $(seq "$START" -1 "$END"); do
 
   # 3) reference datasets build (offline). Game-grain season datasets + QA
   # moved to ncaa-mfb-football-data (built from this repo's parsed mfb/json/).
-  "$PY" python/mfb_datasets.py --academic-year "$ay" > "logs/bf_${ay}_05.log" 2>&1 || true
+  "$PY" python/ncaa_mfb_raw_scrape/mfb_datasets.py --academic-year "$ay" > "logs/bf_${ay}_05.log" 2>&1 || true
   git add mfb/schedules/parquet mfb/rosters/parquet mfb/teams/parquet 2>/dev/null || true
   git commit -q -m "feat(data): built ay${ay} (fall ${fall}) reference frames" \
     && git push -q origin main || true

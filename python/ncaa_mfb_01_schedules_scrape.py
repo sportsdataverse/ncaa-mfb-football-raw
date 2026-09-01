@@ -15,7 +15,7 @@ from __future__ import annotations
 
 import sys
 
-import mfb_run
+import ncaa_mfb_raw_scrape.mfb_run as mfb_run
 
 FORCED = ("--skip-games",)
 

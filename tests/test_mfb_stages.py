@@ -15,10 +15,10 @@ REPO = Path(__file__).resolve().parents[1]
 
 # (shim module, delegate module, forced argv tail)
 STAGES = (
-    ("ncaa_mfb_01_schedules_scrape", "mfb_run", ("--skip-games",)),
-    ("ncaa_mfb_02_games_scrape", "mfb_run", ()),
-    ("ncaa_mfb_04_rosters_scrape", "mfb_run", ("--rosters", "--skip-games")),
-    ("ncaa_mfb_05_datasets_build", "mfb_datasets", ()),
+    ("ncaa_mfb_01_schedules_scrape", "ncaa_mfb_raw_scrape.mfb_run", ("--skip-games",)),
+    ("ncaa_mfb_02_games_scrape", "ncaa_mfb_raw_scrape.mfb_run", ()),
+    ("ncaa_mfb_04_rosters_scrape", "ncaa_mfb_raw_scrape.mfb_run", ("--rosters", "--skip-games")),
+    ("ncaa_mfb_05_datasets_build", "ncaa_mfb_raw_scrape.mfb_datasets", ()),
 )
 
 
@@ -46,7 +46,7 @@ def test_launcher_invokes_its_own_shim(shim, delegate, forced) -> None:
 
 def test_datasets_main_parses_argv() -> None:
     """mfb_datasets.main is the delegate for 05 -- argparse smoke, no build."""
-    import mfb_datasets
+    import ncaa_mfb_raw_scrape.mfb_datasets as mfb_datasets
 
     with pytest.raises(SystemExit) as ei:
         mfb_datasets.main(["--help"])

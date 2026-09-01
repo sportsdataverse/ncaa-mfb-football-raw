@@ -5,7 +5,7 @@ from __future__ import annotations
 from pathlib import Path
 
 import polars as pl
-from mfb_parse import PBP_SCHEMA, parse_mfb_pbp
+from ncaa_mfb_raw_scrape.mfb_parse import PBP_SCHEMA, parse_mfb_pbp
 
 FIX = (
     Path(__file__).resolve().parents[1] / "tests" / "fixtures" / "mfb_pbp_5362535.html"

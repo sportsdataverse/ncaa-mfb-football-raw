@@ -24,8 +24,8 @@ import argparse
 import os
 import sys
 
-from mfb_capture import capture_season
-from mfb_discover import (
+from ncaa_mfb_raw_scrape.mfb_capture import capture_season
+from ncaa_mfb_raw_scrape.mfb_discover import (
     browser_fetch_fn,
     capture_rosters,
     discover_season,

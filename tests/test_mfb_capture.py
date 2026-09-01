@@ -7,7 +7,7 @@ import json
 from pathlib import Path
 
 import pytest
-from mfb_capture import bundle_path, capture_contest, capture_season, is_captured
+from ncaa_mfb_raw_scrape.mfb_capture import bundle_path, capture_contest, capture_season, is_captured
 
 _REAL_PBP = '<div class="drives">' + "x" * 60_000  # >40 KB + the 'drives' marker
 _REAL_BOX = "<table>" + "y" * 20_000

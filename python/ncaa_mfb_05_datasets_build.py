@@ -11,7 +11,7 @@ from __future__ import annotations
 
 import sys
 
-import mfb_datasets
+import ncaa_mfb_raw_scrape.mfb_datasets as mfb_datasets
 
 
 def main(argv: "list[str] | None" = None) -> int:
