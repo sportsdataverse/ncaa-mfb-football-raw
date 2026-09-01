@@ -13,6 +13,80 @@ cfbfastR column-parity mapping prototyped here (`mfb_cfbfastr.py`, 102
 cfbfastR-named columns incl. parity-tested running scores). See
 [docs/DESIGN.md](docs/DESIGN.md) for the phased plan and decision log.
 
+## ncaa-mfb-football workflow diagram
+
+```mermaid
+  graph LR;
+    S[stats.ncaa.org]-->A[ncaa-mfb-football-raw];
+    A[ncaa-mfb-football-raw]-->B[ncaa-mfb-football-data];
+    B[ncaa-mfb-football-data]-->C1[ncaa_mfb_teams];
+    B[ncaa-mfb-football-data]-->C2[ncaa_mfb_schedule];
+    B[ncaa-mfb-football-data]-->C3[ncaa_mfb_rosters];
+    B[ncaa-mfb-football-data]-->C4[ncaa_mfb_pbp];
+    B[ncaa-mfb-football-data]-->C5[ncaa_mfb_pbp_cfbfastr];
+    B[ncaa-mfb-football-data]-->C6[ncaa_mfb_team_stats];
+    B[ncaa-mfb-football-data]-->C7[ncaa_mfb_player_stats];
+    B[ncaa-mfb-football-data]-->C8[ncaa_mfb_drives];
+    B[ncaa-mfb-football-data]-->C9[ncaa_mfb_officials];
+    B[ncaa-mfb-football-data]-->C10[ncaa_mfb_linescore];
+```
+
+```mermaid
+flowchart TB;
+    subgraph A[ncaa-mfb-football-raw];
+        direction TB;
+        A0[scripts/run_backfill_all.sh]-->A1[python/ncaa_mfb_01_schedules_scrape.py];
+        A1[python/ncaa_mfb_01_schedules_scrape.py]-->A2[python/ncaa_mfb_02_games_scrape.py];
+        A2[python/ncaa_mfb_02_games_scrape.py]-->A3[python/ncaa_mfb_03_games_parse.py];
+        A3[python/ncaa_mfb_03_games_parse.py]-->A4[python/ncaa_mfb_04_rosters_scrape.py];
+        A4[python/ncaa_mfb_04_rosters_scrape.py]-->A5[python/ncaa_mfb_05_datasets_build.py];
+        A5[python/ncaa_mfb_05_datasets_build.py]-->A6[python/ncaa_mfb_06_xwalk_build.py];
+    end;
+
+    subgraph B[ncaa-mfb-football-data];
+        direction TB;
+        B0[scripts/run_build.sh]-->B1[python/ncaa_mfb_01_teams_creation.py];
+        B1[python/ncaa_mfb_01_teams_creation.py]-->B2[python/ncaa_mfb_02_schedule_creation.py];
+        B2[python/ncaa_mfb_02_schedule_creation.py]-->B3[python/ncaa_mfb_03_rosters_creation.py];
+        B3[python/ncaa_mfb_03_rosters_creation.py]-->B4[python/ncaa_mfb_04_pbp_creation.py];
+        B4[python/ncaa_mfb_04_pbp_creation.py]-->B5[python/ncaa_mfb_05_pbp_cfbfastr_creation.py];
+        B5[python/ncaa_mfb_05_pbp_cfbfastr_creation.py]-->B6[python/ncaa_mfb_06_team_stats_creation.py];
+        B6[python/ncaa_mfb_06_team_stats_creation.py]-->B7[python/ncaa_mfb_07_player_stats_creation.py];
+        B7[python/ncaa_mfb_07_player_stats_creation.py]-->B8[python/ncaa_mfb_08_drives_creation.py];
+        B8[python/ncaa_mfb_08_drives_creation.py]-->B9[python/ncaa_mfb_09_officials_creation.py];
+        B9[python/ncaa_mfb_09_officials_creation.py]-->B10[python/ncaa_mfb_10_linescore_creation.py];
+    end;
+
+    subgraph C[sportsdataverse-data Releases];
+        direction TB;
+        C1[ncaa_mfb_teams];
+        C2[ncaa_mfb_schedule];
+        C3[ncaa_mfb_rosters];
+        C4[ncaa_mfb_pbp];
+        C5[ncaa_mfb_pbp_cfbfastr];
+        C6[ncaa_mfb_team_stats];
+        C7[ncaa_mfb_player_stats];
+        C8[ncaa_mfb_drives];
+        C9[ncaa_mfb_officials];
+        C10[ncaa_mfb_linescore];
+    end;
+
+    A-->B;
+    B-->C;
+```
+
+`scripts/run_backfill_all.sh` (raw) and `scripts/run_build.sh` +
+`scripts/run_publish.sh` (data) are the drivers. Stage numbers are intended
+build order, not run order.
+
+[ncaa-mfb-football-raw repository (source: stats.ncaa.org)](https://github.com/sportsdataverse/ncaa-mfb-football-raw)
+
+[ncaa-mfb-football-data repository (source: stats.ncaa.org)](https://github.com/sportsdataverse/ncaa-mfb-football-data)
+
+[cfbfastR-cfb-raw repository (source: ESPN)](https://github.com/sportsdataverse/cfbfastR-cfb-raw)
+
+[cfbfastR-cfb-data repository (source: ESPN)](https://github.com/sportsdataverse/cfbfastR-cfb-data)
+
 ## Layout
 
 ```
@@ -92,3 +166,13 @@ Requires a US residential transport — datacenter IPs get an instant Akamai
 edge 403. Capture holds ONE browser session (a rapid relaunch storm across
 proxies crashes the patchright driver with EPIPE); sticky session ids are
 re-minted per run by the sdv-py vendor seam.
+
+## Automation & status
+
+<!-- BEGIN GENERATED: status -->
+
+| workflow | schedule | last run |
+|---|---|---|
+| _none_ | — | — |
+
+<!-- END GENERATED: status -->
