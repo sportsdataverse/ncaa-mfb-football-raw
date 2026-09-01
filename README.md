@@ -186,3 +186,21 @@ re-minted per run by the sdv-py vendor seam.
 | _none_ | — | — |
 
 <!-- END GENERATED: status -->
+
+## Consumers
+
+The packages that read what this repo produces:
+
+- **R:** [cfbfastR](https://cfbfastR.sportsdataverse.org) — docs at <https://cfbfastR.sportsdataverse.org>
+- **Python:** [`sportsdataverse.cfb (cfb_ncaa_*)`](https://github.com/sportsdataverse/sportsdataverse-py) — docs at <https://py.sportsdataverse.org>
+
+## Stage inventory
+
+Every numbered pipeline stage in `python/` (auto-listed; run subsets with the `scripts/*.sh` drivers by number or name):
+
+- `python/ncaa_mfb_01_schedules_scrape.py`
+- `python/ncaa_mfb_02_games_scrape.py`
+- `python/ncaa_mfb_03_games_parse.py`
+- `python/ncaa_mfb_04_rosters_scrape.py`
+- `python/ncaa_mfb_05_datasets_build.py`
+- `python/ncaa_mfb_06_xwalk_build.py`
