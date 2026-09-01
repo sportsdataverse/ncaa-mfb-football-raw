@@ -167,6 +167,16 @@ edge 403. Capture holds ONE browser session (a rapid relaunch storm across
 proxies crashes the patchright driver with EPIPE); sticky session ids are
 re-minted per run by the sdv-py vendor seam.
 
+## Reports & explainers
+
+<!-- BEGIN GENERATED: reports -->
+
+| Report | What it is | Last updated |
+|---|---|---|
+| [NCAA Men's Football (MFB) play-by-play — design + plan](docs/DESIGN.md) | explainer | 2026-07-16 |
+
+<!-- END GENERATED: reports -->
+
 ## Automation & status
 
 <!-- BEGIN GENERATED: status -->
