@@ -47,12 +47,12 @@ patchright/bm-verify transport shipped in sdv-py #271.
 ## Design
 
 ### Pipeline (mirrors `ncaa-mbb-hoops-raw`)
-1. **Discover** (`python/mfb_discover.py`): team list (sport_code=MFB, division) →
+1. **Discover** (`python/ncaa_mfb_raw_scrape/mfb_discover.py`): team list (sport_code=MFB, division) →
    team pages → dedup `contest_id`s → `schedule_master.parquet`.
-2. **Capture** (`python/mfb_capture.py`): `NcaaFetcher.with_browser` fetches
+2. **Capture** (`python/ncaa_mfb_raw_scrape/mfb_capture.py`): `NcaaFetcher.with_browser` fetches
    `/contests/{id}/play_by_play` (+ `box_score`) → committed raw HTML/JSON bundle.
    Idempotent (file-exists resume). Paced rotation (no relaunch storm).
-3. **Parse** (`python/mfb_parse.py` + sdv-py parser): `div.drives` →
+3. **Parse** (`python/ncaa_mfb_raw_scrape/mfb_parse.py` + sdv-py parser): `div.drives` →
    `.scoring_play`/`.non_scoring_play` → one row per play; extract structured
    fields from the play text.
 4. **Publish** (`ncaa-mfb-hoops-data`): tidy parquet + gh release (later).
@@ -75,7 +75,7 @@ score_offense, score_defense, players (rusher/passer/receiver/tackler...), play_
   JSON bundle per contest, consecutive-failure breaker), `mfb_run.py` + `scripts/
   run_mfb_capture.sh` (hold ONE browser session — no relaunch storm — proxy pool
   from env). **Not yet run live at scale** (needs IP rotation, open risk #2).
-- **Phase 2 — drive/play structural parse. ✓ DONE** (`python/mfb_parse.py`,
+- **Phase 2 — drive/play structural parse. ✓ DONE** (`python/ncaa_mfb_raw_scrape/mfb_parse.py`,
   `parse_mfb_pbp`). Parses the FULL game (205 plays from fixture 5362535) → one
   row per play with drive_number/offense/drive_result/drive_scored + down/
   distance/yard_line + raw play_text. 6 offline tests green. Note: rows include

@@ -7,7 +7,7 @@ MFB parsing graduated to sdv-py (`cfb_ncaa_pbp` / `cfb_ncaa_box`) and runs
 inside stage 05. A retired stage leaves a hole rather than renumbering.
 
 Every stage shim in `python/` is a thin argparse wrapper that delegates to the
-working modules (`mfb_run.main` / `mfb_datasets.main`); `mfb_run.py` stays the
+working modules (`mfb_run.main` / `mfb_datasets.main`); `python/ncaa_mfb_raw_scrape/mfb_run.py` stays the
 combined one-session runner (`scripts/run_mfb_capture.sh`).
 
 `--academic-year` is the **ENDING** year (2026 = fall-2025 season).
@@ -25,7 +25,7 @@ combined one-session runner (`scripts/run_mfb_capture.sh`).
 | 05 | datasets: HTML → `mfb/{teams,rosters,schedules}/parquet/` reference frames (game datasets build in `ncaa-mfb-football-data`) | `python/ncaa_mfb_05_datasets_build.py` | `scripts/run_05_datasets.sh` | **offline** (no proxy) | pure function of the tree; re-run overwrites; NOT sharded (one file per kind) | `./scripts/run_05_datasets.sh --academic-year 2026` |
 | 06 | xwalk: NCAA↔ESPN game crosswalk → `mfb/xwalk/espn_game_id/{ay}.json` (+ voted team map) | `python/ncaa_mfb_06_xwalk_build.py` | `scripts/run_06_xwalk.sh` | offline + one `load_cfb_schedule` release read per season | re-run overwrites | `./scripts/run_06_xwalk.sh --academic-year 2026` |
 | — | full historical backfill orchestrator (01+04+02+05 per season, newest→oldest, commits per stage) | — | `scripts/run_backfill_all.sh` | online | every stage resumable | `NCAA_VENDOR=decodo_patchright ./scripts/run_backfill_all.sh 2026 2014` |
-| — | combined runner (01 + 04 + 02 in one browser session) | `python/mfb_run.py` | `scripts/run_mfb_capture.sh` | online | as above | `NCAA_VENDOR=decodo_patchright ./scripts/run_mfb_capture.sh --academic-year 2026 --rosters --max-contests 20` |
+| — | combined runner (01 + 04 + 02 in one browser session) | `python/ncaa_mfb_raw_scrape/mfb_run.py` | `scripts/run_mfb_capture.sh` | online | as above | `NCAA_VENDOR=decodo_patchright ./scripts/run_mfb_capture.sh --academic-year 2026 --rosters --max-contests 20` |
 
 `scripts/_env.sh` is sourced by every launcher (not run): repo root, sdv-py
 sibling venv resolution (droplet `/mnt/sdv_repos/sdv-py` first, then the
@@ -80,6 +80,6 @@ PYTHONPATH="/mnt/sdv_repos/sdv-py:$PWD/python" \
   /mnt/sdv_repos/sdv-py/.venv/bin/python -m pytest python/ tests/ -q
 ```
 
-`python/test_mfb_stages.py` is the stage gate: each shim delegates with its
+`tests/test_mfb_stages.py` is the stage gate: each shim delegates with its
 forced flags, each `run_NN_*.sh` invokes its own shim, and this runbook lists
 every stage and launcher.
