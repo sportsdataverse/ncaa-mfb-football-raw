@@ -146,7 +146,6 @@ def parse_contest(
 
 def _season_inputs(root: Path, ay: int) -> "tuple[list[str], dict, dict, dict]":
     import polars as pl
-
     from ncaa_mfb_06_xwalk_build import load_espn_game_index, team_map_path
 
     cids = sorted(
