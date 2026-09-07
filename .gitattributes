@@ -1,0 +1,17 @@
+# Pin LF for text in the index AND the working tree.
+#
+# Without this, a tool that writes CRLF on Windows (PowerShell `Set-Content`
+# and `Out-File` both default to it) leaves every file it touched showing as
+# modified forever, with zero content difference. On 2026-09-06 this repo
+# carried 506 modified roster HTML files -- 677,268 insertions against
+# 677,268 deletions, and `git diff --ignore-all-space` was completely empty.
+#
+# `text=auto` lets git detect and skip binary; `eol=lf` stops the checkout
+# from re-introducing CRLF on Windows.
+* text=auto eol=lf
+
+# Scraped payloads and columnar data are byte-exact. These are the bulk of
+# the repo (~39k .gz, ~52 .parquet); mark them explicitly rather than relying
+# on auto-detection alone.
+*.gz      binary
+*.parquet binary
