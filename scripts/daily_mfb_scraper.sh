@@ -68,13 +68,13 @@ STAGE_RC="${PIPESTATUS[0]}"
 
 # Commit + push. The season-commit message format is load-bearing downstream, so
 # it is kept verbatim.
-# mfb/ only. `logs/` was in this pathspec but is gitignored in THIS repo (the
-# MBB/WBB twins commit their logs; MFB does not), so git rejected the whole
-# pathspec with exit 1 -- suppressed by 2>/dev/null -- and could never have
-# committed a log. Everything scraped lands under mfb/ (raw, json, schedules,
-# teams, rosters, datasets, xwalk), none of which is ignored, so this stages
-# the full capture.
-git add -- mfb/
+# Both trees. Everything scraped lands under mfb/ (raw, json, schedules, teams,
+# rosters, datasets, xwalk); logs/ carries the run record. `logs/` used to be
+# gitignored here while the MBB/WBB twins tracked theirs, so git rejected this
+# whole pathspec with exit 1 -- suppressed by a 2>/dev/null -- and no log was
+# ever committed by a line written to commit logs. The ignore rule is gone
+# (D22 parity), so both paths stage for real now.
+git add -- mfb/ logs/
 if ! git diff --cached --quiet; then
   git commit -q -m "MFB Raw Update (Start: ${FALL} End: ${FALL})"
 

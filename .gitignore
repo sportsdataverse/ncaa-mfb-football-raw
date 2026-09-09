@@ -2,7 +2,13 @@ __pycache__/
 *.py[cod]
 .venv/
 venv/
-/logs/
+# Stray root logs only (D8: top-level *.log/*.out never belong in git).
+# NOTE: `logs/` is deliberately NOT ignored (D22: run logs are tracked in
+# every repo) -- this repo was the last holdout, and its daily driver had
+# been trying to `git add logs/` the whole time, which git rejected because
+# the whole pathspec named an ignored path.
+/*.log
+/*.out
 .pytest_cache/
 .ruff_cache/
 .mypy_cache/
