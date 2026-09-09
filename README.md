@@ -117,6 +117,7 @@ ncaa-mfb-football-raw/
 │   ├── run_04_rosters.sh
 │   ├── run_05_datasets.sh
 │   ├── run_06_xwalk.sh
+│   ├── daily_mfb_scraper.sh
 │   ├── run_backfill_all.sh
 │   └── run_mfb_capture.sh
 └── tests/   # test suite
@@ -151,6 +152,23 @@ file-exists resumable; a consecutive-failure breaker hard-stops ban storms.
 `./scripts/run_mfb_capture.sh` is the combined one-session runner (01 + 04 +
 02) for chunked one-shot runs. Backfill = the same stages with a different
 `--academic-year`.
+
+`./scripts/daily_mfb_scraper.sh` is the **in-season daily driver, run from the
+droplet crontab** — not from Prefect. It resolves the current academic year from
+`ncaa_mfb_raw_scrape.current_academic_year()`, captures FBS (division 11) and FCS
+(division 12), parses, then commits and pushes. Pace is env-only
+(`MFB_MAX_CONTESTS`, `MFB_WORKERS`, `MFB_ACADEMIC_YEAR`), so it can be re-tuned
+without a commit.
+
+```sh
+NCAA_VENDOR=decodo_patchright ./scripts/daily_mfb_scraper.sh
+tail -f logs/daily_mfb_$(date -u +%Y%m%d).log      # live watch
+```
+
+> sdv-orch's `ncaa_mfb` entry keeps `schedule_active=False` on purpose. Its
+> `crons` model the season window for the nightly coverage report; the deployment
+> stays paused. Activating it while this cron runs would make two producers of
+> the same data.
 
 ## Known source gaps (2025 season)
 
