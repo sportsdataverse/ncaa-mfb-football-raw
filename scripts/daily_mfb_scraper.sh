@@ -17,15 +17,19 @@
 # Tunables (env only -- never edit pace into the script; you should be able to
 # re-tune without a commit):
 #   MFB_MAX_CONTESTS  per-division capture cap per run   (default 400)
-#   MFB_WORKERS       capture concurrency                (default 4)
 #   MFB_ACADEMIC_YEAR override the resolved ay           (default: current)
+#
+# Deliberately single-stream: mfb_run.py parallelises via --shard i/N, not a
+# worker count, and a daily incremental has few new contests. stats.ncaa.org is
+# a hostile host -- run_backfill_all.sh shards only because it is replaying whole
+# seasons. If a daily run ever needs it, add --shard here, not a --workers flag
+# (there is no such flag; passing one exits 2 on every run).
 set -uo pipefail
 
 cd "$(dirname "$0")/.." || exit 2
 source "scripts/_env.sh"
 
 MAX_CONTESTS="${MFB_MAX_CONTESTS:-400}"
-WORKERS="${MFB_WORKERS:-4}"
 
 # The academic year comes from the shared helper, not a hardcoded constant --
 # `range(2014, 2027)` silently excluding ay2027 is precisely the bug this repo
@@ -40,7 +44,7 @@ FALL=$((AY - 1))
 LOG="logs/daily_mfb_$(date -u +%Y%m%d).log"
 mkdir -p logs
 {
-  echo "[$(date -u '+%F %T')Z] daily mfb start: ay=${AY} (fall ${FALL}) max=${MAX_CONTESTS} workers=${WORKERS}"
+  echo "[$(date -u '+%F %T')Z] daily mfb start: ay=${AY} (fall ${FALL}) max=${MAX_CONTESTS}"
 
   rc_total=0
   # Divisions 11 (FBS) and 12 (FCS). Every stage is file-exists resumable, so a
@@ -48,7 +52,7 @@ mkdir -p logs
   for div in 11 12; do
     run_stage "daily_mfb_capture_d${div}" python/ncaa_mfb_raw_scrape/mfb_run.py \
       --out "${ROOT}" --academic-year "${AY}" --division "${div}" \
-      --max-contests "${MAX_CONTESTS}" --workers "${WORKERS}"
+      --max-contests "${MAX_CONTESTS}"
     rc=$?
     [ "$rc" -ne 0 ] && { echo "WARN capture div=${div} rc=${rc}"; rc_total=1; }
   done
