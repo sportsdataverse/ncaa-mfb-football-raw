@@ -1,0 +1,5 @@
+teams: 252
+rosters: 25147 players, 252 teams
+schedule master: 3114 team-games, 1600 unique contests
+game datasets: {'qa_final_score_match': 1558, 'pbp': 349222, 'pbp_cfbfastr': 308466, 'drives': 42855, 'linescore': 12646, 'team_stats': 1112491, 'officials': 11612, 'player_stats_other': 53994, 'games': 1567}
+ay2015 QA: 1558/1567 exact, 1 unverifiable, 8 flagged

@@ -1,0 +1,40 @@
+transport: NCAA_VENDOR=decodo_patchright (canary_vendors.toml) shard 2/8
+discovered 130 MFB teams (ay=2020 div=11)
+team pages 25/130: 295 contests
+team pages 50/130: 536 contests
+team pages 75/130: 708 contests
+team pages 100/130: 826 contests
+team pages 125/130: 883 contests
+discovered 888 MFB contests
+shard 2/8: 111 contests
+games: {'captured': 10, 'skipped': 0, 'failed': 0}
+games: {'captured': 19, 'skipped': 0, 'failed': 1}
+games: {'captured': 29, 'skipped': 0, 'failed': 1}
+games: {'captured': 39, 'skipped': 0, 'failed': 1}
+games: {'captured': 49, 'skipped': 0, 'failed': 1}
+games: {'captured': 59, 'skipped': 0, 'failed': 1}
+games: {'captured': 69, 'skipped': 0, 'failed': 1}
+games: {'captured': 79, 'skipped': 0, 'failed': 1}
+games: {'captured': 89, 'skipped': 0, 'failed': 1}
+games: {'captured': 99, 'skipped': 0, 'failed': 1}
+games: {'captured': 109, 'skipped': 0, 'failed': 1}
+capture: {'captured': 110, 'skipped': 0, 'failed': 1}
+transport: NCAA_VENDOR=decodo_patchright (canary_vendors.toml) shard 2/8
+discovered 126 MFB teams (ay=2020 div=12)
+team pages 25/126: 267 contests
+team pages 50/126: 483 contests
+team pages 75/126: 655 contests
+team pages 100/126: 773 contests
+team pages 125/126: 848 contests
+discovered 848 MFB contests
+shard 2/8: 106 contests
+games: {'captured': 10, 'skipped': 6, 'failed': 0}
+games: {'captured': 20, 'skipped': 11, 'failed': 0}
+games: {'captured': 30, 'skipped': 12, 'failed': 0}
+games: {'captured': 40, 'skipped': 13, 'failed': 0}
+games: {'captured': 50, 'skipped': 13, 'failed': 0}
+games: {'captured': 60, 'skipped': 13, 'failed': 0}
+games: {'captured': 70, 'skipped': 13, 'failed': 0}
+games: {'captured': 79, 'skipped': 14, 'failed': 1}
+games: {'captured': 89, 'skipped': 15, 'failed': 1}
+capture: {'captured': 90, 'skipped': 15, 'failed': 1}

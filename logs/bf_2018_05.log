@@ -1,0 +1,5 @@
+teams: 254
+rosters: 25983 players, 254 teams
+schedule master: 3055 team-games, 1552 unique contests
+game datasets: {'qa_final_score_match': 1518, 'pbp': 333841, 'pbp_cfbfastr': 294756, 'drives': 40996, 'linescore': 12268, 'team_stats': 1177182, 'officials': 12504, 'player_stats_other': 52610, 'games': 1528}
+ay2018 QA: 1518/1528 exact, 8 unverifiable, 2 flagged

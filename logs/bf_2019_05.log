@@ -1,0 +1,5 @@
+teams: 255
+rosters: 26670 players, 255 teams
+schedule master: 3052 team-games, 1558 unique contests
+game datasets: {'qa_final_score_match': 1522, 'pbp': 338681, 'pbp_cfbfastr': 299138, 'drives': 41127, 'linescore': 12368, 'team_stats': 1078560, 'officials': 12514, 'player_stats_other': 53258, 'games': 1532}
+ay2019 QA: 1522/1532 exact, 5 unverifiable, 5 flagged

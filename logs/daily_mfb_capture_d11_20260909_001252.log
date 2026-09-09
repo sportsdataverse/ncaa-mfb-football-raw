@@ -1,0 +1,24 @@
+transport: NCAA_VENDOR=decodo_patchright (canary_vendors.toml) shard 0/1
+Traceback (most recent call last):
+  File "/mnt/sdv_repos/ncaa-mfb-football-raw/python/ncaa_mfb_raw_scrape/mfb_run.py", line 116, in <module>
+    raise SystemExit(main())
+                     ~~~~^^
+  File "/mnt/sdv_repos/ncaa-mfb-football-raw/python/ncaa_mfb_raw_scrape/mfb_run.py", line 87, in main
+    teams = discover_teams(
+        args.academic_year, args.division, fetch_fn=fetch, save_dir=args.out
+    )
+  File "/mnt/sdv_repos/ncaa-mfb-football-raw/python/ncaa_mfb_raw_scrape/mfb_discover.py", line 103, in discover_teams
+    _read_or_fetch(tl_path, fetch, team_list_path(academic_year, division))
+    ~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/mnt/sdv_repos/ncaa-mfb-football-raw/python/ncaa_mfb_raw_scrape/mfb_discover.py", line 76, in _read_or_fetch
+    html = fetch_fn(url_path) or ""
+           ~~~~~~~~^^^^^^^^^^
+  File "/mnt/sdv_repos/ncaa-mfb-football-raw/python/ncaa_mfb_raw_scrape/mfb_discover.py", line 65, in <lambda>
+    return lambda path: fetcher.fetch_html(path)
+                        ~~~~~~~~~~~~~~~~~~^^^^^^
+  File "/mnt/sdv_repos/sdv-py/sportsdataverse/mbb/mbb_ncaa_fetch.py", line 989, in fetch_html
+    text = self._get_with_rotation(url)
+  File "/mnt/sdv_repos/sdv-py/sportsdataverse/mbb/mbb_ncaa_fetch.py", line 937, in _get_with_rotation
+    raise RuntimeError(f"NCAA fetch failed after rotating proxies: {url}: {last_err}")
+RuntimeError: NCAA fetch failed after rotating proxies: https://stats.ncaa.org/team/inst_team_list?academic_year=2027&conf_id=-1&division=11&sport_code=MFB: No module named 'patchright'
+EXIT=1

@@ -1,0 +1,4 @@
+teams: 136
+rosters: 15370 players, 136 teams
+schedule master: 1742 team-games, 934 unique contests
+game datasets: {'qa_final_score_match': 539, 'pbp': 120473, 'pbp_cfbfastr': 105693, 'drives': 13378, 'linescore': 4634, 'team_stats': 83694, 'officials': 569, 'player_stats_rushing': 8427, 'player_stats_passing': 2999, 'player_stats_receiving': 9549, 'player_stats_other': 15754, 'player_stats_defense': 28557, 'player_stats_kicking': 2100, 'player_stats_punt_returns': 1988, 'games': 569}

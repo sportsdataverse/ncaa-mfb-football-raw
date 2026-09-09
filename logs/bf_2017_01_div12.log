@@ -1,0 +1,12 @@
+transport: NCAA_VENDOR=decodo_patchright (canary_vendors.toml) shard 0/1
+discovered 124 MFB teams (ay=2017 div=12)
+team pages 25/124: 248 contests
+team pages 50/124: 463 contests
+team pages 75/124: 619 contests
+team pages 100/124: 731 contests
+discovered 790 MFB contests
+rosters 25/124: {'captured': 25, 'skipped': 0, 'failed': 0}
+rosters 50/124: {'captured': 50, 'skipped': 0, 'failed': 0}
+rosters 75/124: {'captured': 75, 'skipped': 0, 'failed': 0}
+rosters 100/124: {'captured': 100, 'skipped': 0, 'failed': 0}
+rosters: {'captured': 124, 'skipped': 0, 'failed': 0}

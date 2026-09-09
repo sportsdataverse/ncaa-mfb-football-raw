@@ -1,0 +1,1072 @@
+=== SEASON ay2016 (fall 2015) 2026-08-23T11:22:54Z ===
+On branch main
+Your branch is up to date with 'origin/main'.
+
+Untracked files:
+  (use "git add <file>..." to include in what will be committed)
+	mfb/json/227815.json.gz
+	mfb/json/227817.json.gz
+	mfb/json/227821.json.gz
+	mfb/json/227823.json.gz
+	mfb/json/227827.json.gz
+	mfb/json/227828.json.gz
+	mfb/json/227829.json.gz
+	mfb/json/227831.json.gz
+	mfb/json/227832.json.gz
+	mfb/json/227834.json.gz
+	mfb/json/227835.json.gz
+	mfb/json/227837.json.gz
+	mfb/json/227844.json.gz
+	mfb/json/227846.json.gz
+	mfb/json/227849.json.gz
+	mfb/json/227850.json.gz
+	mfb/json/227851.json.gz
+	mfb/json/227854.json.gz
+	mfb/json/227858.json.gz
+	mfb/json/227859.json.gz
+	mfb/json/227870.json.gz
+	mfb/json/227871.json.gz
+	mfb/json/227876.json.gz
+	mfb/json/227878.json.gz
+	mfb/json/227882.json.gz
+	mfb/json/227884.json.gz
+	mfb/json/227885.json.gz
+	mfb/json/227888.json.gz
+	mfb/json/227889.json.gz
+	mfb/json/227892.json.gz
+	mfb/json/227893.json.gz
+	mfb/json/227898.json.gz
+	mfb/json/227904.json.gz
+	mfb/json/227909.json.gz
+	mfb/json/227910.json.gz
+	mfb/json/227914.json.gz
+	mfb/json/227916.json.gz
+	mfb/json/227917.json.gz
+	mfb/json/227918.json.gz
+	mfb/json/227921.json.gz
+	mfb/json/227922.json.gz
+	mfb/json/227923.json.gz
+	mfb/json/227931.json.gz
+	mfb/json/227935.json.gz
+	mfb/json/227936.json.gz
+	mfb/json/227937.json.gz
+	mfb/json/227939.json.gz
+	mfb/json/227945.json.gz
+	mfb/json/227947.json.gz
+	mfb/json/227950.json.gz
+	mfb/json/227952.json.gz
+	mfb/json/227956.json.gz
+	mfb/json/227957.json.gz
+	mfb/json/227958.json.gz
+	mfb/json/227959.json.gz
+	mfb/json/227960.json.gz
+	mfb/json/227962.json.gz
+	mfb/json/227963.json.gz
+	mfb/json/227966.json.gz
+	mfb/json/227974.json.gz
+	mfb/json/227975.json.gz
+	mfb/json/227976.json.gz
+	mfb/json/227977.json.gz
+	mfb/json/227978.json.gz
+	mfb/json/227981.json.gz
+	mfb/json/227983.json.gz
+	mfb/json/227993.json.gz
+	mfb/json/227994.json.gz
+	mfb/json/227996.json.gz
+	mfb/json/227999.json.gz
+	mfb/json/228000.json.gz
+	mfb/json/228001.json.gz
+	mfb/json/228003.json.gz
+	mfb/json/228004.json.gz
+	mfb/json/228009.json.gz
+	mfb/json/228013.json.gz
+	mfb/json/228014.json.gz
+	mfb/json/228016.json.gz
+	mfb/json/228019.json.gz
+	mfb/json/228022.json.gz
+	mfb/json/228023.json.gz
+	mfb/json/228028.json.gz
+	mfb/json/228029.json.gz
+	mfb/json/228033.json.gz
+	mfb/json/228034.json.gz
+	mfb/json/228040.json.gz
+	mfb/json/228042.json.gz
+	mfb/json/228047.json.gz
+	mfb/json/228052.json.gz
+	mfb/json/228053.json.gz
+	mfb/json/228056.json.gz
+	mfb/json/228060.json.gz
+	mfb/json/228062.json.gz
+	mfb/json/228063.json.gz
+	mfb/json/228065.json.gz
+	mfb/json/228066.json.gz
+	mfb/json/228067.json.gz
+	mfb/json/228072.json.gz
+	mfb/json/228074.json.gz
+	mfb/json/228076.json.gz
+	mfb/json/228080.json.gz
+	mfb/json/228085.json.gz
+	mfb/json/228091.json.gz
+	mfb/json/228093.json.gz
+	mfb/json/228094.json.gz
+	mfb/json/228097.json.gz
+	mfb/json/228098.json.gz
+	mfb/json/228099.json.gz
+	mfb/json/228100.json.gz
+	mfb/json/228120.json.gz
+	mfb/json/228126.json.gz
+	mfb/json/228130.json.gz
+	mfb/json/228137.json.gz
+	mfb/json/228139.json.gz
+	mfb/json/228143.json.gz
+	mfb/json/228144.json.gz
+	mfb/json/228147.json.gz
+	mfb/json/228148.json.gz
+	mfb/json/228159.json.gz
+	mfb/json/228161.json.gz
+	mfb/json/228163.json.gz
+	mfb/json/228166.json.gz
+	mfb/json/228168.json.gz
+	mfb/json/228169.json.gz
+	mfb/json/228170.json.gz
+	mfb/json/228172.json.gz
+	mfb/json/228174.json.gz
+	mfb/json/228176.json.gz
+	mfb/json/228182.json.gz
+	mfb/json/228183.json.gz
+	mfb/json/228190.json.gz
+	mfb/json/228200.json.gz
+	mfb/json/228202.json.gz
+	mfb/json/228206.json.gz
+	mfb/json/228208.json.gz
+	mfb/json/228209.json.gz
+	mfb/json/228210.json.gz
+	mfb/json/228215.json.gz
+	mfb/json/228218.json.gz
+	mfb/json/228219.json.gz
+	mfb/json/228223.json.gz
+	mfb/json/228225.json.gz
+	mfb/json/228227.json.gz
+	mfb/json/228228.json.gz
+	mfb/json/228230.json.gz
+	mfb/json/228231.json.gz
+	mfb/json/228232.json.gz
+	mfb/json/228234.json.gz
+	mfb/json/228235.json.gz
+	mfb/json/228236.json.gz
+	mfb/json/228237.json.gz
+	mfb/json/228238.json.gz
+	mfb/json/228239.json.gz
+	mfb/json/228240.json.gz
+	mfb/json/228241.json.gz
+	mfb/json/228243.json.gz
+	mfb/json/228245.json.gz
+	mfb/json/228247.json.gz
+	mfb/json/228248.json.gz
+	mfb/json/228255.json.gz
+	mfb/json/228256.json.gz
+	mfb/json/228258.json.gz
+	mfb/json/228259.json.gz
+	mfb/json/228260.json.gz
+	mfb/json/228267.json.gz
+	mfb/json/228270.json.gz
+	mfb/json/228272.json.gz
+	mfb/json/228277.json.gz
+	mfb/json/228286.json.gz
+	mfb/json/228289.json.gz
+	mfb/json/228293.json.gz
+	mfb/json/228295.json.gz
+	mfb/json/228299.json.gz
+	mfb/json/228300.json.gz
+	mfb/json/228303.json.gz
+	mfb/json/228304.json.gz
+	mfb/json/228306.json.gz
+	mfb/json/228307.json.gz
+	mfb/json/228308.json.gz
+	mfb/json/228311.json.gz
+	mfb/json/228314.json.gz
+	mfb/json/228316.json.gz
+	mfb/json/228321.json.gz
+	mfb/json/228326.json.gz
+	mfb/json/228328.json.gz
+	mfb/json/228329.json.gz
+	mfb/json/228331.json.gz
+	mfb/json/228332.json.gz
+	mfb/json/228334.json.gz
+	mfb/json/228337.json.gz
+	mfb/json/228339.json.gz
+	mfb/json/228343.json.gz
+	mfb/json/228344.json.gz
+	mfb/json/228352.json.gz
+	mfb/json/228355.json.gz
+	mfb/json/228356.json.gz
+	mfb/json/228359.json.gz
+	mfb/json/228360.json.gz
+	mfb/json/228367.json.gz
+	mfb/json/228368.json.gz
+	mfb/json/228370.json.gz
+	mfb/json/228373.json.gz
+	mfb/json/228375.json.gz
+	mfb/json/228386.json.gz
+	mfb/json/228388.json.gz
+	mfb/json/228389.json.gz
+	mfb/json/228392.json.gz
+	mfb/json/228393.json.gz
+	mfb/json/228397.json.gz
+	mfb/json/228401.json.gz
+	mfb/json/228409.json.gz
+	mfb/json/228410.json.gz
+	mfb/json/228411.json.gz
+	mfb/json/228412.json.gz
+	mfb/json/228413.json.gz
+	mfb/json/228436.json.gz
+	mfb/json/228439.json.gz
+	mfb/json/228441.json.gz
+	mfb/json/228443.json.gz
+	mfb/json/228449.json.gz
+	mfb/json/228450.json.gz
+	mfb/json/228451.json.gz
+	mfb/json/228452.json.gz
+	mfb/json/228454.json.gz
+	mfb/json/228455.json.gz
+	mfb/json/228473.json.gz
+	mfb/json/228475.json.gz
+	mfb/json/228477.json.gz
+	mfb/json/228478.json.gz
+	mfb/json/228482.json.gz
+	mfb/json/228483.json.gz
+	mfb/json/228493.json.gz
+	mfb/json/228495.json.gz
+	mfb/json/228496.json.gz
+	mfb/json/228499.json.gz
+	mfb/json/228500.json.gz
+	mfb/json/228502.json.gz
+	mfb/json/228505.json.gz
+	mfb/json/228507.json.gz
+	mfb/json/228512.json.gz
+	mfb/json/228517.json.gz
+	mfb/json/228522.json.gz
+	mfb/json/228525.json.gz
+	mfb/json/228527.json.gz
+	mfb/json/228530.json.gz
+	mfb/json/228531.json.gz
+	mfb/json/228532.json.gz
+	mfb/json/228533.json.gz
+	mfb/json/228534.json.gz
+	mfb/json/228535.json.gz
+	mfb/json/228540.json.gz
+	mfb/json/228541.json.gz
+	mfb/json/228542.json.gz
+	mfb/json/228552.json.gz
+	mfb/json/228555.json.gz
+	mfb/json/228558.json.gz
+	mfb/json/228567.json.gz
+	mfb/json/228572.json.gz
+	mfb/json/228576.json.gz
+	mfb/json/228577.json.gz
+	mfb/json/228578.json.gz
+	mfb/json/228580.json.gz
+	mfb/json/228582.json.gz
+	mfb/json/228591.json.gz
+	mfb/json/228594.json.gz
+	mfb/json/228597.json.gz
+	mfb/json/228603.json.gz
+	mfb/json/228604.json.gz
+	mfb/json/228606.json.gz
+	mfb/json/228607.json.gz
+	mfb/json/228610.json.gz
+	mfb/json/228612.json.gz
+	mfb/json/228615.json.gz
+	mfb/json/228617.json.gz
+	mfb/json/228620.json.gz
+	mfb/json/228622.json.gz
+	mfb/json/228623.json.gz
+	mfb/json/228625.json.gz
+	mfb/json/228626.json.gz
+	mfb/json/228628.json.gz
+	mfb/json/228630.json.gz
+	mfb/json/228634.json.gz
+	mfb/json/228639.json.gz
+	mfb/json/228642.json.gz
+	mfb/json/228643.json.gz
+	mfb/json/228646.json.gz
+	mfb/json/228649.json.gz
+	mfb/json/228655.json.gz
+	mfb/json/228661.json.gz
+	mfb/json/228662.json.gz
+	mfb/json/228664.json.gz
+	mfb/json/228666.json.gz
+	mfb/json/228667.json.gz
+	mfb/json/228668.json.gz
+	mfb/json/228684.json.gz
+	mfb/json/228686.json.gz
+	mfb/json/228687.json.gz
+	mfb/json/228695.json.gz
+	mfb/json/228703.json.gz
+	mfb/json/228710.json.gz
+	mfb/json/228711.json.gz
+	mfb/json/228716.json.gz
+	mfb/json/228719.json.gz
+	mfb/json/228750.json.gz
+	mfb/json/228751.json.gz
+	mfb/json/228752.json.gz
+	mfb/json/228756.json.gz
+	mfb/json/228765.json.gz
+	mfb/json/228771.json.gz
+	mfb/json/228776.json.gz
+	mfb/json/228780.json.gz
+	mfb/json/228782.json.gz
+	mfb/json/228789.json.gz
+	mfb/json/228798.json.gz
+	mfb/json/228799.json.gz
+	mfb/json/228808.json.gz
+	mfb/json/228809.json.gz
+	mfb/json/228811.json.gz
+	mfb/json/228812.json.gz
+	mfb/json/228813.json.gz
+	mfb/json/228821.json.gz
+	mfb/json/228822.json.gz
+	mfb/json/228825.json.gz
+	mfb/json/228829.json.gz
+	mfb/json/228830.json.gz
+	mfb/json/228831.json.gz
+	mfb/json/228832.json.gz
+	mfb/json/228837.json.gz
+	mfb/json/228838.json.gz
+	mfb/json/228839.json.gz
+	mfb/json/228845.json.gz
+	mfb/json/228846.json.gz
+	mfb/json/228853.json.gz
+	mfb/json/228862.json.gz
+	mfb/json/228865.json.gz
+	mfb/json/228880.json.gz
+	mfb/json/228881.json.gz
+	mfb/json/228882.json.gz
+	mfb/json/228884.json.gz
+	mfb/json/228885.json.gz
+	mfb/json/228892.json.gz
+	mfb/json/228893.json.gz
+	mfb/json/228900.json.gz
+	mfb/json/228901.json.gz
+	mfb/json/228907.json.gz
+	mfb/json/228908.json.gz
+	mfb/json/228909.json.gz
+	mfb/json/228915.json.gz
+	mfb/json/228919.json.gz
+	mfb/json/228920.json.gz
+	mfb/json/228921.json.gz
+	mfb/json/228923.json.gz
+	mfb/json/228924.json.gz
+	mfb/json/228925.json.gz
+	mfb/json/228932.json.gz
+	mfb/json/228936.json.gz
+	mfb/json/228939.json.gz
+	mfb/json/228951.json.gz
+	mfb/json/228955.json.gz
+	mfb/json/228956.json.gz
+	mfb/json/228961.json.gz
+	mfb/json/228962.json.gz
+	mfb/json/228967.json.gz
+	mfb/json/228971.json.gz
+	mfb/json/228975.json.gz
+	mfb/json/228977.json.gz
+	mfb/json/228978.json.gz
+	mfb/json/228986.json.gz
+	mfb/json/228992.json.gz
+	mfb/json/229008.json.gz
+	mfb/json/229011.json.gz
+	mfb/json/229012.json.gz
+	mfb/json/229015.json.gz
+	mfb/json/229036.json.gz
+	mfb/json/229040.json.gz
+	mfb/json/229042.json.gz
+	mfb/json/229044.json.gz
+	mfb/json/229045.json.gz
+	mfb/json/229060.json.gz
+	mfb/json/229061.json.gz
+	mfb/json/229062.json.gz
+	mfb/json/229070.json.gz
+	mfb/json/229084.json.gz
+	mfb/json/229085.json.gz
+	mfb/json/229097.json.gz
+	mfb/json/229098.json.gz
+	mfb/json/229102.json.gz
+	mfb/json/229107.json.gz
+	mfb/json/229111.json.gz
+	mfb/json/229112.json.gz
+	mfb/json/229116.json.gz
+	mfb/json/229117.json.gz
+	mfb/json/229118.json.gz
+	mfb/json/229119.json.gz
+	mfb/json/229126.json.gz
+	mfb/json/229128.json.gz
+	mfb/json/229131.json.gz
+	mfb/json/229132.json.gz
+	mfb/json/229133.json.gz
+	mfb/json/229134.json.gz
+	mfb/json/229136.json.gz
+	mfb/json/229139.json.gz
+	mfb/json/229149.json.gz
+	mfb/json/229150.json.gz
+	mfb/json/229154.json.gz
+	mfb/json/229158.json.gz
+	mfb/json/229160.json.gz
+	mfb/json/229161.json.gz
+	mfb/json/229165.json.gz
+	mfb/json/229169.json.gz
+	mfb/json/229176.json.gz
+	mfb/json/229177.json.gz
+	mfb/json/229182.json.gz
+	mfb/json/229186.json.gz
+	mfb/json/229188.json.gz
+	mfb/json/229191.json.gz
+	mfb/json/229195.json.gz
+	mfb/json/229199.json.gz
+	mfb/json/229205.json.gz
+	mfb/json/229213.json.gz
+	mfb/json/229219.json.gz
+	mfb/json/229223.json.gz
+	mfb/json/229225.json.gz
+	mfb/json/229229.json.gz
+	mfb/json/229234.json.gz
+	mfb/json/229239.json.gz
+	mfb/json/229243.json.gz
+	mfb/json/229245.json.gz
+	mfb/json/229254.json.gz
+	mfb/json/229263.json.gz
+	mfb/json/229265.json.gz
+	mfb/json/229266.json.gz
+	mfb/json/229271.json.gz
+	mfb/json/229289.json.gz
+	mfb/json/229293.json.gz
+	mfb/json/229299.json.gz
+	mfb/json/229309.json.gz
+	mfb/json/229310.json.gz
+	mfb/json/229314.json.gz
+	mfb/json/229352.json.gz
+	mfb/json/229354.json.gz
+	mfb/json/229357.json.gz
+	mfb/json/229358.json.gz
+	mfb/json/229363.json.gz
+	mfb/json/229364.json.gz
+	mfb/json/229366.json.gz
+	mfb/json/229376.json.gz
+	mfb/json/229382.json.gz
+	mfb/json/229386.json.gz
+	mfb/json/229394.json.gz
+	mfb/json/229396.json.gz
+	mfb/json/229411.json.gz
+	mfb/json/229412.json.gz
+	mfb/json/229413.json.gz
+	mfb/json/229419.json.gz
+	mfb/json/229421.json.gz
+	mfb/json/229426.json.gz
+	mfb/json/229428.json.gz
+	mfb/json/229429.json.gz
+	mfb/json/229431.json.gz
+	mfb/json/229432.json.gz
+	mfb/json/229435.json.gz
+	mfb/json/229437.json.gz
+	mfb/json/229438.json.gz
+	mfb/json/229439.json.gz
+	mfb/json/229445.json.gz
+	mfb/json/229446.json.gz
+	mfb/json/229451.json.gz
+	mfb/json/229457.json.gz
+	mfb/json/229465.json.gz
+	mfb/json/229466.json.gz
+	mfb/json/229469.json.gz
+	mfb/json/229478.json.gz
+	mfb/json/229480.json.gz
+	mfb/json/229488.json.gz
+	mfb/json/229489.json.gz
+	mfb/json/229492.json.gz
+	mfb/json/229495.json.gz
+	mfb/json/229502.json.gz
+	mfb/json/229509.json.gz
+	mfb/json/229510.json.gz
+	mfb/json/229513.json.gz
+	mfb/json/229518.json.gz
+	mfb/json/229519.json.gz
+	mfb/json/229522.json.gz
+	mfb/json/229523.json.gz
+	mfb/json/229524.json.gz
+	mfb/json/229527.json.gz
+	mfb/json/229540.json.gz
+	mfb/json/229542.json.gz
+	mfb/json/229544.json.gz
+	mfb/json/229546.json.gz
+	mfb/json/229559.json.gz
+	mfb/json/229564.json.gz
+	mfb/json/229574.json.gz
+	mfb/json/229577.json.gz
+	mfb/json/229593.json.gz
+	mfb/json/229598.json.gz
+	mfb/json/229601.json.gz
+	mfb/json/229608.json.gz
+	mfb/json/229620.json.gz
+	mfb/json/229623.json.gz
+	mfb/json/229653.json.gz
+	mfb/json/229655.json.gz
+	mfb/json/229656.json.gz
+	mfb/json/229657.json.gz
+	mfb/json/229659.json.gz
+	mfb/json/229660.json.gz
+	mfb/json/229663.json.gz
+	mfb/json/229664.json.gz
+	mfb/json/229665.json.gz
+	mfb/json/229671.json.gz
+	mfb/json/229673.json.gz
+	mfb/json/229693.json.gz
+	mfb/json/229698.json.gz
+	mfb/json/229705.json.gz
+	mfb/json/229707.json.gz
+	mfb/json/229718.json.gz
+	mfb/json/229723.json.gz
+	mfb/json/229725.json.gz
+	mfb/json/229728.json.gz
+	mfb/json/229730.json.gz
+	mfb/json/229733.json.gz
+	mfb/json/229736.json.gz
+	mfb/json/229741.json.gz
+	mfb/json/229750.json.gz
+	mfb/json/229751.json.gz
+	mfb/json/229753.json.gz
+	mfb/json/229754.json.gz
+	mfb/json/229757.json.gz
+	mfb/json/229773.json.gz
+	mfb/json/229776.json.gz
+	mfb/json/229783.json.gz
+	mfb/json/229799.json.gz
+	mfb/json/229800.json.gz
+	mfb/json/229809.json.gz
+	mfb/json/229812.json.gz
+	mfb/json/229816.json.gz
+	mfb/json/229819.json.gz
+	mfb/json/229827.json.gz
+	mfb/json/229829.json.gz
+	mfb/json/229835.json.gz
+	mfb/json/229838.json.gz
+	mfb/json/229839.json.gz
+	mfb/json/229841.json.gz
+	mfb/json/229843.json.gz
+	mfb/json/229848.json.gz
+	mfb/json/229849.json.gz
+	mfb/json/229852.json.gz
+	mfb/json/229856.json.gz
+	mfb/json/229858.json.gz
+	mfb/json/229862.json.gz
+	mfb/json/229868.json.gz
+	mfb/json/229871.json.gz
+	mfb/json/229875.json.gz
+	mfb/json/229884.json.gz
+	mfb/json/229893.json.gz
+	mfb/json/229897.json.gz
+	mfb/json/229918.json.gz
+	mfb/json/229923.json.gz
+	mfb/json/229928.json.gz
+	mfb/json/229933.json.gz
+	mfb/json/229970.json.gz
+	mfb/json/229971.json.gz
+	mfb/json/229972.json.gz
+	mfb/json/229973.json.gz
+	mfb/json/229978.json.gz
+	mfb/json/229980.json.gz
+	mfb/json/229984.json.gz
+	mfb/json/229991.json.gz
+	mfb/json/229995.json.gz
+	mfb/json/230010.json.gz
+	mfb/json/230026.json.gz
+	mfb/json/230029.json.gz
+	mfb/json/230030.json.gz
+	mfb/json/230031.json.gz
+	mfb/json/230032.json.gz
+	mfb/json/230034.json.gz
+	mfb/json/230037.json.gz
+	mfb/json/230043.json.gz
+	mfb/json/230047.json.gz
+	mfb/json/230055.json.gz
+	mfb/json/230056.json.gz
+	mfb/json/230063.json.gz
+	mfb/json/230064.json.gz
+	mfb/json/230066.json.gz
+	mfb/json/230067.json.gz
+	mfb/json/230068.json.gz
+	mfb/json/230071.json.gz
+	mfb/json/230072.json.gz
+	mfb/json/230073.json.gz
+	mfb/json/230083.json.gz
+	mfb/json/230087.json.gz
+	mfb/json/230090.json.gz
+	mfb/json/230099.json.gz
+	mfb/json/230109.json.gz
+	mfb/json/230110.json.gz
+	mfb/json/230111.json.gz
+	mfb/json/230115.json.gz
+	mfb/json/230120.json.gz
+	mfb/json/230132.json.gz
+	mfb/json/230134.json.gz
+	mfb/json/230139.json.gz
+	mfb/json/230141.json.gz
+	mfb/json/230143.json.gz
+	mfb/json/230146.json.gz
+	mfb/json/230150.json.gz
+	mfb/json/230161.json.gz
+	mfb/json/230168.json.gz
+	mfb/json/230175.json.gz
+	mfb/json/230189.json.gz
+	mfb/json/230192.json.gz
+	mfb/json/230199.json.gz
+	mfb/json/230207.json.gz
+	mfb/json/230227.json.gz
+	mfb/json/230232.json.gz
+	mfb/json/230235.json.gz
+	mfb/json/230256.json.gz
+	mfb/json/230286.json.gz
+	mfb/json/230287.json.gz
+	mfb/json/230288.json.gz
+	mfb/json/230289.json.gz
+	mfb/json/230291.json.gz
+	mfb/json/230293.json.gz
+	mfb/json/230294.json.gz
+	mfb/json/230296.json.gz
+	mfb/json/230297.json.gz
+	mfb/json/230298.json.gz
+	mfb/json/230306.json.gz
+	mfb/json/230312.json.gz
+	mfb/json/230324.json.gz
+	mfb/json/230331.json.gz
+	mfb/json/230332.json.gz
+	mfb/json/230334.json.gz
+	mfb/json/230352.json.gz
+	mfb/json/230355.json.gz
+	mfb/json/230357.json.gz
+	mfb/json/230362.json.gz
+	mfb/json/230366.json.gz
+	mfb/json/230367.json.gz
+	mfb/json/230369.json.gz
+	mfb/json/230370.json.gz
+	mfb/json/230376.json.gz
+	mfb/json/230378.json.gz
+	mfb/json/230383.json.gz
+	mfb/json/230385.json.gz
+	mfb/json/230443.json.gz
+	mfb/json/230447.json.gz
+	mfb/json/230453.json.gz
+	mfb/json/230459.json.gz
+	mfb/json/230467.json.gz
+	mfb/json/230478.json.gz
+	mfb/json/230482.json.gz
+	mfb/json/230486.json.gz
+	mfb/json/230495.json.gz
+	mfb/json/230496.json.gz
+	mfb/json/230511.json.gz
+	mfb/json/230517.json.gz
+	mfb/json/230521.json.gz
+	mfb/json/230545.json.gz
+	mfb/json/230551.json.gz
+	mfb/json/230554.json.gz
+	mfb/json/230565.json.gz
+	mfb/json/230601.json.gz
+	mfb/json/230602.json.gz
+	mfb/json/230603.json.gz
+	mfb/json/230604.json.gz
+	mfb/json/230606.json.gz
+	mfb/json/230608.json.gz
+	mfb/json/230610.json.gz
+	mfb/json/230613.json.gz
+	mfb/json/230614.json.gz
+	mfb/json/230615.json.gz
+	mfb/json/230618.json.gz
+	mfb/json/230622.json.gz
+	mfb/json/230656.json.gz
+	mfb/json/230669.json.gz
+	mfb/json/230674.json.gz
+	mfb/json/230675.json.gz
+	mfb/json/230678.json.gz
+	mfb/json/230680.json.gz
+	mfb/json/230686.json.gz
+	mfb/json/230694.json.gz
+	mfb/json/230698.json.gz
+	mfb/json/230705.json.gz
+	mfb/json/230706.json.gz
+	mfb/json/230709.json.gz
+	mfb/json/230710.json.gz
+	mfb/json/230711.json.gz
+	mfb/json/230713.json.gz
+	mfb/json/230719.json.gz
+	mfb/json/230737.json.gz
+	mfb/json/230738.json.gz
+	mfb/json/230740.json.gz
+	mfb/json/230742.json.gz
+	mfb/json/230744.json.gz
+	mfb/json/230752.json.gz
+	mfb/json/230762.json.gz
+	mfb/json/230773.json.gz
+	mfb/json/230781.json.gz
+	mfb/json/230786.json.gz
+	mfb/json/230791.json.gz
+	mfb/json/230802.json.gz
+	mfb/json/230804.json.gz
+	mfb/json/230806.json.gz
+	mfb/json/230810.json.gz
+	mfb/json/230812.json.gz
+	mfb/json/230818.json.gz
+	mfb/json/230839.json.gz
+	mfb/json/230842.json.gz
+	mfb/json/230883.json.gz
+	mfb/json/230884.json.gz
+	mfb/json/230885.json.gz
+	mfb/json/230925.json.gz
+	mfb/json/230926.json.gz
+	mfb/json/230928.json.gz
+	mfb/json/230929.json.gz
+	mfb/json/230930.json.gz
+	mfb/json/230935.json.gz
+	mfb/json/230943.json.gz
+	mfb/json/230947.json.gz
+	mfb/json/230957.json.gz
+	mfb/json/230968.json.gz
+	mfb/json/230969.json.gz
+	mfb/json/230975.json.gz
+	mfb/json/230985.json.gz
+	mfb/json/230988.json.gz
+	mfb/json/230992.json.gz
+	mfb/json/230995.json.gz
+	mfb/json/231008.json.gz
+	mfb/json/231009.json.gz
+	mfb/json/231014.json.gz
+	mfb/json/231015.json.gz
+	mfb/json/231016.json.gz
+	mfb/json/231019.json.gz
+	mfb/json/231020.json.gz
+	mfb/json/231037.json.gz
+	mfb/json/231041.json.gz
+	mfb/json/231042.json.gz
+	mfb/json/231044.json.gz
+	mfb/json/231050.json.gz
+	mfb/json/231055.json.gz
+	mfb/json/231057.json.gz
+	mfb/json/231061.json.gz
+	mfb/json/231065.json.gz
+	mfb/json/231080.json.gz
+	mfb/json/231085.json.gz
+	mfb/json/231087.json.gz
+	mfb/json/231088.json.gz
+	mfb/json/231091.json.gz
+	mfb/json/231100.json.gz
+	mfb/json/231107.json.gz
+	mfb/json/231110.json.gz
+	mfb/json/231115.json.gz
+	mfb/json/231124.json.gz
+	mfb/json/231128.json.gz
+	mfb/json/231138.json.gz
+	mfb/json/231143.json.gz
+	mfb/json/231145.json.gz
+	mfb/json/231154.json.gz
+	mfb/json/231163.json.gz
+	mfb/json/231170.json.gz
+	mfb/json/231182.json.gz
+	mfb/json/231234.json.gz
+	mfb/json/231235.json.gz
+	mfb/json/231236.json.gz
+	mfb/json/231237.json.gz
+	mfb/json/231238.json.gz
+	mfb/json/231241.json.gz
+	mfb/json/231242.json.gz
+	mfb/json/231248.json.gz
+	mfb/json/231249.json.gz
+	mfb/json/231251.json.gz
+	mfb/json/231253.json.gz
+	mfb/json/231261.json.gz
+	mfb/json/231262.json.gz
+	mfb/json/231263.json.gz
+	mfb/json/231267.json.gz
+	mfb/json/231269.json.gz
+	mfb/json/231270.json.gz
+	mfb/json/231271.json.gz
+	mfb/json/231273.json.gz
+	mfb/json/231274.json.gz
+	mfb/json/231277.json.gz
+	mfb/json/231279.json.gz
+	mfb/json/231280.json.gz
+	mfb/json/231281.json.gz
+	mfb/json/231282.json.gz
+	mfb/json/231285.json.gz
+	mfb/json/231286.json.gz
+	mfb/json/231287.json.gz
+	mfb/json/231289.json.gz
+	mfb/json/231295.json.gz
+	mfb/json/231296.json.gz
+	mfb/json/231299.json.gz
+	mfb/json/231301.json.gz
+	mfb/json/231304.json.gz
+	mfb/json/231306.json.gz
+	mfb/json/231310.json.gz
+	mfb/json/231313.json.gz
+	mfb/json/231314.json.gz
+	mfb/json/231318.json.gz
+	mfb/json/231319.json.gz
+	mfb/json/231320.json.gz
+	mfb/json/231322.json.gz
+	mfb/json/231327.json.gz
+	mfb/json/231328.json.gz
+	mfb/json/231330.json.gz
+	mfb/json/231331.json.gz
+	mfb/json/231332.json.gz
+	mfb/json/231338.json.gz
+	mfb/json/231339.json.gz
+	mfb/json/231342.json.gz
+	mfb/json/231346.json.gz
+	mfb/json/231347.json.gz
+	mfb/json/231350.json.gz
+	mfb/json/231383.json.gz
+	mfb/json/231390.json.gz
+	mfb/json/231391.json.gz
+	mfb/json/231393.json.gz
+	mfb/json/231394.json.gz
+	mfb/json/231395.json.gz
+	mfb/json/231396.json.gz
+	mfb/json/231397.json.gz
+	mfb/json/231398.json.gz
+	mfb/json/231401.json.gz
+	mfb/json/231402.json.gz
+	mfb/json/231403.json.gz
+	mfb/json/231404.json.gz
+	mfb/json/231405.json.gz
+	mfb/json/231406.json.gz
+	mfb/json/231409.json.gz
+	mfb/json/231410.json.gz
+	mfb/json/231412.json.gz
+	mfb/json/231413.json.gz
+	mfb/json/231414.json.gz
+	mfb/json/231415.json.gz
+	mfb/json/231418.json.gz
+	mfb/json/231419.json.gz
+	mfb/json/231420.json.gz
+	mfb/json/231421.json.gz
+	mfb/json/231422.json.gz
+	mfb/json/231423.json.gz
+	mfb/json/231426.json.gz
+	mfb/json/231427.json.gz
+	mfb/json/231428.json.gz
+	mfb/json/231429.json.gz
+	mfb/json/231430.json.gz
+	mfb/json/231432.json.gz
+	mfb/json/231435.json.gz
+	mfb/json/231436.json.gz
+	mfb/json/231437.json.gz
+	mfb/json/231438.json.gz
+	mfb/json/231439.json.gz
+	mfb/json/231440.json.gz
+	mfb/json/231443.json.gz
+	mfb/json/231444.json.gz
+	mfb/json/231445.json.gz
+	mfb/json/231446.json.gz
+	mfb/json/231447.json.gz
+	mfb/json/231448.json.gz
+	mfb/json/231451.json.gz
+	mfb/json/231452.json.gz
+	mfb/json/231477.json.gz
+	mfb/json/231479.json.gz
+	mfb/json/231480.json.gz
+	mfb/json/231481.json.gz
+	mfb/json/231484.json.gz
+	mfb/json/231485.json.gz
+	mfb/json/231486.json.gz
+	mfb/json/231490.json.gz
+	mfb/json/231496.json.gz
+	mfb/json/231505.json.gz
+	mfb/json/231511.json.gz
+	mfb/json/231512.json.gz
+	mfb/json/231522.json.gz
+	mfb/json/231525.json.gz
+	mfb/json/231528.json.gz
+	mfb/json/231529.json.gz
+	mfb/json/231533.json.gz
+	mfb/json/231534.json.gz
+	mfb/json/231535.json.gz
+	mfb/json/231536.json.gz
+	mfb/json/231537.json.gz
+	mfb/json/231538.json.gz
+	mfb/json/231541.json.gz
+	mfb/json/231542.json.gz
+	mfb/json/231543.json.gz
+	mfb/json/231544.json.gz
+	mfb/json/231545.json.gz
+	mfb/json/231546.json.gz
+	mfb/json/231549.json.gz
+	mfb/json/231550.json.gz
+	mfb/json/231551.json.gz
+	mfb/json/231552.json.gz
+	mfb/json/231553.json.gz
+	mfb/json/231554.json.gz
+	mfb/json/231557.json.gz
+	mfb/json/231558.json.gz
+	mfb/json/231559.json.gz
+	mfb/json/231560.json.gz
+	mfb/json/231561.json.gz
+	mfb/json/231562.json.gz
+	mfb/json/231565.json.gz
+	mfb/json/231566.json.gz
+	mfb/json/231567.json.gz
+	mfb/json/231569.json.gz
+
+nothing added to commit but untracked files present (use "git add" to track)
+capture: {'captured': 4, 'skipped': 30, 'failed': 3}
+capture: {'captured': 29, 'skipped': 3, 'failed': 1}
+capture: {'captured': 14, 'skipped': 20, 'failed': 3}
+capture: {'captured': 26, 'skipped': 5, 'failed': 2}
+capture: {'captured': 0, 'skipped': 34, 'failed': 2}
+capture: {'captured': 26, 'skipped': 6, 'failed': 1}
+capture: {'captured': 0, 'skipped': 36, 'failed': 0}
+capture: {'captured': 23, 'skipped': 10, 'failed': 0}
+capture: {'captured': 0, 'skipped': 36, 'failed': 0}
+capture: {'captured': 16, 'skipped': 16, 'failed': 1}
+capture: {'captured': 0, 'skipped': 36, 'failed': 0}
+capture: {'captured': 23, 'skipped': 9, 'failed': 1}
+capture: {'captured': 0, 'skipped': 36, 'failed': 0}
+capture: {'captured': 23, 'skipped': 9, 'failed': 1}
+capture: {'captured': 0, 'skipped': 36, 'failed': 0}
+capture: {'captured': 20, 'skipped': 12, 'failed': 1}
+capture: {'captured': 5, 'skipped': 27, 'failed': 4}
+capture: {'captured': 28, 'skipped': 4, 'failed': 1}
+capture: {'captured': 14, 'skipped': 21, 'failed': 1}
+capture: {'captured': 29, 'skipped': 3, 'failed': 0}
+capture: {'captured': 0, 'skipped': 35, 'failed': 1}
+capture: {'captured': 28, 'skipped': 3, 'failed': 1}
+capture: {'captured': 0, 'skipped': 36, 'failed': 0}
+capture: {'captured': 22, 'skipped': 10, 'failed': 0}
+capture: {'captured': 0, 'skipped': 37, 'failed': 0}
+capture: {'captured': 26, 'skipped': 5, 'failed': 2}
+capture: {'captured': 0, 'skipped': 35, 'failed': 1}
+capture: {'captured': 14, 'skipped': 17, 'failed': 1}
+capture: {'captured': 0, 'skipped': 35, 'failed': 1}
+capture: {'captured': 24, 'skipped': 7, 'failed': 1}
+capture: {'captured': 0, 'skipped': 35, 'failed': 1}
+capture: {'captured': 21, 'skipped': 10, 'failed': 1}
+capture: {'captured': 0, 'skipped': 36, 'failed': 0}
+capture: {'captured': 19, 'skipped': 12, 'failed': 1}
+capture: {'captured': 0, 'skipped': 37, 'failed': 0}
+capture: {'captured': 22, 'skipped': 11, 'failed': 0}
+capture: {'captured': 0, 'skipped': 37, 'failed': 0}
+capture: {'captured': 12, 'skipped': 20, 'failed': 1}
+capture: {'captured': 0, 'skipped': 37, 'failed': 0}
+capture: {'captured': 21, 'skipped': 8, 'failed': 4}
+capture: {'captured': 0, 'skipped': 36, 'failed': 0}
+capture: {'captured': 24, 'skipped': 9, 'failed': 0}
+capture: {'captured': 0, 'skipped': 35, 'failed': 1}
+capture: {'captured': 20, 'skipped': 13, 'failed': 0}
+capture: {'captured': 4, 'skipped': 31, 'failed': 1}
+capture: {'captured': 28, 'skipped': 5, 'failed': 0}
+capture: {'captured': 14, 'skipped': 22, 'failed': 0}
+capture: {'captured': 29, 'skipped': 4, 'failed': 0}
+ay2016 QA: 1511/1515 exact, 2 unverifiable, 2 flagged
+=== ay2016 complete 2026-08-23T13:49:59Z ===
+=== SEASON ay2015 (fall 2014) 2026-08-23T13:49:59Z ===
+capture: {'captured': 36, 'skipped': 0, 'failed': 1}
+capture: {'captured': 28, 'skipped': 6, 'failed': 1}
+capture: {'captured': 36, 'skipped': 0, 'failed': 1}
+capture: {'captured': 28, 'skipped': 7, 'failed': 0}
+capture: {'captured': 37, 'skipped': 0, 'failed': 0}
+capture: {'captured': 29, 'skipped': 6, 'failed': 0}
+capture: {'captured': 37, 'skipped': 0, 'failed': 0}
+capture: {'captured': 32, 'skipped': 3, 'failed': 0}
+capture: {'captured': 37, 'skipped': 0, 'failed': 0}
+capture: {'captured': 30, 'skipped': 5, 'failed': 0}
+capture: {'captured': 37, 'skipped': 0, 'failed': 0}
+capture: {'captured': 29, 'skipped': 5, 'failed': 1}
+capture: {'captured': 36, 'skipped': 0, 'failed': 1}
+capture: {'captured': 30, 'skipped': 4, 'failed': 1}
+capture: {'captured': 35, 'skipped': 0, 'failed': 1}
+capture: {'captured': 27, 'skipped': 7, 'failed': 1}
+capture: {'captured': 35, 'skipped': 0, 'failed': 1}
+capture: {'captured': 27, 'skipped': 7, 'failed': 1}
+capture: {'captured': 35, 'skipped': 0, 'failed': 1}
+capture: {'captured': 32, 'skipped': 3, 'failed': 0}
+capture: {'captured': 35, 'skipped': 0, 'failed': 1}
+capture: {'captured': 29, 'skipped': 3, 'failed': 3}
+capture: {'captured': 35, 'skipped': 0, 'failed': 1}
+capture: {'captured': 32, 'skipped': 2, 'failed': 1}
+capture: {'captured': 34, 'skipped': 0, 'failed': 3}
+capture: {'captured': 30, 'skipped': 5, 'failed': 0}
+capture: {'captured': 36, 'skipped': 0, 'failed': 0}
+capture: {'captured': 29, 'skipped': 6, 'failed': 0}
+capture: {'captured': 31, 'skipped': 1, 'failed': 4}
+capture: {'captured': 27, 'skipped': 6, 'failed': 2}
+capture: {'captured': 36, 'skipped': 0, 'failed': 0}
+capture: {'captured': 27, 'skipped': 7, 'failed': 0}
+capture: {'captured': 36, 'skipped': 0, 'failed': 0}
+capture: {'captured': 31, 'skipped': 3, 'failed': 0}
+capture: {'captured': 37, 'skipped': 0, 'failed': 0}
+capture: {'captured': 29, 'skipped': 5, 'failed': 1}
+capture: {'captured': 37, 'skipped': 0, 'failed': 0}
+capture: {'captured': 30, 'skipped': 4, 'failed': 1}
+capture: {'captured': 36, 'skipped': 0, 'failed': 1}
+capture: {'captured': 29, 'skipped': 5, 'failed': 1}
+capture: {'captured': 37, 'skipped': 0, 'failed': 0}
+capture: {'captured': 27, 'skipped': 6, 'failed': 2}
+capture: {'captured': 36, 'skipped': 0, 'failed': 1}
+capture: {'captured': 31, 'skipped': 3, 'failed': 1}
+capture: {'captured': 37, 'skipped': 0, 'failed': 0}
+capture: {'captured': 31, 'skipped': 2, 'failed': 2}
+capture: {'captured': 36, 'skipped': 0, 'failed': 1}
+capture: {'captured': 33, 'skipped': 2, 'failed': 0}
+ay2015 QA: 1558/1567 exact, 1 unverifiable, 8 flagged
+=== ay2015 complete 2026-08-23T18:50:14Z ===
+=== SEASON ay2014 (fall 2013) 2026-08-23T18:50:14Z ===
+capture: {'captured': 37, 'skipped': 0, 'failed': 0}
+capture: {'captured': 34, 'skipped': 2, 'failed': 0}
+capture: {'captured': 36, 'skipped': 0, 'failed': 1}
+capture: {'captured': 28, 'skipped': 6, 'failed': 2}
+capture: {'captured': 37, 'skipped': 0, 'failed': 0}
+capture: {'captured': 29, 'skipped': 5, 'failed': 1}
+capture: {'captured': 36, 'skipped': 0, 'failed': 0}
+capture: {'captured': 27, 'skipped': 8, 'failed': 0}
+capture: {'captured': 36, 'skipped': 0, 'failed': 0}
+capture: {'captured': 26, 'skipped': 6, 'failed': 3}
+capture: {'captured': 36, 'skipped': 0, 'failed': 0}
+capture: {'captured': 27, 'skipped': 5, 'failed': 3}
+capture: {'captured': 36, 'skipped': 0, 'failed': 0}
+capture: {'captured': 28, 'skipped': 5, 'failed': 2}
+capture: {'captured': 36, 'skipped': 0, 'failed': 0}
+capture: {'captured': 29, 'skipped': 4, 'failed': 2}
+capture: {'captured': 36, 'skipped': 0, 'failed': 0}
+capture: {'captured': 29, 'skipped': 6, 'failed': 0}
+capture: {'captured': 36, 'skipped': 0, 'failed': 0}
+capture: {'captured': 28, 'skipped': 6, 'failed': 1}
+capture: {'captured': 36, 'skipped': 0, 'failed': 0}
+capture: {'captured': 29, 'skipped': 6, 'failed': 0}
+capture: {'captured': 35, 'skipped': 0, 'failed': 1}
+capture: {'captured': 30, 'skipped': 3, 'failed': 2}
+capture: {'captured': 36, 'skipped': 0, 'failed': 1}
+capture: {'captured': 27, 'skipped': 7, 'failed': 2}
+capture: {'captured': 36, 'skipped': 0, 'failed': 0}
+capture: {'captured': 25, 'skipped': 7, 'failed': 3}
+capture: {'captured': 36, 'skipped': 0, 'failed': 0}
+capture: {'captured': 27, 'skipped': 6, 'failed': 2}
+capture: {'captured': 35, 'skipped': 0, 'failed': 1}
+capture: {'captured': 27, 'skipped': 5, 'failed': 3}
+capture: {'captured': 35, 'skipped': 0, 'failed': 1}
+capture: {'captured': 26, 'skipped': 6, 'failed': 3}
+capture: {'captured': 37, 'skipped': 0, 'failed': 0}
+capture: {'captured': 29, 'skipped': 6, 'failed': 1}
+capture: {'captured': 37, 'skipped': 0, 'failed': 0}
+capture: {'captured': 28, 'skipped': 6, 'failed': 2}
+capture: {'captured': 37, 'skipped': 0, 'failed': 0}
+capture: {'captured': 30, 'skipped': 6, 'failed': 0}
+capture: {'captured': 37, 'skipped': 0, 'failed': 0}
+capture: {'captured': 29, 'skipped': 5, 'failed': 1}
+capture: {'captured': 37, 'skipped': 0, 'failed': 0}
+capture: {'captured': 30, 'skipped': 4, 'failed': 1}
+capture: {'captured': 37, 'skipped': 0, 'failed': 0}
+capture: {'captured': 28, 'skipped': 4, 'failed': 3}
+capture: {'captured': 36, 'skipped': 0, 'failed': 1}
+capture: {'captured': 27, 'skipped': 6, 'failed': 2}
+Auto packing the repository in background for optimum performance.
+See "git help gc" for manual housekeeping.
+ay2014 QA: 1533/1546 exact, 2 unverifiable, 11 flagged
+=== ay2014 complete 2026-08-23T23:33:08Z ===
+=== SEASON ay2013 (fall 2012) 2026-08-23T23:33:08Z ===
+ay2013: no FBS teams -- stopping backfill at fall 2012
+BACKFILL FLOOR REACHED at ay2013

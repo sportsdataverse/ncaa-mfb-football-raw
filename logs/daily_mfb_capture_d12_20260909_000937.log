@@ -1,0 +1,5 @@
+usage: mfb_run.py [-h] [--academic-year ACADEMIC_YEAR] [--division DIVISION]
+                  [--out OUT] [--max-contests MAX_CONTESTS] [--rosters]
+                  [--skip-games] [--shard SHARD]
+mfb_run.py: error: unrecognized arguments: --workers 1
+EXIT=2

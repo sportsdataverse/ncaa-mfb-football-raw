@@ -1,0 +1,13 @@
+6400590: failed
+  page size 21862; head: '<!DOCTYPE html>\n<html lang="en">\n<head>\n<META HTTP-EQUIV="CONTENT-TYPE" CONTENT="text/html; charset=UTF-8">\n<meta charset="UTF-8">\n<meta http-equiv="X'
+6419926: failed
+Traceback (most recent call last):
+  File "<stdin>", line 10, in <module>
+  File "/mnt/sdv_repos/ncaa-mfb-football-raw/python/mfb_discover.py", line 65, in <lambda>
+    return lambda path: fetcher.fetch_html(path)
+                        ~~~~~~~~~~~~~~~~~~^^^^^^
+  File "/mnt/sdv_repos/sdv-py/sportsdataverse/mbb/mbb_ncaa_fetch.py", line 978, in fetch_html
+    text = self._get_with_rotation(url)
+  File "/mnt/sdv_repos/sdv-py/sportsdataverse/mbb/mbb_ncaa_fetch.py", line 926, in _get_with_rotation
+    raise RuntimeError(f"NCAA fetch failed after rotating proxies: {url}: {last_err}")
+RuntimeError: NCAA fetch failed after rotating proxies: https://stats.ncaa.org/contests/6419926/play_by_play: patchright: bm-verify not passed after 3 attempts (643-byte body)

@@ -1,0 +1,5 @@
+teams: 256
+rosters: 27256 players, 256 teams
+schedule master: 3176 team-games, 1622 unique contests
+game datasets: {'qa_final_score_match': 1602, 'pbp': 350351, 'pbp_cfbfastr': 309985, 'drives': 42135, 'linescore': 13058, 'team_stats': 1134420, 'officials': 13071, 'player_stats_other': 55330, 'games': 1607}
+ay2020 QA: 1602/1607 exact, 1 unverifiable, 4 flagged

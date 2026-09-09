@@ -1,0 +1,19 @@
+transport: NCAA_VENDOR=decodo_patchright (canary_vendors.toml)
+discovered 136 MFB teams (ay=2026 div=11)
+team pages 25/136: 283 contests
+team pages 50/136: 520 contests
+team pages 75/136: 713 contests
+team pages 100/136: 851 contests
+team pages 125/136: 917 contests
+discovered 934 MFB contests
+rosters 25/136: {'captured': 25, 'skipped': 0, 'failed': 0}
+rosters 50/136: {'captured': 50, 'skipped': 0, 'failed': 0}
+rosters 75/136: {'captured': 75, 'skipped': 0, 'failed': 0}
+rosters 100/136: {'captured': 100, 'skipped': 0, 'failed': 0}
+rosters 125/136: {'captured': 125, 'skipped': 0, 'failed': 0}
+rosters: {'captured': 136, 'skipped': 0, 'failed': 0}
+games: {'captured': 10, 'skipped': 0, 'failed': 0}
+games: {'captured': 20, 'skipped': 0, 'failed': 0}
+games: {'captured': 30, 'skipped': 0, 'failed': 0}
+games: {'captured': 40, 'skipped': 0, 'failed': 0}
+EXIT=143

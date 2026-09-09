@@ -1,0 +1,25 @@
+transport: NCAA_VENDOR=decodo_patchright (canary_vendors.toml) shard 0/24
+discovered 128 MFB teams (ay=2014 div=11)
+team pages 25/128: 296 contests
+team pages 50/128: 534 contests
+team pages 75/128: 697 contests
+team pages 100/128: 818 contests
+team pages 125/128: 872 contests
+discovered 875 MFB contests
+shard 0/24: 37 contests
+games: {'captured': 10, 'skipped': 0, 'failed': 0}
+games: {'captured': 20, 'skipped': 0, 'failed': 0}
+games: {'captured': 30, 'skipped': 0, 'failed': 0}
+capture: {'captured': 37, 'skipped': 0, 'failed': 0}
+transport: NCAA_VENDOR=decodo_patchright (canary_vendors.toml) shard 0/24
+discovered 124 MFB teams (ay=2014 div=12)
+team pages 25/124: 258 contests
+team pages 50/124: 477 contests
+team pages 75/124: 656 contests
+team pages 100/124: 778 contests
+discovered 846 MFB contests
+shard 0/24: 36 contests
+games: {'captured': 10, 'skipped': 2, 'failed': 0}
+games: {'captured': 20, 'skipped': 2, 'failed': 0}
+games: {'captured': 30, 'skipped': 2, 'failed': 0}
+capture: {'captured': 34, 'skipped': 2, 'failed': 0}

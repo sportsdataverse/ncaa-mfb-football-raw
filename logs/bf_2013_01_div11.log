@@ -1,0 +1,14 @@
+transport: NCAA_VENDOR=decodo_patchright (canary_vendors.toml) shard 0/1
+Traceback (most recent call last):
+  File "/mnt/sdv_repos/ncaa-mfb-football-raw/python/mfb_run.py", line 116, in <module>
+    raise SystemExit(main())
+                     ~~~~^^
+  File "/mnt/sdv_repos/ncaa-mfb-football-raw/python/mfb_run.py", line 87, in main
+    teams = discover_teams(
+        args.academic_year, args.division, fetch_fn=fetch, save_dir=args.out
+    )
+  File "/mnt/sdv_repos/ncaa-mfb-football-raw/python/mfb_discover.py", line 106, in discover_teams
+    raise ValueError(
+        f"no MFB teams for academic_year={academic_year} division={division}"
+    )
+ValueError: no MFB teams for academic_year=2013 division=11

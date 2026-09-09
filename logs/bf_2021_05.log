@@ -1,0 +1,5 @@
+teams: 257
+rosters: 25952 players, 257 teams
+schedule master: 1995 team-games, 847 unique contests
+game datasets: {'qa_final_score_match': 824, 'pbp': 179924, 'pbp_cfbfastr': 159368, 'drives': 21196, 'linescore': 6700, 'team_stats': 108369, 'officials': 6290, 'player_stats_rushing': 11063, 'player_stats_passing': 4303, 'player_stats_receiving': 13039, 'games': 828}
+ay2021 QA: 824/828 exact, 2 unverifiable, 2 flagged
