@@ -203,16 +203,18 @@ def run_season(root: Path, ay: int, workers: int, force: bool) -> "dict[str, int
 def main(argv: "list[str] | None" = None) -> int:
     ap = argparse.ArgumentParser(description=__doc__)
     ap.add_argument("--academic-year", type=int, default=None)
-    ap.add_argument("--all", action="store_true", help="parse 2014..2026")
+    ap.add_argument("--all", action="store_true", help="parse every academic year from 2014 through the current one")
     ap.add_argument("--root", default=str(REPO_ROOT))
     ap.add_argument("--workers", type=int, default=8)
     ap.add_argument(
         "--force", action="store_true", help="re-parse even when output exists"
     )
+    from ncaa_mfb_raw_scrape import coverage_years
+
     args = ap.parse_args(argv)
     if not args.all and args.academic_year is None:
         ap.error("--academic-year or --all required")
-    years = range(2014, 2027) if args.all else [args.academic_year]
+    years = coverage_years() if args.all else [args.academic_year]
     for ay in years:
         run_season(Path(args.root), ay, args.workers, args.force)
     return 0
