@@ -28,6 +28,22 @@ if [ -n "${OFFLINE:-}" ]; then
   echo "offline stage: no proxy / transport needed"
 elif [ -n "${NCAA_VENDOR:-}" ]; then
   echo "transport: NCAA_VENDOR=${NCAA_VENDOR} (canary_vendors.toml)"
+  # Preflight the browser transport. patchright is imported lazily inside the
+  # fetch, so a missing package or an uninstalled chromium revision surfaces as
+  # "NCAA fetch failed after rotating proxies" -- a transport error for what is
+  # really a setup error, and the cron dies looking like a ban. This install is
+  # idempotent and ~0.7s when everything is already present, so it either fixes
+  # the box or fails here where the message is honest.
+  #
+  # Needed because ${PY} is sdv-py's venv, which declares patchright only in its
+  # `all` extra; a plain `uv sync` there drops it (that is how it went missing).
+  # Note the chromium revision is pinned per patchright version -- a populated
+  # ms-playwright cache does NOT imply the right build is present.
+  if ! timeout 900 "${PY}" -m patchright install chromium >/dev/null 2>&1; then
+    echo "ERROR: ${PY} cannot provide the patchright chromium transport." >&2
+    echo "       Fix: (cd ${SDV_PY} && uv sync --extra all && .venv/bin/patchright install chromium)" >&2
+    exit 2
+  fi
 else
   # Fallback: US residential sticky pool (Decodo). Creds from .Renviron (call time only).
   RENV="${HOME}/.Renviron"; [ -f "$RENV" ] || RENV="${HOME}/Documents/.Renviron"
