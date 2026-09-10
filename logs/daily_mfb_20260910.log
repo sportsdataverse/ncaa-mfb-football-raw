@@ -1,0 +1,27 @@
+[2026-09-10 14:30:04Z] daily mfb start: ay=2027 (fall 2026) max=400
+log -> logs/daily_mfb_capture_d11_20260910_103004.log  (watch: tail -f logs/daily_mfb_capture_d11_20260910_103004.log)
+transport: NCAA_VENDOR=decodo_patchright (canary_vendors.toml) shard 0/1
+discovered 138 MFB teams (ay=2027 div=11)
+team pages 25/138: 23 contests
+team pages 50/138: 49 contests
+team pages 75/138: 70 contests
+team pages 100/138: 85 contests
+team pages 125/138: 94 contests
+discovered 99 MFB contests
+capture: {'captured': 0, 'skipped': 99, 'failed': 0}
+EXIT=0
+log -> logs/daily_mfb_capture_d12_20260910_103009.log  (watch: tail -f logs/daily_mfb_capture_d12_20260910_103009.log)
+transport: NCAA_VENDOR=decodo_patchright (canary_vendors.toml) shard 0/1
+discovered 128 MFB teams (ay=2027 div=12)
+team pages 25/128: 39 contests
+team pages 50/128: 78 contests
+team pages 75/128: 115 contests
+team pages 100/128: 140 contests
+team pages 125/128: 156 contests
+discovered 157 MFB contests
+capture: {'captured': 0, 'skipped': 157, 'failed': 0}
+EXIT=0
+log -> logs/daily_mfb_parse_20260910_103014.log  (watch: tail -f logs/daily_mfb_parse_20260910_103014.log)
+ay2027: {'skipped': 208}
+EXIT=0
+[2026-09-10 14:30:15Z] daily mfb stages done (rc_total=0)
