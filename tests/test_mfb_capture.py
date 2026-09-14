@@ -34,8 +34,33 @@ def test_capture_writes_bundle_then_skips(tmp_path: Path) -> None:
 
 
 def test_stub_pbp_is_failed_not_written(tmp_path: Path) -> None:
-    assert capture_contest(lambda _p: "tiny stub", "222", tmp_path, 2026) == "failed"
+    calls: "list[tuple[str, bool]]" = []
+
+    def stub(path: str, force: bool = False) -> str:
+        calls.append((path, force))
+        return "tiny stub"
+
+    assert capture_contest(stub, "222", tmp_path, 2026) == "failed"
     assert not is_captured("222", tmp_path, 2026)
+    # cache-first read, then exactly one forced re-fetch before giving up
+    assert calls == [("contests/222/play_by_play", False), ("contests/222/play_by_play", True)]
+
+
+def test_stale_cached_pbp_recovers_with_forced_refetch(tmp_path: Path) -> None:
+    calls: "list[tuple[str, bool]]" = []
+
+    def cache_then_live(path: str, force: bool = False) -> str:
+        calls.append((path, force))
+        if not force:
+            return "short cached page"  # what .ncaa_fetch_cache re-serves
+        return _REAL_PBP if "play_by_play" in path else _REAL_BOX
+
+    assert capture_contest(cache_then_live, "666", tmp_path, 2026) == "captured"
+    with gzip.open(bundle_path("666", tmp_path, 2026), "rt", encoding="utf-8") as fh:
+        b = json.load(fh)
+    assert b["play_by_play"] == _REAL_PBP and b["box_score"] == _REAL_BOX
+    # every sibling tab was forced too, so the bundle is one snapshot
+    assert all(force for path, force in calls[1:])
 
 
 def test_box_is_best_effort(tmp_path: Path) -> None:

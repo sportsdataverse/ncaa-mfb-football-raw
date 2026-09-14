@@ -20,7 +20,7 @@ from datetime import datetime, timezone
 from pathlib import Path
 from typing import Callable, Iterable, Optional
 
-FetchFn = Callable[[str], str]
+FetchFn = Callable[..., str]  # (path, force=False) -> html
 
 _MIN_PBP_BYTES = 40_000  # a real MFB pbp page is ~100 KB; a stub/ban is < 2 KB
 # Extra game-detail tabs captured alongside play_by_play (best-effort). Each maps
@@ -57,16 +57,32 @@ def capture_contest(
     """
     if is_captured(contest_id, out_dir, academic_year):
         return "skipped"
+    pbp_path = f"contests/{contest_id}/play_by_play"
     try:
-        pbp = fetch_fn(f"contests/{contest_id}/play_by_play")
+        pbp = fetch_fn(pbp_path)
     except Exception:  # noqa: BLE001 - any transport failure = a failed capture, breaker counts it
         return "failed"
+    # The live fetcher is cache-first and caches whatever came back, real or
+    # not. A short page (pbp not posted yet, or a stub) would otherwise be
+    # re-served from .ncaa_fetch_cache on every later run and fail forever:
+    # 2026-09-14, contests 6586107 + 6607050 -- both final, both cached at
+    # ~23 KB. One forced re-fetch before calling it failed.
+    forced = False
     if not _looks_real(pbp):
-        return "failed"
+        try:
+            pbp = fetch_fn(pbp_path, force=True)
+        except Exception:  # noqa: BLE001
+            return "failed"
+        forced = True
+        if not _looks_real(pbp):
+            return "failed"
     bundle: "dict[str, object]" = {"contest_id": str(contest_id), "play_by_play": pbp}
     for tab in _EXTRA_TABS:  # best-effort; pbp already landed, so a tab miss is null
         try:
-            bundle[tab] = fetch_fn(f"contests/{contest_id}/{tab}")
+            # a stale cached pbp means its sibling tabs were cached at the same
+            # moment: re-fetch them too, or the bundle mixes two snapshots
+            tab_path = f"contests/{contest_id}/{tab}"
+            bundle[tab] = fetch_fn(tab_path, force=True) if forced else fetch_fn(tab_path)
         except Exception:  # noqa: BLE001
             bundle[tab] = None
     bundle["captured_at"] = datetime.now(timezone.utc).isoformat()
