@@ -59,6 +59,13 @@ def main(argv: "list[str] | None" = None) -> int:
         help="discovery (+ rosters) only; no game bundles",
     )
     ap.add_argument(
+        "--refresh-discovery",
+        action="store_true",
+        help="re-fetch the team list + team pages instead of reading the saved "
+        "copies. Required for an in-progress season: team pages only link a "
+        "contest after it is played",
+    )
+    ap.add_argument(
         "--shard",
         default="0/1",
         help="i/N parallel-worker shard: worker i of N takes contests[i::N] and a "
@@ -85,14 +92,24 @@ def main(argv: "list[str] | None" = None) -> int:
         fetch = browser_fetch_fn(proxy_pool=pool or None)
 
     teams = discover_teams(
-        args.academic_year, args.division, fetch_fn=fetch, save_dir=args.out
+        args.academic_year,
+        args.division,
+        fetch_fn=fetch,
+        save_dir=args.out,
+        refresh=args.refresh_discovery,
     )
     print(
         f"discovered {len(teams)} MFB teams (ay={args.academic_year} div={args.division})",
         flush=True,
     )
+    # With --refresh-discovery this fetches the team list a second time (one
+    # page per division) -- accepted over threading the list through.
     ids = discover_season(
-        args.academic_year, args.division, fetch_fn=fetch, save_dir=args.out
+        args.academic_year,
+        args.division,
+        fetch_fn=fetch,
+        save_dir=args.out,
+        refresh=args.refresh_discovery,
     )
     print(f"discovered {len(ids)} MFB contests", flush=True)
 

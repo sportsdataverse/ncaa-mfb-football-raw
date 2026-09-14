@@ -18,6 +18,8 @@
 # re-tune without a commit):
 #   MFB_MAX_CONTESTS  per-division capture cap per run   (default 400)
 #   MFB_ACADEMIC_YEAR override the resolved ay           (default: current)
+#   MFB_REFRESH_MAX_STALE_FRAC  fail if more than this share of team pages
+#                     could not be re-fetched           (default 0.5)
 #
 # Deliberately single-stream: mfb_run.py parallelises via --shard i/N, not a
 # worker count, and a daily incremental has few new contests. stats.ncaa.org is
@@ -47,12 +49,19 @@ mkdir -p logs
   echo "[$(date -u '+%F %T')Z] daily mfb start: ay=${AY} (fall ${FALL}) max=${MAX_CONTESTS}"
 
   rc_total=0
-  # Divisions 11 (FBS) and 12 (FCS). Every stage is file-exists resumable, so a
-  # re-run after a partial night costs nothing and re-captures nothing.
+  # Divisions 11 (FBS) and 12 (FCS). Game bundles are file-exists resumable, so
+  # a re-run after a partial night re-captures nothing.
+  #
+  # Discovery is NOT: --refresh-discovery re-fetches the team list and every
+  # team page (~270 pages/day across both divisions). A team page only links a
+  # contest once the game is played, so reading the saved copies froze fall 2026
+  # at its 2026-09-09 snapshot -- every run after "captured 0", exit 0, and
+  # week 2 never landed. Refresh fails the stage if most pages fall back to
+  # their saved copy (MFB_REFRESH_MAX_STALE_FRAC, default 0.5).
   for div in 11 12; do
     run_stage "daily_mfb_capture_d${div}" python/ncaa_mfb_raw_scrape/mfb_run.py \
       --out "${ROOT}" --academic-year "${AY}" --division "${div}" \
-      --max-contests "${MAX_CONTESTS}"
+      --max-contests "${MAX_CONTESTS}" --refresh-discovery
     rc=$?
     [ "$rc" -ne 0 ] && { echo "WARN capture div=${div} rc=${rc}"; rc_total=1; }
   done

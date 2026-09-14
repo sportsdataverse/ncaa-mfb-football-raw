@@ -67,3 +67,79 @@ def test_discover_season_walks_and_dedups() -> None:
 def test_discover_no_teams_raises_loudly() -> None:
     with pytest.raises(ValueError, match="no MFB teams"):
         discover_season(2025, fetch_fn=lambda _p: "")
+
+
+def _site(pages: "dict[str, str]"):
+    """Fake stats.ncaa.org whose pages can change between calls; records forces."""
+    calls: "list[tuple[str, bool]]" = []
+
+    def fetch(path: str, force: bool = False) -> str:
+        calls.append((path, force))
+        return pages.get(path, "")
+
+    return fetch, calls
+
+
+def _pad(html: str) -> str:
+    return html + "<!--" + "x" * 10_000 + "-->"  # clear the real-page size floor
+
+
+def test_saved_pages_freeze_discovery_without_refresh(tmp_path: Path) -> None:
+    pages = {
+        "team/inst_team_list?academic_year=2027&conf_id=-1&division=11&sport_code=MFB": _pad(
+            '<a href="/teams/1">a</a>'
+        ),
+        "teams/1": _pad('<a href="/contests/100/box_score">wk1</a>'),
+    }
+    fetch, _ = _site(pages)
+    assert discover_season(2027, fetch_fn=fetch, save_dir=tmp_path) == ["100"]
+
+    # week 2 is played: the live team page now links a second contest
+    pages["teams/1"] = _pad(
+        '<a href="/contests/100/box_score">wk1</a><a href="/contests/200/box_score">wk2</a>'
+    )
+    assert discover_season(2027, fetch_fn=fetch, save_dir=tmp_path) == ["100"]  # frozen
+    got = discover_season(2027, fetch_fn=fetch, save_dir=tmp_path, refresh=True)
+    assert got == ["100", "200"]
+    # and the refreshed page replaced the saved copy
+    saved = (tmp_path / "mfb" / "schedules" / "html" / "2027" / "1.html").read_text()
+    assert "/contests/200/" in saved
+
+
+def test_refresh_bypasses_fetcher_cache(tmp_path: Path) -> None:
+    fetch, calls = _site(
+        {
+            "team/inst_team_list?academic_year=2027&conf_id=-1&division=11&sport_code=MFB": _pad(
+                '<a href="/teams/1">a</a>'
+            ),
+            "teams/1": _pad('<a href="/contests/100/box_score">x</a>'),
+        }
+    )
+    discover_season(2027, fetch_fn=fetch, save_dir=tmp_path, refresh=True)
+    assert calls and all(force for _, force in calls)
+
+
+def test_refresh_stub_keeps_saved_page(tmp_path: Path) -> None:
+    tl = "team/inst_team_list?academic_year=2027&conf_id=-1&division=11&sport_code=MFB"
+    pages = {tl: _pad('<a href="/teams/1">a</a><a href="/teams/2">b</a>'),
+             "teams/1": _pad('<a href="/contests/100/box_score">x</a>'),
+             "teams/2": _pad('<a href="/contests/300/box_score">z</a>')}
+    fetch, _ = _site(pages)
+    discover_season(2027, fetch_fn=fetch, save_dir=tmp_path)
+
+    pages["teams/1"] = _pad('<a href="/contests/100/box_score">x</a><a href="/contests/200/box_score">y</a>')
+    pages["teams/2"] = "bm-verify stub"  # blocked on refresh: keep the saved page
+    got = discover_season(2027, fetch_fn=fetch, save_dir=tmp_path, refresh=True)
+    assert got == ["100", "200", "300"]
+
+
+def test_refresh_mostly_blocked_fails_loudly(tmp_path: Path) -> None:
+    tl = "team/inst_team_list?academic_year=2027&conf_id=-1&division=11&sport_code=MFB"
+    pages = {tl: _pad('<a href="/teams/1">a</a><a href="/teams/2">b</a>'),
+             "teams/1": _pad('<a href="/contests/100/box_score">x</a>'),
+             "teams/2": _pad('<a href="/contests/300/box_score">z</a>')}
+    fetch, _ = _site(pages)
+    discover_season(2027, fetch_fn=fetch, save_dir=tmp_path)
+    pages["teams/1"] = pages["teams/2"] = "blocked"
+    with pytest.raises(RuntimeError, match="discovery is stale"):
+        discover_season(2027, fetch_fn=fetch, save_dir=tmp_path, refresh=True)

@@ -12,7 +12,7 @@ import re
 from pathlib import Path
 from typing import Callable, List, Optional
 
-FetchFn = Callable[[str], str]  # (path) -> html
+FetchFn = Callable[..., str]  # (path, force=False) -> html
 
 #: A real stats.ncaa.org page (team list / team page / roster) is >=40 KB of
 #: framework HTML; a bm-verify stub or edge block is ~2 KB.
@@ -47,7 +47,7 @@ def browser_fetch_fn(proxy_pool: "Optional[List[str]]" = None) -> FetchFn:
     from sportsdataverse.mbb.mbb_ncaa_fetch import NcaaFetcher
 
     fetcher = NcaaFetcher.with_browser(proxy_pool=proxy_pool)
-    return lambda path: fetcher.fetch_html(path, force=True)
+    return lambda path, force=True: fetcher.fetch_html(path, force=True)
 
 
 def vendor_fetch_fn(
@@ -62,22 +62,43 @@ def vendor_fetch_fn(
     fetcher = _vendor_fetcher(
         os.environ["NCAA_VENDOR"], root, shard_i=shard_i, shard_n=shard_n
     )
-    return lambda path: fetcher.fetch_html(path)
+    return lambda path, force=False: fetcher.fetch_html(path, force=force)
 
 
-def _read_or_fetch(path: "Optional[Path]", fetch_fn: FetchFn, url_path: str) -> str:
+def _read_or_fetch(
+    path: "Optional[Path]", fetch_fn: FetchFn, url_path: str, *, refresh: bool = False
+) -> "tuple[str, bool]":
     """Fetch ``url_path``, persisting real pages to ``path`` (resume = read disk).
+
+    Returns ``(html, fresh)``. ``fresh`` is False when the page came from disk.
 
     ``path=None`` (tests / no save_dir) never touches disk. A too-small body
     (bm-verify stub) is returned but NOT persisted, so a retry re-fetches.
+
+    ``refresh=True`` bypasses BOTH caches -- the persisted page here and the
+    fetcher's own ``.ncaa_fetch_cache`` (``force=True``). Discovery for an
+    in-progress season must refresh: a team page only links a contest once the
+    game is played, so a page saved in week 1 lists week-1 games forever. That
+    froze fall 2026 at its 2026-09-09 snapshot -- every later run "captured 0",
+    exit 0. A refresh that comes back as a stub or raises falls back to the
+    saved copy (``fresh=False``) rather than shrinking the discovered set;
+    the caller decides whether too many fallbacks is a failure.
     """
-    if path is not None and path.exists():
-        return path.read_text(encoding="utf-8")
-    html = fetch_fn(url_path) or ""
-    if path is not None and len(html) >= _MIN_PAGE_BYTES:
-        path.parent.mkdir(parents=True, exist_ok=True)
-        path.write_text(html, encoding="utf-8")
-    return html
+    cached = path.read_text(encoding="utf-8") if path is not None and path.exists() else None
+    if cached is not None and not refresh:
+        return cached, False
+    try:
+        html = (fetch_fn(url_path, force=True) if refresh else fetch_fn(url_path)) or ""
+    except Exception:  # noqa: BLE001 - a transport failure on refresh keeps the saved page
+        if cached is None:
+            raise
+        return cached, False
+    if len(html) >= _MIN_PAGE_BYTES:
+        if path is not None:
+            path.parent.mkdir(parents=True, exist_ok=True)
+            path.write_text(html, encoding="utf-8")
+        return html, True
+    return (cached, False) if cached is not None else (html, False)
 
 
 def discover_teams(
@@ -86,9 +107,11 @@ def discover_teams(
     *,
     fetch_fn: "Optional[FetchFn]" = None,
     save_dir: "str | Path | None" = None,
+    refresh: bool = False,
 ) -> List[str]:
     """Team ids for a season/division, persisting the team-list HTML when
-    ``save_dir`` (repo root) is given -> ``mfb/teams/html/{ay}_div{d}.html``."""
+    ``save_dir`` (repo root) is given -> ``mfb/teams/html/{ay}_div{d}.html``.
+    ``refresh`` re-fetches instead of reading the saved list."""
     fetch = fetch_fn or browser_fetch_fn()
     tl_path = (
         Path(save_dir)
@@ -99,9 +122,10 @@ def discover_teams(
         if save_dir
         else None
     )
-    teams = parse_team_ids(
-        _read_or_fetch(tl_path, fetch, team_list_path(academic_year, division))
+    html, _ = _read_or_fetch(
+        tl_path, fetch, team_list_path(academic_year, division), refresh=refresh
     )
+    teams = parse_team_ids(html)
     if not teams:
         raise ValueError(
             f"no MFB teams for academic_year={academic_year} division={division}"
@@ -165,6 +189,7 @@ def discover_season(
     fetch_fn: Optional[FetchFn] = None,
     save_dir: "str | Path | None" = None,
     log_every: int = 25,
+    refresh: bool = False,
 ) -> List[str]:
     """Discover every MFB ``contest_id`` in a season (team list -> team pages -> dedup).
 
@@ -177,6 +202,10 @@ def discover_season(
             ``mfb/schedules/html/{ay}/{team_id}.html``, and re-runs read the
             persisted pages instead of re-fetching (resume).
         log_every: progress print cadence over the team-page sweep (0 = quiet).
+        refresh: re-fetch the team list and every team page, bypassing both
+            the persisted pages and the fetcher cache. REQUIRED for a season
+            still being played (see :func:`_read_or_fetch`); leave False for a
+            completed season, where the saved pages are final.
 
     Returns:
         Sorted, de-duplicated list of ``contest_id`` strings.
@@ -184,10 +213,17 @@ def discover_season(
     Raises:
         ValueError: the team list resolved zero teams (bad year/division or a
             fetch failure) -- raised loudly instead of returning a hollow list.
+        RuntimeError: ``refresh`` was requested but more than
+            ``MFB_REFRESH_MAX_STALE_FRAC`` (env, default 0.5) of team pages
+            fell back to their saved copy -- a blocked transport must fail the
+            run, not quietly re-serve last week's schedule.
     """
     fetch = fetch_fn or browser_fetch_fn()
-    teams = discover_teams(academic_year, division, fetch_fn=fetch, save_dir=save_dir)
+    teams = discover_teams(
+        academic_year, division, fetch_fn=fetch, save_dir=save_dir, refresh=refresh
+    )
     contests: "set[str]" = set()
+    stale = 0
     for i, team_id in enumerate(teams, 1):
         page_path = (
             Path(save_dir)
@@ -199,9 +235,21 @@ def discover_season(
             if save_dir
             else None
         )
-        contests.update(
-            parse_contest_ids(_read_or_fetch(page_path, fetch, f"teams/{team_id}"))
-        )
+        html, fresh = _read_or_fetch(page_path, fetch, f"teams/{team_id}", refresh=refresh)
+        stale += refresh and not fresh
+        contests.update(parse_contest_ids(html))
         if log_every and i % log_every == 0:
             print(f"team pages {i}/{len(teams)}: {len(contests)} contests", flush=True)
+    if refresh:
+        max_frac = float(os.environ.get("MFB_REFRESH_MAX_STALE_FRAC", "0.5"))
+        print(
+            f"refresh: {len(teams) - stale}/{len(teams)} team pages re-fetched, "
+            f"{stale} fell back to the saved copy",
+            flush=True,
+        )
+        if teams and stale / len(teams) > max_frac:
+            raise RuntimeError(
+                f"refresh: {stale}/{len(teams)} team pages could not be re-fetched "
+                f"(> {max_frac:.0%}) -- discovery is stale, failing the run"
+            )
     return sorted(contests)
