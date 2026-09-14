@@ -20,18 +20,47 @@
 #   MFB_ACADEMIC_YEAR override the resolved ay           (default: current)
 #   MFB_REFRESH_MAX_STALE_FRAC  fail if more than this share of team pages
 #                     could not be re-fetched           (default 0.5)
+#   MFB_WORKERS       parallel shard processes           (default 1)
 #
-# Deliberately single-stream: mfb_run.py parallelises via --shard i/N, not a
-# worker count, and a daily incremental has few new contests. stats.ncaa.org is
-# a hostile host -- run_backfill_all.sh shards only because it is replaying whole
-# seasons. If a daily run ever needs it, add --shard here, not a --workers flag
-# (there is no such flag; passing one exits 2 on every run).
+# Single-stream by default: stats.ncaa.org is a hostile host and a normal night
+# has few new contests. MFB_WORKERS=N shards instead -- N separate processes via
+# mfb_run.py --shard i/N, each on a disjoint slice of canary_vendors.toml's 50
+# sticky ports (keep >=2 ports/worker => N <= 25). Serially a refresh is ~16 s
+# a page: 266 team pages plus 6 tabs per new contest, so catching up a missed
+# week is hours (2026-09-14: ~1,500 pages, ~6.6 h at N=1).
+#
+# Sharded, each division runs TWO waves, never one: wave A refreshes disjoint
+# slices of team pages (--skip-games), wave B captures disjoint slices of the
+# contests re-discovered from those now-fresh pages. A refreshing shard only
+# sees its own teams' contests, so capturing inside wave A would drop games
+# (mfb_run.py refuses that combination).
 set -uo pipefail
 
 cd "$(dirname "$0")/.." || exit 2
 source "scripts/_env.sh"
 
 MAX_CONTESTS="${MFB_MAX_CONTESTS:-400}"
+WORKERS="${MFB_WORKERS:-1}"
+if ! [[ "$WORKERS" =~ ^[0-9]+$ ]] || [ "$WORKERS" -lt 1 ] || [ "$WORKERS" -gt 25 ]; then
+  echo "ERROR: MFB_WORKERS must be 1-25 (got '${WORKERS}')" >&2
+  exit 2
+fi
+
+# run_wave <label> <args...> : WORKERS shard processes of mfb_run.py, waited on.
+# Returns 1 if any shard failed. Each shard tees its own log via run_stage.
+run_wave() {
+  local label="$1"; shift
+  local pids=() i rc=0
+  for i in $(seq 0 $((WORKERS - 1))); do
+    run_stage "${label}_s${i}of${WORKERS}" python/ncaa_mfb_raw_scrape/mfb_run.py \
+      "$@" --shard "${i}/${WORKERS}" > /dev/null &
+    pids+=("$!")
+  done
+  for i in "${!pids[@]}"; do
+    wait "${pids[$i]}" || { echo "WARN ${label} shard ${i} rc=$?"; rc=1; }
+  done
+  return "$rc"
+}
 
 # The academic year comes from the shared helper, not a hardcoded constant --
 # `range(2014, 2027)` silently excluding ay2027 is precisely the bug this repo
@@ -46,7 +75,7 @@ FALL=$((AY - 1))
 LOG="logs/daily_mfb_$(date -u +%Y%m%d).log"
 mkdir -p logs
 {
-  echo "[$(date -u '+%F %T')Z] daily mfb start: ay=${AY} (fall ${FALL}) max=${MAX_CONTESTS}"
+  echo "[$(date -u '+%F %T')Z] daily mfb start: ay=${AY} (fall ${FALL}) max=${MAX_CONTESTS} workers=${WORKERS}"
 
   rc_total=0
   # Divisions 11 (FBS) and 12 (FCS). Game bundles are file-exists resumable, so
@@ -59,10 +88,22 @@ mkdir -p logs
   # week 2 never landed. Refresh fails the stage if most pages fall back to
   # their saved copy (MFB_REFRESH_MAX_STALE_FRAC, default 0.5).
   for div in 11 12; do
-    run_stage "daily_mfb_capture_d${div}" python/ncaa_mfb_raw_scrape/mfb_run.py \
-      --out "${ROOT}" --academic-year "${AY}" --division "${div}" \
-      --max-contests "${MAX_CONTESTS}" --refresh-discovery
-    rc=$?
+    common=(--out "${ROOT}" --academic-year "${AY}" --division "${div}")
+    if [ "$WORKERS" -eq 1 ]; then
+      run_stage "daily_mfb_capture_d${div}" python/ncaa_mfb_raw_scrape/mfb_run.py \
+        "${common[@]}" --max-contests "${MAX_CONTESTS}" --refresh-discovery
+      rc=$?
+    else
+      echo "[$(date -u '+%F %T')Z] div=${div} wave A: refresh team pages x${WORKERS}"
+      run_wave "daily_mfb_refresh_d${div}" "${common[@]}" --refresh-discovery --skip-games
+      rc=$?
+      # A failed refresh wave means stale pages: capture from them anyway (the
+      # games they do list are real), but the run still reports the failure.
+      echo "[$(date -u '+%F %T')Z] div=${div} wave B: capture x${WORKERS}"
+      per_shard=$(( (MAX_CONTESTS + WORKERS - 1) / WORKERS ))
+      run_wave "daily_mfb_capture_d${div}" "${common[@]}" --max-contests "${per_shard}" || rc=1
+      grep -h "discovered .* contests\|capture:" logs/daily_mfb_capture_d${div}_s*of${WORKERS}_$(date +%Y%m%d)_*.log 2>/dev/null | sort | uniq -c
+    fi
     [ "$rc" -ne 0 ] && { echo "WARN capture div=${div} rc=${rc}"; rc_total=1; }
   done
 

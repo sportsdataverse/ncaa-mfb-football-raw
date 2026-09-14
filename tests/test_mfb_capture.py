@@ -87,3 +87,9 @@ def test_failure_breaker_trips(tmp_path: Path) -> None:
             2026,
             max_consecutive_failures=5,
         )
+
+
+def test_bundle_write_leaves_no_tmp(tmp_path) -> None:
+    assert capture_contest(_real_fetch, "555", tmp_path, 2026) == "captured"
+    raw = tmp_path / "mfb" / "raw" / "2026"
+    assert [p.name for p in raw.iterdir()] == ["555.json.gz"]

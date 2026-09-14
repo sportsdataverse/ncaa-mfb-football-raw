@@ -73,6 +73,13 @@ def main(argv: "list[str] | None" = None) -> int:
     )
     args = ap.parse_args(argv)
     shard_i, shard_n = (int(x) for x in args.shard.split("/", 1))
+    if args.refresh_discovery and shard_n > 1 and not args.skip_games:
+        # A sharded refresh walks only its slice of teams, so its contest list
+        # is partial; sharding that again for capture would silently drop games.
+        ap.error(
+            "--refresh-discovery with --shard needs --skip-games: refresh the "
+            "pages in one sharded pass, then capture in a second pass without it"
+        )
 
     if os.environ.get("NCAA_VENDOR"):
         print(
@@ -96,7 +103,7 @@ def main(argv: "list[str] | None" = None) -> int:
         args.division,
         fetch_fn=fetch,
         save_dir=args.out,
-        refresh=args.refresh_discovery,
+        refresh=args.refresh_discovery and shard_i == 0,
     )
     print(
         f"discovered {len(teams)} MFB teams (ay={args.academic_year} div={args.division})",
@@ -110,6 +117,7 @@ def main(argv: "list[str] | None" = None) -> int:
         fetch_fn=fetch,
         save_dir=args.out,
         refresh=args.refresh_discovery,
+        team_shard=(shard_i, shard_n) if args.refresh_discovery else (0, 1),
     )
     print(f"discovered {len(ids)} MFB contests", flush=True)
 

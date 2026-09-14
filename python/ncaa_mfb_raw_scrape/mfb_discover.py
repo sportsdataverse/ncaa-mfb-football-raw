@@ -65,6 +65,16 @@ def vendor_fetch_fn(
     return lambda path, force=False: fetcher.fetch_html(path, force=force)
 
 
+def _atomic_write(path: Path, text: str) -> None:
+    """tmp + rename. Refresh REWRITES pages that already exist, and parallel
+    workers read the team list while shard 0 rewrites it -- an in-place write
+    exposes a truncated page, which parses as a short contest list."""
+    path.parent.mkdir(parents=True, exist_ok=True)
+    tmp = path.with_name(f".{path.name}.{os.getpid()}.tmp")
+    tmp.write_text(text, encoding="utf-8")
+    os.replace(tmp, path)
+
+
 def _read_or_fetch(
     path: "Optional[Path]", fetch_fn: FetchFn, url_path: str, *, refresh: bool = False
 ) -> "tuple[str, bool]":
@@ -95,8 +105,7 @@ def _read_or_fetch(
         return cached, False
     if len(html) >= _MIN_PAGE_BYTES:
         if path is not None:
-            path.parent.mkdir(parents=True, exist_ok=True)
-            path.write_text(html, encoding="utf-8")
+            _atomic_write(path, html)
         return html, True
     return (cached, False) if cached is not None else (html, False)
 
@@ -190,6 +199,7 @@ def discover_season(
     save_dir: "str | Path | None" = None,
     log_every: int = 25,
     refresh: bool = False,
+    team_shard: "tuple[int, int]" = (0, 1),
 ) -> List[str]:
     """Discover every MFB ``contest_id`` in a season (team list -> team pages -> dedup).
 
@@ -206,6 +216,11 @@ def discover_season(
             the persisted pages and the fetcher cache. REQUIRED for a season
             still being played (see :func:`_read_or_fetch`); leave False for a
             completed season, where the saved pages are final.
+        team_shard: ``(i, n)`` -- walk only ``teams[i::n]``, so ``n`` processes
+            refresh disjoint slices in parallel. Only shard 0 refreshes the
+            team list itself (one writer). The contests returned cover the
+            slice alone: a sharded call is for REFRESHING pages, and capture
+            must re-discover from disk afterwards to see the whole season.
 
     Returns:
         Sorted, de-duplicated list of ``contest_id`` strings.
@@ -219,9 +234,14 @@ def discover_season(
             run, not quietly re-serve last week's schedule.
     """
     fetch = fetch_fn or browser_fetch_fn()
+    shard_i, shard_n = team_shard
     teams = discover_teams(
-        academic_year, division, fetch_fn=fetch, save_dir=save_dir, refresh=refresh
-    )
+        academic_year,
+        division,
+        fetch_fn=fetch,
+        save_dir=save_dir,
+        refresh=refresh and shard_i == 0,
+    )[shard_i::shard_n]
     contests: "set[str]" = set()
     stale = 0
     for i, team_id in enumerate(teams, 1):

@@ -15,6 +15,7 @@ from __future__ import annotations
 
 import gzip
 import json
+import os
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Callable, Iterable, Optional
@@ -71,8 +72,12 @@ def capture_contest(
     bundle["captured_at"] = datetime.now(timezone.utc).isoformat()
     path = bundle_path(contest_id, out_dir, academic_year)
     path.parent.mkdir(parents=True, exist_ok=True)
-    with gzip.open(path, "wt", encoding="utf-8") as fh:
+    # tmp + rename: resume is file-EXISTS, so a worker killed mid-write would
+    # otherwise leave a truncated bundle that every later run skips as captured.
+    tmp = path.with_name(f".{path.name}.{os.getpid()}.tmp")
+    with gzip.open(tmp, "wt", encoding="utf-8") as fh:
         json.dump(bundle, fh)
+    os.replace(tmp, path)
     return "captured"
 
 

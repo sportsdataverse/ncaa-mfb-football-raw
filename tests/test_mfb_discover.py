@@ -143,3 +143,26 @@ def test_refresh_mostly_blocked_fails_loudly(tmp_path: Path) -> None:
     pages["teams/1"] = pages["teams/2"] = "blocked"
     with pytest.raises(RuntimeError, match="discovery is stale"):
         discover_season(2027, fetch_fn=fetch, save_dir=tmp_path, refresh=True)
+
+
+def test_team_shards_refresh_disjoint_slices_covering_every_team(tmp_path: Path) -> None:
+    tl = "team/inst_team_list?academic_year=2027&conf_id=-1&division=11&sport_code=MFB"
+    pages = {tl: _pad("".join(f'<a href="/teams/{t}">t</a>' for t in range(1, 8)))}
+    pages.update({f"teams/{t}": _pad(f'<a href="/contests/{t}00/box_score">g</a>') for t in range(1, 8)})
+    fetch, calls = _site(pages)
+    got: "set[str]" = set()
+    for i in range(3):
+        got |= set(discover_season(2027, fetch_fn=fetch, save_dir=tmp_path, refresh=True, team_shard=(i, 3)))
+    team_fetches = [p for p, _ in calls if p.startswith("teams/")]
+    assert sorted(team_fetches) == sorted(set(team_fetches))  # no page fetched twice
+    assert len(team_fetches) == 7
+    assert sum(1 for p, _ in calls if p == tl) == 1  # only shard 0 refreshes the list
+    assert got == {f"{t}00" for t in range(1, 8)}
+
+
+def test_sharded_refresh_without_skip_games_is_refused() -> None:
+    from ncaa_mfb_raw_scrape import mfb_run
+
+    with pytest.raises(SystemExit) as exc:
+        mfb_run.main(["--refresh-discovery", "--shard", "1/4"])
+    assert exc.value.code == 2
