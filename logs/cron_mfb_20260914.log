@@ -26,3 +26,46 @@ log -> logs/daily_mfb_parse_20260914_103017.log  (watch: tail -f logs/daily_mfb_
 ay2027: {'skipped': 208}
 EXIT=0
 [2026-09-14 14:30:17Z] daily mfb stages done (rc_total=0)
+[2026-09-14 14:30:19Z] daily mfb done EXIT=0
+transport: NCAA_VENDOR=decodo_patchright (canary_vendors.toml)
+[2026-09-14 16:50:04Z] daily mfb start: ay=2027 (fall 2026) max=400
+log -> logs/daily_mfb_capture_d11_20260914_125004.log  (watch: tail -f logs/daily_mfb_capture_d11_20260914_125004.log)
+transport: NCAA_VENDOR=decodo_patchright (canary_vendors.toml) shard 0/1
+discovered 138 MFB teams (ay=2027 div=11)
+team pages 25/138: 47 contests
+team pages 50/138: 91 contests
+team pages 75/138: 128 contests
+team pages 100/138: 158 contests
+team pages 125/138: 174 contests
+refresh: 138/138 team pages re-fetched, 0 fell back to the saved copy
+discovered 185 MFB contests
+games: {'captured': 10, 'skipped': 9, 'failed': 0}
+EXIT=143
+transport: NCAA_VENDOR=decodo_patchright (canary_vendors.toml)
+[2026-09-14 17:57:51Z] daily mfb start: ay=2027 (fall 2026) max=400 workers=12
+[2026-09-14 17:57:51Z] div=11 wave A: refresh team pages x12
+[2026-09-14 18:01:39Z] div=11 wave B: capture x12
+      2 capture: {'captured': 3, 'skipped': 12, 'failed': 0}
+      1 capture: {'captured': 4, 'skipped': 11, 'failed': 0}
+      1 capture: {'captured': 5, 'skipped': 10, 'failed': 0}
+      1 capture: {'captured': 5, 'skipped': 11, 'failed': 0}
+      1 capture: {'captured': 5, 'skipped': 9, 'failed': 2}
+      3 capture: {'captured': 6, 'skipped': 10, 'failed': 0}
+      1 capture: {'captured': 6, 'skipped': 9, 'failed': 0}
+      1 capture: {'captured': 8, 'skipped': 7, 'failed': 0}
+      1 capture: {'captured': 9, 'skipped': 6, 'failed': 0}
+     12 discovered 185 MFB contests
+[2026-09-14 18:15:14Z] div=12 wave A: refresh team pages x12
+[2026-09-14 18:18:21Z] div=12 wave B: capture x12
+      1 capture: {'captured': 2, 'skipped': 17, 'failed': 1}
+      2 capture: {'captured': 2, 'skipped': 18, 'failed': 0}
+      3 capture: {'captured': 3, 'skipped': 17, 'failed': 0}
+      2 capture: {'captured': 4, 'skipped': 16, 'failed': 0}
+      1 capture: {'captured': 5, 'skipped': 14, 'failed': 0}
+      2 capture: {'captured': 5, 'skipped': 15, 'failed': 0}
+      1 capture: {'captured': 7, 'skipped': 13, 'failed': 0}
+     12 discovered 239 MFB contests
+log -> logs/daily_mfb_parse_20260914_142920.log  (watch: tail -f logs/daily_mfb_parse_20260914_142920.log)
+ay2027: {'parsed': 129, 'skipped': 208}
+EXIT=0
+[2026-09-14 18:30:05Z] daily mfb stages done (rc_total=0)
