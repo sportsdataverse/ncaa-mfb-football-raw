@@ -156,7 +156,11 @@ file-exists resumable; a consecutive-failure breaker hard-stops ban storms.
 `./scripts/daily_mfb_scraper.sh` is the **in-season daily driver, run from the
 droplet crontab** — not from Prefect. It resolves the current academic year from
 `ncaa_mfb_raw_scrape.current_academic_year()`, captures FBS (division 11) and FCS
-(division 12), parses, then commits and pushes. Pace is env-only
+(division 12) games and rosters, builds the reference frames (05) and ESPN
+crosswalk (06), parses (03), then commits and pushes. That push fires
+`.github/workflows/ncaa_mfb_data_trigger.yml`, which dispatches
+[`ncaa-mfb-football-data`](https://github.com/sportsdataverse/ncaa-mfb-football-data)
+to rebuild and publish the season over https. Pace is env-only
 (`MFB_MAX_CONTESTS`, `MFB_WORKERS`, `MFB_ACADEMIC_YEAR`), so it can be re-tuned
 without a commit.
 
