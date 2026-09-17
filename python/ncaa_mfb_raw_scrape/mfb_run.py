@@ -122,7 +122,10 @@ def main(argv: "list[str] | None" = None) -> int:
     print(f"discovered {len(ids)} MFB contests", flush=True)
 
     if args.rosters:
-        rstats = capture_rosters(teams, fetch, args.out, args.academic_year)
+        # Same team slice as the sharded discovery above. Unsliced, every shard
+        # walked all teams: 12 shards raced one list, ~6x duplicate roster
+        # fetches against stats.ncaa.org (caught live 2026-09-17).
+        rstats = capture_rosters(teams[shard_i::shard_n], fetch, args.out, args.academic_year)
         print(f"rosters: {rstats}", flush=True)
 
     if args.skip_games:

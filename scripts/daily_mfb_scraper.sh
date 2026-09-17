@@ -11,6 +11,11 @@
 # Composes the existing numbered stages -- it does NOT reimplement them. A
 # backfill is the same stages with different env (see RUNBOOK.md).
 #
+# The season it leaves behind is complete for ncaa-mfb-football-data: capture +
+# rosters (01/02/04), reference frames (05), ESPN crosswalk (06), then parse (03,
+# which reads the crosswalk). Its push fires .github/workflows/
+# ncaa_mfb_data_trigger.yml, which dispatches the data repo's rebuild + publish.
+#
 #   run:    NCAA_VENDOR=decodo_patchright ./scripts/daily_mfb_scraper.sh
 #   watch:  tail -f logs/daily_mfb_$(date -u +%Y%m%d).log
 #
@@ -91,11 +96,13 @@ mkdir -p logs
     common=(--out "${ROOT}" --academic-year "${AY}" --division "${div}")
     if [ "$WORKERS" -eq 1 ]; then
       run_stage "daily_mfb_capture_d${div}" python/ncaa_mfb_raw_scrape/mfb_run.py \
-        "${common[@]}" --max-contests "${MAX_CONTESTS}" --refresh-discovery
+        "${common[@]}" --max-contests "${MAX_CONTESTS}" --refresh-discovery --rosters
       rc=$?
     else
       echo "[$(date -u '+%F %T')Z] div=${div} wave A: refresh team pages x${WORKERS}"
-      run_wave "daily_mfb_refresh_d${div}" "${common[@]}" --refresh-discovery --skip-games
+      # --rosters rides wave A: it is the only pass sharded by TEAM. Roster html
+      # already on disk is skipped, so after a season's first run it costs nothing.
+      run_wave "daily_mfb_refresh_d${div}" "${common[@]}" --refresh-discovery --skip-games --rosters
       rc=$?
       # A failed refresh wave means stale pages: capture from them anyway (the
       # games they do list are real), but the run still reports the failure.
@@ -106,6 +113,17 @@ mkdir -p logs
     fi
     [ "$rc" -ne 0 ] && { echo "WARN capture div=${div} rc=${rc}"; rc_total=1; }
   done
+
+  # Offline, in dependency order: 05 builds the schedule master 06 matches
+  # against ESPN, and 03 stamps espn_game_id from 06's crosswalk. Without 05/06
+  # the data repo had no reference frames for the season at all (fall 2026 sat
+  # unpublished 2026-09-02..17).
+  run_stage "daily_mfb_datasets" python/ncaa_mfb_05_datasets_build.py --root "${ROOT}" --academic-year "${AY}"
+  rc=$?
+  [ "$rc" -ne 0 ] && { echo "WARN datasets rc=${rc}"; rc_total=1; }
+  run_stage "daily_mfb_xwalk" python/ncaa_mfb_06_xwalk_build.py --root "${ROOT}" --academic-year "${AY}"
+  rc=$?
+  [ "$rc" -ne 0 ] && { echo "WARN xwalk rc=${rc}"; rc_total=1; }
 
   run_stage "daily_mfb_parse" python/ncaa_mfb_03_games_parse.py --academic-year "${AY}"
   rc=$?
