@@ -1,0 +1,2 @@
+ay2027: 316/339 matched  [{'match_method': 'score_exact', 'len': 238}, {'match_method': 'date_window', 'len': 1}, {'match_method': 'single_team', 'len': 19}, {'match_method': 'score_window', 'len': 49}, {'match_method': 'exact', 'len': 6}, {'match_method': 'score_pair', 'len': 3}]
+EXIT=0
