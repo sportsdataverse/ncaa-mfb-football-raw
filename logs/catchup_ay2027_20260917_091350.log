@@ -1,0 +1,67 @@
+[2026-09-17 09:13:50Z] catch-up ay2027 (retry, team-sliced rosters from /mnt/sdv_repos/wt-ncaa-mfb-raw-dispatch): rosters -> 05 -> 06 -> 03 --force
+transport: NCAA_VENDOR=decodo_patchright (canary_vendors.toml)
+[1]   Done                    PYTHONPATH="$WT/python" "$PY" "$WT/python/ncaa_mfb_raw_scrape/mfb_run.py" --out "$ROOT" --academic-year 2027 --division "$div" --refresh-discovery --skip-games --rosters --shard "$i/12" > "logs/catchup_rosters_d${div}_s${i}.log" 2>&1
+[3]   Done                    PYTHONPATH="$WT/python" "$PY" "$WT/python/ncaa_mfb_raw_scrape/mfb_run.py" --out "$ROOT" --academic-year 2027 --division "$div" --refresh-discovery --skip-games --rosters --shard "$i/12" > "logs/catchup_rosters_d${div}_s${i}.log" 2>&1
+[4]   Done                    PYTHONPATH="$WT/python" "$PY" "$WT/python/ncaa_mfb_raw_scrape/mfb_run.py" --out "$ROOT" --academic-year 2027 --division "$div" --refresh-discovery --skip-games --rosters --shard "$i/12" > "logs/catchup_rosters_d${div}_s${i}.log" 2>&1
+[6]   Done                    PYTHONPATH="$WT/python" "$PY" "$WT/python/ncaa_mfb_raw_scrape/mfb_run.py" --out "$ROOT" --academic-year 2027 --division "$div" --refresh-discovery --skip-games --rosters --shard "$i/12" > "logs/catchup_rosters_d${div}_s${i}.log" 2>&1
+[7]   Done                    PYTHONPATH="$WT/python" "$PY" "$WT/python/ncaa_mfb_raw_scrape/mfb_run.py" --out "$ROOT" --academic-year 2027 --division "$div" --refresh-discovery --skip-games --rosters --shard "$i/12" > "logs/catchup_rosters_d${div}_s${i}.log" 2>&1
+[8]   Done                    PYTHONPATH="$WT/python" "$PY" "$WT/python/ncaa_mfb_raw_scrape/mfb_run.py" --out "$ROOT" --academic-year 2027 --division "$div" --refresh-discovery --skip-games --rosters --shard "$i/12" > "logs/catchup_rosters_d${div}_s${i}.log" 2>&1
+[9]   Done                    PYTHONPATH="$WT/python" "$PY" "$WT/python/ncaa_mfb_raw_scrape/mfb_run.py" --out "$ROOT" --academic-year 2027 --division "$div" --refresh-discovery --skip-games --rosters --shard "$i/12" > "logs/catchup_rosters_d${div}_s${i}.log" 2>&1
+[10]   Done                    PYTHONPATH="$WT/python" "$PY" "$WT/python/ncaa_mfb_raw_scrape/mfb_run.py" --out "$ROOT" --academic-year 2027 --division "$div" --refresh-discovery --skip-games --rosters --shard "$i/12" > "logs/catchup_rosters_d${div}_s${i}.log" 2>&1
+[11]-  Done                    PYTHONPATH="$WT/python" "$PY" "$WT/python/ncaa_mfb_raw_scrape/mfb_run.py" --out "$ROOT" --academic-year 2027 --division "$div" --refresh-discovery --skip-games --rosters --shard "$i/12" > "logs/catchup_rosters_d${div}_s${i}.log" 2>&1
+[12]+  Done                    PYTHONPATH="$WT/python" "$PY" "$WT/python/ncaa_mfb_raw_scrape/mfb_run.py" --out "$ROOT" --academic-year 2027 --division "$div" --refresh-discovery --skip-games --rosters --shard "$i/12" > "logs/catchup_rosters_d${div}_s${i}.log" 2>&1
+[2]-  Done                    PYTHONPATH="$WT/python" "$PY" "$WT/python/ncaa_mfb_raw_scrape/mfb_run.py" --out "$ROOT" --academic-year 2027 --division "$div" --refresh-discovery --skip-games --rosters --shard "$i/12" > "logs/catchup_rosters_d${div}_s${i}.log" 2>&1
+[5]+  Done                    PYTHONPATH="$WT/python" "$PY" "$WT/python/ncaa_mfb_raw_scrape/mfb_run.py" --out "$ROOT" --academic-year 2027 --division "$div" --refresh-discovery --skip-games --rosters --shard "$i/12" > "logs/catchup_rosters_d${div}_s${i}.log" 2>&1
+rosters: {'captured': 9, 'skipped': 3, 'failed': 0}
+rosters: {'captured': 9, 'skipped': 3, 'failed': 0}
+rosters: {'captured': 9, 'skipped': 3, 'failed': 0}
+rosters: {'captured': 9, 'skipped': 3, 'failed': 0}
+rosters: {'captured': 8, 'skipped': 3, 'failed': 0}
+rosters: {'captured': 8, 'skipped': 3, 'failed': 0}
+rosters: {'captured': 8, 'skipped': 3, 'failed': 0}
+rosters: {'captured': 9, 'skipped': 2, 'failed': 0}
+rosters: {'captured': 8, 'skipped': 3, 'failed': 0}
+rosters: {'captured': 9, 'skipped': 3, 'failed': 0}
+rosters: {'captured': 9, 'skipped': 3, 'failed': 0}
+rosters: {'captured': 8, 'skipped': 3, 'failed': 0}
+[2026-09-17 09:20:47Z] rosters div=11 done (138 roster files)
+[1]   Done                    PYTHONPATH="$WT/python" "$PY" "$WT/python/ncaa_mfb_raw_scrape/mfb_run.py" --out "$ROOT" --academic-year 2027 --division "$div" --refresh-discovery --skip-games --rosters --shard "$i/12" > "logs/catchup_rosters_d${div}_s${i}.log" 2>&1
+[3]   Done                    PYTHONPATH="$WT/python" "$PY" "$WT/python/ncaa_mfb_raw_scrape/mfb_run.py" --out "$ROOT" --academic-year 2027 --division "$div" --refresh-discovery --skip-games --rosters --shard "$i/12" > "logs/catchup_rosters_d${div}_s${i}.log" 2>&1
+[4]   Done                    PYTHONPATH="$WT/python" "$PY" "$WT/python/ncaa_mfb_raw_scrape/mfb_run.py" --out "$ROOT" --academic-year 2027 --division "$div" --refresh-discovery --skip-games --rosters --shard "$i/12" > "logs/catchup_rosters_d${div}_s${i}.log" 2>&1
+[5]   Done                    PYTHONPATH="$WT/python" "$PY" "$WT/python/ncaa_mfb_raw_scrape/mfb_run.py" --out "$ROOT" --academic-year 2027 --division "$div" --refresh-discovery --skip-games --rosters --shard "$i/12" > "logs/catchup_rosters_d${div}_s${i}.log" 2>&1
+[7]   Done                    PYTHONPATH="$WT/python" "$PY" "$WT/python/ncaa_mfb_raw_scrape/mfb_run.py" --out "$ROOT" --academic-year 2027 --division "$div" --refresh-discovery --skip-games --rosters --shard "$i/12" > "logs/catchup_rosters_d${div}_s${i}.log" 2>&1
+[8]   Done                    PYTHONPATH="$WT/python" "$PY" "$WT/python/ncaa_mfb_raw_scrape/mfb_run.py" --out "$ROOT" --academic-year 2027 --division "$div" --refresh-discovery --skip-games --rosters --shard "$i/12" > "logs/catchup_rosters_d${div}_s${i}.log" 2>&1
+[9]   Done                    PYTHONPATH="$WT/python" "$PY" "$WT/python/ncaa_mfb_raw_scrape/mfb_run.py" --out "$ROOT" --academic-year 2027 --division "$div" --refresh-discovery --skip-games --rosters --shard "$i/12" > "logs/catchup_rosters_d${div}_s${i}.log" 2>&1
+[10]   Done                    PYTHONPATH="$WT/python" "$PY" "$WT/python/ncaa_mfb_raw_scrape/mfb_run.py" --out "$ROOT" --academic-year 2027 --division "$div" --refresh-discovery --skip-games --rosters --shard "$i/12" > "logs/catchup_rosters_d${div}_s${i}.log" 2>&1
+[11]-  Done                    PYTHONPATH="$WT/python" "$PY" "$WT/python/ncaa_mfb_raw_scrape/mfb_run.py" --out "$ROOT" --academic-year 2027 --division "$div" --refresh-discovery --skip-games --rosters --shard "$i/12" > "logs/catchup_rosters_d${div}_s${i}.log" 2>&1
+[12]+  Done                    PYTHONPATH="$WT/python" "$PY" "$WT/python/ncaa_mfb_raw_scrape/mfb_run.py" --out "$ROOT" --academic-year 2027 --division "$div" --refresh-discovery --skip-games --rosters --shard "$i/12" > "logs/catchup_rosters_d${div}_s${i}.log" 2>&1
+[2]-  Done                    PYTHONPATH="$WT/python" "$PY" "$WT/python/ncaa_mfb_raw_scrape/mfb_run.py" --out "$ROOT" --academic-year 2027 --division "$div" --refresh-discovery --skip-games --rosters --shard "$i/12" > "logs/catchup_rosters_d${div}_s${i}.log" 2>&1
+[6]+  Done                    PYTHONPATH="$WT/python" "$PY" "$WT/python/ncaa_mfb_raw_scrape/mfb_run.py" --out "$ROOT" --academic-year 2027 --division "$div" --refresh-discovery --skip-games --rosters --shard "$i/12" > "logs/catchup_rosters_d${div}_s${i}.log" 2>&1
+rosters: {'captured': 11, 'skipped': 0, 'failed': 0}
+rosters: {'captured': 10, 'skipped': 0, 'failed': 0}
+rosters: {'captured': 11, 'skipped': 0, 'failed': 0}
+rosters: {'captured': 11, 'skipped': 0, 'failed': 0}
+rosters: {'captured': 10, 'skipped': 0, 'failed': 0}
+rosters: {'captured': 10, 'skipped': 0, 'failed': 0}
+rosters: {'captured': 11, 'skipped': 0, 'failed': 0}
+rosters: {'captured': 11, 'skipped': 0, 'failed': 0}
+rosters: {'captured': 11, 'skipped': 0, 'failed': 0}
+rosters: {'captured': 11, 'skipped': 0, 'failed': 0}
+rosters: {'captured': 10, 'skipped': 0, 'failed': 0}
+rosters: {'captured': 11, 'skipped': 0, 'failed': 0}
+[2026-09-17 09:29:04Z] rosters div=12 done (266 roster files)
+offline stage: no proxy / transport needed
+log -> logs/datasets_20260917_052905.log  (watch: tail -f logs/datasets_20260917_052905.log)
+teams: 266
+rosters: 29386 players, 266 teams
+schedule master: 3150 team-games, 339 unique contests
+EXIT=0
+offline stage: no proxy / transport needed
+log -> logs/xwalk_20260917_053207.log  (watch: tail -f logs/xwalk_20260917_053207.log)
+ay2027: 316/339 matched  [{'match_method': 'score_pair', 'len': 3}, {'match_method': 'score_window', 'len': 49}, {'match_method': 'score_exact', 'len': 238}, {'match_method': 'date_window', 'len': 1}, {'match_method': 'single_team', 'len': 19}, {'match_method': 'exact', 'len': 6}]
+EXIT=0
+offline stage: no proxy / transport needed
+log -> logs/parse_20260917_053219.log  (watch: tail -f logs/parse_20260917_053219.log)
+ay2027: {'parsed': 339}
+EXIT=0
+[2026-09-17 09:34:16Z] catch-up EXIT=0
