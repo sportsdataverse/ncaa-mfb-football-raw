@@ -11,6 +11,9 @@ name: ncaa-mfb-football-data trigger
 # The daily driver commits data + logs in ONE commit, so unlike nfl-ngs-raw there
 # is no log-only push to gate out.
 #
+# `sha` pins the data side's raw.githubusercontent reads to this exact commit
+# (`main` is CDN-cached for 5 minutes).
+#
 # Needs SDV_GH_TOKEN (org secret; a PAT with repo scope on the data repo) -- the
 # default GITHUB_TOKEN cannot dispatch to another repo.
 
@@ -37,5 +40,6 @@ jobs:
             {
               "ref": "refs/heads/main",
               "event_name": "daily_ncaa_mfb_data",
+              "sha": "${{ github.sha }}",
               "commit_message": ${{ toJSON(github.event.head_commit.message) }}
             }
