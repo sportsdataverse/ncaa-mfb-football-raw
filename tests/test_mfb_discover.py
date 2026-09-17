@@ -166,3 +166,23 @@ def test_sharded_refresh_without_skip_games_is_refused() -> None:
     with pytest.raises(SystemExit) as exc:
         mfb_run.main(["--refresh-discovery", "--shard", "1/4"])
     assert exc.value.code == 2
+
+
+def test_sharded_rosters_walk_disjoint_team_slices(monkeypatch, tmp_path: Path) -> None:
+    from ncaa_mfb_raw_scrape import mfb_run
+
+    teams = [str(t) for t in range(1, 8)]
+    walked: "list[list[str]]" = []
+    monkeypatch.setenv("NCAA_VENDOR", "stub")
+    monkeypatch.setattr(mfb_run, "vendor_fetch_fn", lambda *a, **k: None)
+    monkeypatch.setattr(mfb_run, "discover_teams", lambda *a, **k: teams)
+    monkeypatch.setattr(mfb_run, "discover_season", lambda *a, **k: [])
+    monkeypatch.setattr(
+        mfb_run, "capture_rosters", lambda ids, *a, **k: walked.append(list(ids)) or {}
+    )
+    for i in range(3):
+        argv = ["--out", str(tmp_path), "--refresh-discovery", "--skip-games", "--rosters"]
+        assert mfb_run.main([*argv, "--shard", f"{i}/3"]) == 0
+
+    flat = [t for ids in walked for t in ids]
+    assert sorted(flat) == sorted(teams)  # every team once, no shard repeats another's
