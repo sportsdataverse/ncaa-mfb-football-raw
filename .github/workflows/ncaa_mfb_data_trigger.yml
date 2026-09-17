@@ -19,6 +19,9 @@ name: ncaa-mfb-football-data trigger
 
 on: [push, workflow_dispatch]
 
+# The dispatch authenticates with SDV_GH_TOKEN; the job needs nothing from GITHUB_TOKEN.
+permissions: {}
+
 env:
   FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
 
