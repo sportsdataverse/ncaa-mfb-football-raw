@@ -1,0 +1,54 @@
+transport: NCAA_VENDOR=decodo_patchright (canary_vendors.toml) shard 3/12
+discovered 128 MFB teams (ay=2027 div=12)
+team pages 25/128: 81 contests
+team pages 50/128: 157 contests
+team pages 75/128: 226 contests
+team pages 100/128: 277 contests
+team pages 125/128: 308 contests
+discovered 310 MFB contests
+shard 3/12: 26 contests
+node:internal/process/promises:394
+    triggerUncaughtException(err, true /* fromPromise */);
+    ^
+
+ProtocolError: Protocol error (Network.setCacheDisabled): Internal server error, session closed.
+    at /mnt/sdv_repos/sdv-py/.venv/lib/python3.13/site-packages/patchright/driver/package/lib/coreBundle.js:35961:61
+    at new Promise (<anonymous>)
+    at _CRSession.send (/mnt/sdv_repos/sdv-py/.venv/lib/python3.13/site-packages/patchright/driver/package/lib/coreBundle.js:35960:16)
+    at /mnt/sdv_repos/sdv-py/.venv/lib/python3.13/site-packages/patchright/driver/package/lib/coreBundle.js:36841:61
+    at /mnt/sdv_repos/sdv-py/.venv/lib/python3.13/site-packages/patchright/driver/package/lib/coreBundle.js:36806:20
+    at Array.map (<anonymous>)
+    at CRNetworkManager._forEachSession (/mnt/sdv_repos/sdv-py/.venv/lib/python3.13/site-packages/patchright/driver/package/lib/coreBundle.js:36804:56)
+    at CRNetworkManager.setRequestInterception (/mnt/sdv_repos/sdv-py/.venv/lib/python3.13/site-packages/patchright/driver/package/lib/coreBundle.js:36841:22)
+    at runNextTicks (node:internal/process/task_queues:65:5)
+    at process.processImmediate (node:internal/timers:472:9) {
+  type: 'closed',
+  method: 'Network.setCacheDisabled',
+  logs: '\n' +
+    '<launching> /root/.cache/ms-playwright/chromium-1228/chrome-linux64/chrome --disable-field-trial-config --disable-background-networking --disable-background-timer-throttling --disable-backgrounding-occluded-windows --disable-breakpad --no-default-browser-check --disable-dev-shm-usage --disable-edgeupdater --disable-features=AvoidUnnecessaryBeforeUnloadCheckSync,BoundaryEventDispatchTracksNodeRemoval,DestroyProfileOnBrowserClose,DialMediaRouteProvider,GlobalMediaControls,HttpsUpgrades,LensOverlay,MediaRouter,PaintHolding,ThirdPartyStoragePartitioning,Translate,AutoDeElevate,RenderDocument,OptimizationHints,msForceBrowserSignIn,msEdgeUpdateLaunchServicesPreferredVersion --enable-features=CDPScreenshotNewSurface --disable-hang-monitor --disable-prompt-on-repost --disable-renderer-backgrounding --force-color-profile=srgb --no-first-run --password-store=basic --use-mock-keychain --no-service-autorun --export-tagged-pdf --disable-search-engine-choice-screen --edge-skip-compat-layer-relaunch --disable-infobars --disable-search-engine-choice-screen --disable-sync --disable-blink-features=AutomationControlled --no-sandbox --proxy-server=http://us.decodo.com:10013 --proxy-bypass-list=<-loopback> --headless=new --user-data-dir=/tmp/patchright_udd_a5ka8j51 --remote-debugging-pipe about:blank\n' +
+    '<launched> pid=1280562\n' +
+    '[pid=1280562][err] [1280562:1280706:0920/133717.945783:ERROR:dbus/bus.cc:405] Failed to connect to the bus: Could not parse server address: Unknown address type (examples of valid types are "tcp" and on UNIX "unix")\n' +
+    '[pid=1280562][err] [1280562:1280706:0920/133717.962337:ERROR:dbus/bus.cc:405] Failed to connect to the bus: Could not parse server address: Unknown address type (examples of valid types are "tcp" and on UNIX "unix")\n' +
+    '[pid=1280562][err] [1280562:1280706:0920/133717.970175:ERROR:dbus/bus.cc:405] Failed to connect to the bus: Could not parse server address: Unknown address type (examples of valid types are "tcp" and on UNIX "unix")\n' +
+    '[pid=1280562][err] [1280562:1280562:0920/133718.147720:ERROR:dbus/object_proxy.cc:572] Failed to call method: org.freedesktop.DBus.NameHasOwner: object_path= /org/freedesktop/DBus: unknown error type: \n' +
+    '[pid=1280562][err] [1280562:1280706:0920/133718.148377:ERROR:dbus/bus.cc:405] Failed to connect to the bus: Could not parse server address: Unknown address type (examples of valid types are "tcp" and on UNIX "unix")\n' +
+    '[pid=1280562][err] [1280562:1280562:0920/133718.148634:ERROR:dbus/object_proxy.cc:572] Failed to call method: org.freedesktop.DBus.NameHasOwner: object_path= /org/freedesktop/DBus: unknown error type: \n' +
+    '[pid=1280562][err] [1280562:1280706:0920/133718.148790:ERROR:dbus/bus.cc:405] Failed to connect to the bus: Could not parse server address: Unknown address type (examples of valid types are "tcp" and on UNIX "unix")\n' +
+    '[pid=1280562][err] [1280562:1280562:0920/133718.149921:ERROR:dbus/object_proxy.cc:572] Failed to call method: org.freedesktop.DBus.NameHasOwner: object_path= /org/freedesktop/DBus: unknown error type: \n' +
+    '[pid=1280562][err] [1280562:1280562:0920/133718.170203:ERROR:dbus/object_proxy.cc:572] Failed to call method: org.freedesktop.DBus.NameHasOwner: object_path= /org/freedesktop/DBus: unknown error type: \n' +
+    '[pid=1280562][err] [1280562:1280562:0920/133718.170246:ERROR:dbus/object_proxy.cc:572] Failed to call method: org.freedesktop.DBus.NameHasOwner: object_path= /org/freedesktop/DBus: unknown error type: \n' +
+    '[pid=1280562][err] [1280562:1280706:0920/133718.170287:ERROR:dbus/bus.cc:405] Failed to connect to the bus: Could not parse server address: Unknown address type (examples of valid types are "tcp" and on UNIX "unix")\n' +
+    '[pid=1280562][err] [1280562:1280562:0920/133718.178195:ERROR:dbus/object_proxy.cc:572] Failed to call method: org.freedesktop.DBus.NameHasOwner: object_path= /org/freedesktop/DBus: unknown error type: \n' +
+    '[pid=1280562][err] [1280562:1280706:0920/133718.178324:ERROR:dbus/bus.cc:405] Failed to connect to the bus: Could not parse server address: Unknown address type (examples of valid types are "tcp" and on UNIX "unix")\n' +
+    '[pid=1280562][err] [1280562:1280562:0920/133718.224835:ERROR:dbus/object_proxy.cc:572] Failed to call method: org.freedesktop.DBus.NameHasOwner: object_path= /org/freedesktop/DBus: unknown error type: \n' +
+    '[pid=1280562][err] [1280562:1280706:0920/133718.225947:ERROR:dbus/bus.cc:405] Failed to connect to the bus: Could not parse server address: Unknown address type (examples of valid types are "tcp" and on UNIX "unix")\n' +
+    '[pid=1280562][err] [1280562:1280562:0920/133718.239153:ERROR:dbus/object_proxy.cc:572] Failed to call method: org.freedesktop.DBus.NameHasOwner: object_path= /org/freedesktop/DBus: unknown error type: \n' +
+    '[pid=1280562][err] [0920/133718.339528:ERROR:third_party/crashpad/crashpad/util/file/file_io_posix.cc:145] open /sys/devices/system/cpu/cpu0/cpufreq/scaling_cur_freq: No such file or directory (2)\n' +
+    '[pid=1280562][err] [0920/133718.339857:ERROR:third_party/crashpad/crashpad/util/file/file_io_posix.cc:145] open /sys/devices/system/cpu/cpu0/cpufreq/scaling_max_freq: No such file or directory (2)\n' +
+    '[pid=1280562][err] [0920/133718.376297:ERROR:third_party/crashpad/crashpad/util/file/file_writer.cc:99] writev: No space left on device (28)\n' +
+    '[pid=1280562][err] [0920/133718.376621:ERROR:third_party/crashpad/crashpad/handler/linux/crash_report_exception_handler.cc:226] WriteEverything failed'
+}
+
+Node.js v24.16.0
+capture: {'captured': 0, 'skipped': 19, 'failed': 7}
+EXIT=1

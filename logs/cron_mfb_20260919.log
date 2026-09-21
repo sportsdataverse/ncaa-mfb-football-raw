@@ -23,3 +23,6 @@ log -> logs/daily_mfb_parse_20260919_114214.log  (watch: tail -f logs/daily_mfb_
 ay2027: {'skipped': 340, 'parsed': 3}
 EXIT=0
 [2026-09-19 15:42:18Z] daily mfb stages done (rc_total=0)
+Auto packing the repository in background for optimum performance.
+See "git help gc" for manual housekeeping.
+[2026-09-19 15:42:24Z] daily mfb done EXIT=0

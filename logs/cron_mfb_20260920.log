@@ -1,0 +1,21 @@
+transport: NCAA_VENDOR=decodo_patchright (canary_vendors.toml)
+[2026-09-20 14:30:03Z] daily mfb start: ay=2027 (fall 2026) max=400 workers=12
+[2026-09-20 14:30:03Z] div=11 wave A: refresh team pages x12
+[2026-09-20 15:06:32Z] div=11 wave B: capture x12
+      1 capture: {'captured': 3, 'skipped': 19, 'failed': 0}
+      1 capture: {'captured': 4, 'skipped': 17, 'failed': 0}
+      2 capture: {'captured': 5, 'skipped': 16, 'failed': 0}
+      1 capture: {'captured': 5, 'skipped': 17, 'failed': 0}
+      1 capture: {'captured': 6, 'skipped': 15, 'failed': 0}
+      2 capture: {'captured': 6, 'skipped': 16, 'failed': 0}
+      2 capture: {'captured': 7, 'skipped': 15, 'failed': 0}
+      1 capture: {'captured': 8, 'skipped': 14, 'failed': 0}
+      1 capture: {'captured': 9, 'skipped': 13, 'failed': 0}
+     12 discovered 260 MFB contests
+[2026-09-20 17:01:55Z] div=12 wave A: refresh team pages x12
+[2026-09-20 17:37:13Z] div=12 wave B: capture x12
+WARN daily_mfb_capture_d12 shard 0 rc=1
+WARN daily_mfb_capture_d12 shard 1 rc=1
+WARN daily_mfb_capture_d12 shard 2 rc=1
+WARN daily_mfb_capture_d12 shard 3 rc=1
+WARN daily_mfb_capture_d12 shard 4 rc=1

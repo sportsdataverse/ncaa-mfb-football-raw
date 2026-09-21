@@ -1,0 +1,28 @@
+transport: NCAA_VENDOR=decodo_patchright (canary_vendors.toml)
+[2026-09-21 14:30:03Z] daily mfb start: ay=2027 (fall 2026) max=400 workers=12
+[2026-09-21 14:30:03Z] div=11 wave A: refresh team pages x12
+[2026-09-21 14:59:33Z] div=11 wave B: capture x12
+      4 capture: {'captured': 0, 'skipped': 21, 'failed': 0}
+      8 capture: {'captured': 0, 'skipped': 22, 'failed': 0}
+     12 discovered 260 MFB contests
+[2026-09-21 14:59:40Z] div=12 wave A: refresh team pages x12
+[2026-09-21 15:36:44Z] div=12 wave B: capture x12
+      4 capture: {'captured': 3, 'skipped': 23, 'failed': 0}
+      2 capture: {'captured': 4, 'skipped': 21, 'failed': 0}
+      2 capture: {'captured': 4, 'skipped': 22, 'failed': 0}
+      1 capture: {'captured': 5, 'skipped': 21, 'failed': 0}
+      1 capture: {'captured': 6, 'skipped': 20, 'failed': 0}
+      2 capture: {'captured': 7, 'skipped': 19, 'failed': 0}
+     12 discovered 310 MFB contests
+log -> logs/daily_mfb_datasets_20260921_131519.log  (watch: tail -f logs/daily_mfb_datasets_20260921_131519.log)
+teams: 266
+rosters: 29386 players, 266 teams
+schedule master: 3150 team-games, 467 unique contests
+EXIT=0
+log -> logs/daily_mfb_xwalk_20260921_131558.log  (watch: tail -f logs/daily_mfb_xwalk_20260921_131558.log)
+ay2027: 454/467 matched  [{'match_method': 'date_window', 'len': 6}, {'match_method': 'score_pair', 'len': 3}, {'match_method': 'exact', 'len': 24}, {'match_method': 'score_exact', 'len': 324}, {'match_method': 'score_window', 'len': 58}, {'match_method': 'single_team', 'len': 39}]
+EXIT=0
+log -> logs/daily_mfb_parse_20260921_131603.log  (watch: tail -f logs/daily_mfb_parse_20260921_131603.log)
+ay2027: {'skipped': 343, 'parsed': 124}
+EXIT=0
+[2026-09-21 17:16:25Z] daily mfb stages done (rc_total=0)
