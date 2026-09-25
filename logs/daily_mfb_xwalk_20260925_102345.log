@@ -1,0 +1,2 @@
+ay2027: 454/467 matched  [{'match_method': 'single_team', 'len': 40}, {'match_method': 'exact', 'len': 24}, {'match_method': 'score_pair', 'len': 3}, {'match_method': 'score_window', 'len': 58}, {'match_method': 'date_window', 'len': 6}, {'match_method': 'score_exact', 'len': 323}]
+EXIT=0

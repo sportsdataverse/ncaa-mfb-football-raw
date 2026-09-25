@@ -18,3 +18,23 @@ WARN daily_mfb_capture_d12 shard 1 rc=1
 WARN daily_mfb_capture_d12 shard 2 rc=1
 WARN daily_mfb_capture_d12 shard 3 rc=1
 WARN daily_mfb_capture_d12 shard 4 rc=1
+WARN daily_mfb_capture_d12 shard 5 rc=143
+WARN daily_mfb_capture_d12 shard 6 rc=1
+WARN daily_mfb_capture_d12 shard 7 rc=1
+WARN daily_mfb_capture_d12 shard 8 rc=1
+WARN daily_mfb_capture_d12 shard 9 rc=1
+WARN daily_mfb_capture_d12 shard 10 rc=1
+WARN daily_mfb_capture_d12 shard 11 rc=1
+WARN capture div=12 rc=1
+log -> logs/daily_mfb_datasets_20260925_102303.log  (watch: tail -f logs/daily_mfb_datasets_20260925_102303.log)
+teams: 266
+rosters: 29386 players, 266 teams
+schedule master: 3150 team-games, 467 unique contests
+EXIT=0
+log -> logs/daily_mfb_xwalk_20260925_102345.log  (watch: tail -f logs/daily_mfb_xwalk_20260925_102345.log)
+ay2027: 454/467 matched  [{'match_method': 'single_team', 'len': 40}, {'match_method': 'exact', 'len': 24}, {'match_method': 'score_pair', 'len': 3}, {'match_method': 'score_window', 'len': 58}, {'match_method': 'date_window', 'len': 6}, {'match_method': 'score_exact', 'len': 323}]
+EXIT=0
+log -> logs/daily_mfb_parse_20260925_102349.log  (watch: tail -f logs/daily_mfb_parse_20260925_102349.log)
+ay2027: {'skipped': 467}
+EXIT=0
+[2026-09-25 14:23:50Z] daily mfb stages done (rc_total=1)
