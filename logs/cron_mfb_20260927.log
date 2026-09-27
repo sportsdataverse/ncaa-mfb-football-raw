@@ -1,0 +1,38 @@
+transport: NCAA_VENDOR=decodo_patchright (canary_vendors.toml)
+[2026-09-27 14:30:03Z] daily mfb start: ay=2027 (fall 2026) max=400 workers=12
+[2026-09-27 14:30:03Z] div=11 wave A: refresh team pages x12
+[2026-09-27 14:57:16Z] div=11 wave B: capture x12
+      1 capture: {'captured': 3, 'skipped': 23, 'failed': 2}
+      1 capture: {'captured': 3, 'skipped': 24, 'failed': 1}
+      1 capture: {'captured': 4, 'skipped': 22, 'failed': 1}
+      1 capture: {'captured': 4, 'skipped': 23, 'failed': 0}
+      2 capture: {'captured': 4, 'skipped': 23, 'failed': 1}
+      1 capture: {'captured': 5, 'skipped': 22, 'failed': 0}
+      2 capture: {'captured': 5, 'skipped': 23, 'failed': 0}
+      1 capture: {'captured': 6, 'skipped': 21, 'failed': 1}
+      1 capture: {'captured': 7, 'skipped': 20, 'failed': 0}
+      1 capture: {'captured': 8, 'skipped': 19, 'failed': 0}
+     12 discovered 331 MFB contests
+[2026-09-27 16:08:14Z] div=12 wave A: refresh team pages x12
+[2026-09-27 16:35:11Z] div=12 wave B: capture x12
+      1 capture: {'captured': 10, 'skipped': 21, 'failed': 0}
+      3 capture: {'captured': 2, 'skipped': 29, 'failed': 0}
+      2 capture: {'captured': 3, 'skipped': 28, 'failed': 0}
+      2 capture: {'captured': 4, 'skipped': 27, 'failed': 0}
+      1 capture: {'captured': 5, 'skipped': 26, 'failed': 0}
+      1 capture: {'captured': 5, 'skipped': 27, 'failed': 0}
+      1 capture: {'captured': 6, 'skipped': 25, 'failed': 0}
+      1 capture: {'captured': 6, 'skipped': 26, 'failed': 0}
+     12 discovered 374 MFB contests
+log -> logs/daily_mfb_datasets_20260927_133940.log  (watch: tail -f logs/daily_mfb_datasets_20260927_133940.log)
+teams: 266
+rosters: 29386 players, 266 teams
+schedule master: 3150 team-games, 590 unique contests
+EXIT=0
+log -> logs/daily_mfb_xwalk_20260927_134014.log  (watch: tail -f logs/daily_mfb_xwalk_20260927_134014.log)
+ay2027: 579/590 matched  [{'match_method': 'exact', 'len': 61}, {'match_method': 'score_exact', 'len': 407}, {'match_method': 'date_window', 'len': 9}, {'match_method': 'score_window', 'len': 74}, {'match_method': 'unordered_pair', 'len': 1}, {'match_method': 'single_team', 'len': 24}, {'match_method': 'score_pair', 'len': 3}]
+EXIT=0
+log -> logs/daily_mfb_parse_20260927_134017.log  (watch: tail -f logs/daily_mfb_parse_20260927_134017.log)
+ay2027: {'parsed': 110, 'skipped': 474}
+EXIT=0
+[2026-09-27 17:40:34Z] daily mfb stages done (rc_total=0)
