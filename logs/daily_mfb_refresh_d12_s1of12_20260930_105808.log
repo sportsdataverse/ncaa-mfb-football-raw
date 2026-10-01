@@ -1,0 +1,5 @@
+transport: NCAA_VENDOR=decodo_patchright (canary_vendors.toml) shard 1/12
+discovered 128 MFB teams (ay=2027 div=12)
+(node:3024156) TimeoutNegativeWarning: -6655.293999999994 is a negative number.
+Timeout duration was set to 1.
+(Use `node --trace-warnings ...` to show where the warning was created)
