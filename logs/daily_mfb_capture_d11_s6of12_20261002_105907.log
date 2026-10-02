@@ -1,0 +1,11 @@
+transport: NCAA_VENDOR=decodo_patchright (canary_vendors.toml) shard 6/12
+discovered 138 MFB teams (ay=2027 div=11)
+team pages 25/138: 89 contests
+team pages 50/138: 169 contests
+team pages 75/138: 236 contests
+team pages 100/138: 290 contests
+team pages 125/138: 317 contests
+discovered 333 MFB contests
+shard 6/12: 28 contests
+capture: {'captured': 0, 'skipped': 28, 'failed': 0}
+EXIT=0

@@ -1,0 +1,2 @@
+ay2027: 580/592 matched  [{'match_method': 'unordered_pair', 'len': 1}, {'match_method': 'score_pair', 'len': 3}, {'match_method': 'single_team', 'len': 24}, {'match_method': 'date_window', 'len': 10}, {'match_method': 'exact', 'len': 61}, {'match_method': 'score_exact', 'len': 407}, {'match_method': 'score_window', 'len': 74}]
+EXIT=0
