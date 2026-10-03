@@ -1,0 +1,2 @@
+ay2027: 582/596 matched  [{'match_method': 'score_window', 'len': 75}, {'match_method': 'score_pair', 'len': 3}, {'match_method': 'single_team', 'len': 25}, {'match_method': 'unordered_pair', 'len': 1}, {'match_method': 'exact', 'len': 60}, {'match_method': 'date_window', 'len': 9}, {'match_method': 'score_exact', 'len': 409}]
+EXIT=0
