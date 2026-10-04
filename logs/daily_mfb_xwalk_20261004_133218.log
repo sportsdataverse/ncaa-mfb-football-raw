@@ -1,0 +1,2 @@
+ay2027: 686/703 matched  [{'match_method': 'unordered_pair', 'len': 1}, {'match_method': 'single_team', 'len': 20}, {'match_method': 'score_exact', 'len': 482}, {'match_method': 'exact', 'len': 85}, {'match_method': 'date_window', 'len': 11}, {'match_method': 'score_pair', 'len': 3}, {'match_method': 'score_window', 'len': 84}]
+EXIT=0
