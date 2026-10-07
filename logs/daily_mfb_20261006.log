@@ -22,3 +22,4 @@ log -> logs/daily_mfb_parse_20261006_112813.log  (watch: tail -f logs/daily_mfb_
 ay2027: {'skipped': 703, 'parsed': 1}
 EXIT=0
 [2026-10-06 15:28:19Z] daily mfb stages done (rc_total=0)
+[2026-10-06 15:28:28Z] daily mfb done EXIT=0
