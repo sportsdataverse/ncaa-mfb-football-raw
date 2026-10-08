@@ -5,7 +5,7 @@ description = "stats.ncaa.org MFB raw-page capture + parse pipeline"
 requires-python = ">=3.10"
 dependencies = [
     "sportsdataverse",
-    "polars>=1.0,<2.0",
+    "polars>=1.0",
     "pyarrow>=15.0",
     "beautifulsoup4>=4.12",
     # The NCAA browser transport needs it. sdv-py only declares it in its
