@@ -1,0 +1,24 @@
+[2026-10-08 15:07:02Z] daily mfb start: ay=2027 (fall 2026) max=400 workers=12
+[2026-10-08 15:07:02Z] div=11 wave A: refresh team pages x12
+[2026-10-08 15:35:31Z] div=11 wave B: capture x12
+      3 capture: {'captured': 0, 'skipped': 32, 'failed': 0}
+      7 capture: {'captured': 0, 'skipped': 33, 'failed': 0}
+      2 capture: {'captured': 1, 'skipped': 32, 'failed': 0}
+     12 discovered 393 MFB contests
+[2026-10-08 15:37:39Z] div=12 wave A: refresh team pages x12
+[2026-10-08 15:48:59Z] div=12 wave B: capture x12
+     11 capture: {'captured': 0, 'skipped': 36, 'failed': 0}
+      1 capture: {'captured': 0, 'skipped': 37, 'failed': 0}
+     12 discovered 433 MFB contests
+log -> logs/daily_mfb_datasets_20261008_114907.log  (watch: tail -f logs/daily_mfb_datasets_20261008_114907.log)
+teams: 266
+rosters: 29386 players, 266 teams
+schedule master: 3150 team-games, 707 unique contests
+EXIT=0
+log -> logs/daily_mfb_xwalk_20261008_114949.log  (watch: tail -f logs/daily_mfb_xwalk_20261008_114949.log)
+ay2027: 690/707 matched  [{'match_method': 'date_window', 'len': 11}, {'match_method': 'unordered_pair', 'len': 1}, {'match_method': 'single_team', 'len': 20}, {'match_method': 'exact', 'len': 90}, {'match_method': 'score_pair', 'len': 3}, {'match_method': 'score_exact', 'len': 480}, {'match_method': 'score_window', 'len': 85}]
+EXIT=0
+log -> logs/daily_mfb_parse_20261008_114953.log  (watch: tail -f logs/daily_mfb_parse_20261008_114953.log)
+ay2027: {'skipped': 705, 'parsed': 2}
+EXIT=0
+[2026-10-08 15:49:57Z] daily mfb stages done (rc_total=0)
