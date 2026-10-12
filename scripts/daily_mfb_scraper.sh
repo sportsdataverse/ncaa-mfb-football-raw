@@ -124,6 +124,8 @@ mkdir -p logs
   run_stage "daily_mfb_xwalk" python/ncaa_mfb_06_xwalk_build.py --root "${ROOT}" --academic-year "${AY}"
   rc=$?
   [ "$rc" -ne 0 ] && { echo "WARN xwalk rc=${rc}"; rc_total=1; }
+  # Stage 07 (J6), non-fatal: a player-crosswalk miss must not fail the capture.
+  bash scripts/run_07_player_xwalk.sh --seasons "${AY}" || echo "WARN player xwalk rc=$? (non-fatal)"
 
   run_stage "daily_mfb_parse" python/ncaa_mfb_03_games_parse.py --academic-year "${AY}"
   rc=$?
