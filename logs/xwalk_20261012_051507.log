@@ -1,0 +1,2 @@
+ay2021: 831/847 matched  [{'match_method': 'score_window', 'len': 158}, {'match_method': 'single_team', 'len': 6}, {'match_method': 'date_window', 'len': 3}, {'match_method': 'score_exact', 'len': 638}, {'match_method': 'score_pair', 'len': 14}, {'match_method': 'exact', 'len': 12}]
+EXIT=0

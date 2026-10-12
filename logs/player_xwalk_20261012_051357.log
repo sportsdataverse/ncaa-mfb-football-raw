@@ -1,0 +1,3 @@
+mfb 2014: players=25041 matched=8518 (34.02%) name_jersey=6354 name=1941 last_jersey=161 jaro_winkler=62 no_espn_team=922 no_espn_players=4071 ambiguous=19 no_candidate=11511
+mfb 2021: players=25952 matched=14610 (56.3%) name_jersey=8977 name=5372 last_jersey=161 jaro_winkler=100 no_espn_team=3519 no_espn_players=7536 ambiguous=6 no_candidate=281
+EXIT=0
