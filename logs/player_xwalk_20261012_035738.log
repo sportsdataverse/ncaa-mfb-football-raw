@@ -1,0 +1,15 @@
+mfb 2014: players=25041 matched=7644 (30.53%) name_jersey=5637 name=1809 last_jersey=139 jaro_winkler=59 no_espn_team=10694 no_espn_players=0 ambiguous=17 no_candidate=6686
+mfb 2015: players=25147 matched=19329 (76.86%) name_jersey=13448 name=5280 last_jersey=423 jaro_winkler=178 no_espn_team=213 no_espn_players=4499 ambiguous=30 no_candidate=1076
+mfb 2016: players=25710 matched=19887 (77.35%) name_jersey=13680 name=5669 last_jersey=340 jaro_winkler=198 no_espn_team=523 no_espn_players=4534 ambiguous=31 no_candidate=735
+mfb 2017: players=25634 matched=20333 (79.32%) name_jersey=13660 name=6112 last_jersey=363 jaro_winkler=198 no_espn_team=883 no_espn_players=3713 ambiguous=49 no_candidate=656
+mfb 2018: players=25983 matched=20794 (80.03%) name_jersey=13771 name=6454 last_jersey=369 jaro_winkler=200 no_espn_team=104 no_espn_players=4308 ambiguous=43 no_candidate=734
+mfb 2019: players=26670 matched=21515 (80.67%) name_jersey=13650 name=7329 last_jersey=333 jaro_winkler=203 no_espn_team=529 no_espn_players=3987 ambiguous=154 no_candidate=485
+mfb 2020: players=27256 matched=22273 (81.72%) name_jersey=13943 name=7818 last_jersey=333 jaro_winkler=179 no_espn_team=209 no_espn_players=3913 ambiguous=271 no_candidate=590
+mfb 2021: players=25952 matched=14275 (55.01%) name_jersey=8740 name=5277 last_jersey=158 jaro_winkler=100 no_espn_team=11436 no_espn_players=0 ambiguous=6 no_candidate=235
+mfb 2022: players=28708 matched=23817 (82.96%) name_jersey=15574 name=7709 last_jersey=353 jaro_winkler=181 no_espn_team=913 no_espn_players=3398 ambiguous=19 no_candidate=561
+mfb 2023: players=28960 matched=21433 (74.01%) name_jersey=13986 name=6994 last_jersey=302 jaro_winkler=151 no_espn_team=3776 no_espn_players=3287 ambiguous=7 no_candidate=457
+mfb 2024: players=29338 matched=21797 (74.3%) name_jersey=14366 name=6976 last_jersey=303 jaro_winkler=152 no_espn_team=3912 no_espn_players=3020 ambiguous=7 no_candidate=602
+mfb 2025: players=29950 matched=24137 (80.59%) name_jersey=17534 name=6122 last_jersey=331 jaro_winkler=150 no_espn_team=2746 no_espn_players=2788 ambiguous=12 no_candidate=267
+mfb 2026: players=29206 matched=23717 (81.21%) name_jersey=20508 name=2674 last_jersey=442 jaro_winkler=93 no_espn_team=2370 no_espn_players=3003 ambiguous=6 no_candidate=110
+mfb 2027: players=29386 matched=24076 (81.93%) name_jersey=23167 name=341 last_jersey=495 jaro_winkler=73 no_espn_team=1955 no_espn_players=3278 ambiguous=3 no_candidate=74
+EXIT=0

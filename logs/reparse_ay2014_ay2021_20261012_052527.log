@@ -1,0 +1,12 @@
+offline stage: no proxy / transport needed
+log -> logs/parse_20261012_052527.log  (watch: tail -f logs/parse_20261012_052527.log)
+ay2014: {'parsed': 1546}
+EXIT=0
+ay2014 rc=0 changed=1546
+fall 2013 committed 1905b0c21
+offline stage: no proxy / transport needed
+log -> logs/parse_20261012_052808.log  (watch: tail -f logs/parse_20261012_052808.log)
+ay2021: {'parsed': 828}
+EXIT=0
+ay2021 rc=0 changed=828
+fall 2020 committed 5d41b53c8

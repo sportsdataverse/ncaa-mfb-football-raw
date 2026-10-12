@@ -1,0 +1,27 @@
+[2026-10-12 14:30:02Z] daily mfb start: ay=2027 (fall 2026) max=400 workers=12
+[2026-10-12 14:30:02Z] div=11 wave A: refresh team pages x12
+[2026-10-12 14:34:40Z] div=11 wave B: capture x12
+      8 capture: {'captured': 0, 'skipped': 37, 'failed': 0}
+      4 capture: {'captured': 0, 'skipped': 38, 'failed': 0}
+     12 discovered 448 MFB contests
+[2026-10-12 14:34:52Z] div=12 wave A: refresh team pages x12
+[2026-10-12 14:39:07Z] div=12 wave B: capture x12
+      9 capture: {'captured': 0, 'skipped': 40, 'failed': 0}
+      3 capture: {'captured': 0, 'skipped': 41, 'failed': 0}
+     12 discovered 483 MFB contests
+log -> logs/daily_mfb_datasets_20261012_103921.log  (watch: tail -f logs/daily_mfb_datasets_20261012_103921.log)
+teams: 266
+rosters: 29386 players, 266 teams
+schedule master: 3150 team-games, 812 unique contests
+EXIT=0
+log -> logs/daily_mfb_xwalk_20261012_104007.log  (watch: tail -f logs/daily_mfb_xwalk_20261012_104007.log)
+ay2027: 794/812 matched  [{'match_method': 'score_window', 'len': 91}, {'match_method': 'unordered_pair', 'len': 1}, {'match_method': 'score_exact', 'len': 560}, {'match_method': 'single_team', 'len': 24}, {'match_method': 'score_pair', 'len': 3}, {'match_method': 'exact', 'len': 102}, {'match_method': 'date_window', 'len': 13}]
+EXIT=0
+offline stage: no proxy / transport needed
+log -> logs/player_xwalk_20261012_104012.log  (watch: tail -f logs/player_xwalk_20261012_104012.log)
+mfb 2027: players=29386 matched=24076 (81.93%) name_jersey=23167 name=341 last_jersey=495 jaro_winkler=73 no_espn_team=1955 no_espn_players=3278 ambiguous=3 no_candidate=74
+EXIT=0
+log -> logs/daily_mfb_parse_20261012_104017.log  (watch: tail -f logs/daily_mfb_parse_20261012_104017.log)
+ay2027: {'skipped': 812}
+EXIT=0
+[2026-10-12 14:40:18Z] daily mfb stages done (rc_total=0)
