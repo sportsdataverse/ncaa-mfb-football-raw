@@ -36,6 +36,7 @@ Usage::
 from __future__ import annotations
 
 import argparse
+import gzip
 import json
 from pathlib import Path
 from typing import List, Optional
@@ -119,35 +120,49 @@ def ncaa_schedule_side(root: Path, academic_year: int) -> pl.DataFrame:
         .unique(subset=["contest_id"], keep="first", maintain_order=True)
         .sort("contest_id")
     )
-    # Early-era schedule pages (<= ay 2014) carry no result column at all; the
-    # built linescore dataset holds the official finals AND explicit home/away,
-    # so fall back to it wherever the schedule row lacks scores.
-    ls_path = root / "mfb" / "datasets" / str(academic_year) / "linescore.parquet"
-    if ls_path.is_file() and frame.get_column("home_points").null_count():
-        ls = (
-            pl.read_parquet(ls_path)
-            .select("contest_id", "home_away", "final")
-            .drop_nulls()
-            .unique(subset=["contest_id", "home_away"], keep="first")
-            .pivot(on="home_away", index="contest_id", values="final")
-        )
-        if {"home", "away"} <= set(ls.columns):
-            frame = frame.join(
-                ls.select(
-                    pl.col("contest_id").cast(pl.Utf8),
-                    pl.col("home").cast(pl.Int64).alias("_ls_home"),
-                    pl.col("away").cast(pl.Int64).alias("_ls_away"),
-                ),
-                on="contest_id",
+    # Early-era schedule pages (<= ay 2014) carry no result column at all. The
+    # stage-03 parsed bundles (mfb/json/{contest_id}.json.gz, in this repo) hold
+    # each team's official final keyed by NCAA team id, so fall back to them
+    # wherever the schedule row lacks scores. (The old fallback read a
+    # mfb/datasets/{ay}/linescore.parquet nothing in this repo writes, so
+    # ay2014 silently built with zero scores -> no score tiers -> no team map.)
+    missing = frame.filter(pl.col("home_points").is_null()).get_column("contest_id")
+    finals = []
+    for cid in missing.to_list():
+        path = root / "mfb" / "json" / f"{cid}.json.gz"
+        if not path.is_file():
+            continue
+        teams = json.loads(gzip.decompress(path.read_bytes())).get("teams") or []
+        finals += [
+            {"contest_id": cid, "team": str(t["ncaa_team_id"]), "final": t["final"]}
+            for t in teams
+            if t.get("ncaa_team_id") and t.get("final") is not None
+        ]
+    if finals:
+        fin = pl.DataFrame(
+            finals,
+            schema={"contest_id": pl.Utf8, "team": pl.Utf8, "final": pl.Int64},
+        ).unique(subset=["contest_id", "team"], keep="first")
+        frame = (
+            frame.join(
+                fin.rename({"team": "ncaa_home_id", "final": "_b_home"}),
+                on=["contest_id", "ncaa_home_id"],
                 how="left",
-            ).select(
+            )
+            .join(
+                fin.rename({"team": "ncaa_away_id", "final": "_b_away"}),
+                on=["contest_id", "ncaa_away_id"],
+                how="left",
+            )
+            .select(
                 "contest_id",
                 "game_date",
                 "ncaa_home_id",
                 "ncaa_away_id",
-                pl.coalesce("home_points", "_ls_home").alias("home_points"),
-                pl.coalesce("away_points", "_ls_away").alias("away_points"),
+                pl.coalesce("home_points", "_b_home").alias("home_points"),
+                pl.coalesce("away_points", "_b_away").alias("away_points"),
             )
+        )
     return frame
 
 
