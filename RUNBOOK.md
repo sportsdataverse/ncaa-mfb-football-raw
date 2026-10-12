@@ -24,6 +24,7 @@ combined one-session runner (`scripts/run_mfb_capture.sh`).
 | 04 | rosters: `teams/{id}/roster` → `mfb/rosters/html/{ay}/` | `python/ncaa_mfb_04_rosters_scrape.py` | `scripts/run_04_rosters.sh` | online (≈1 page/team) | teams with roster html skipped | `NCAA_VENDOR=decodo_patchright ./scripts/run_04_rosters.sh --academic-year 2026 --division 11` |
 | 05 | datasets: HTML → `mfb/{teams,rosters,schedules}/parquet/` reference frames (game datasets build in `ncaa-mfb-football-data`) | `python/ncaa_mfb_05_datasets_build.py` | `scripts/run_05_datasets.sh` | **offline** (no proxy) | pure function of the tree; re-run overwrites; NOT sharded (one file per kind) | `./scripts/run_05_datasets.sh --academic-year 2026` |
 | 06 | xwalk: NCAA↔ESPN game crosswalk → `mfb/xwalk/espn_game_id/{ay}.json` (+ voted team map) | `python/ncaa_mfb_06_xwalk_build.py` | `scripts/run_06_xwalk.sh` | offline + one `load_cfb_schedule` release read per season | re-run overwrites | `./scripts/run_06_xwalk.sh --academic-year 2026` |
+| 07 | player xwalk (J6): NCAA player ↔ ESPN athlete → `mfb/xwalk/espn_athlete_id/{ay}.json` (name+jersey → name → last+jersey → mutually-unique Jaro-Winkler; ties unmatched) | `python/ncaa_mfb_07_player_xwalk_build.py` | `scripts/run_07_player_xwalk.sh` | offline + ESPN game-roster release reads | re-run overwrites | `./scripts/run_07_player_xwalk.sh --seasons 2026` |
 | — | full historical backfill orchestrator (01+04+02+05 per season, newest→oldest, commits per stage) | — | `scripts/run_backfill_all.sh` | online | every stage resumable | `NCAA_VENDOR=decodo_patchright ./scripts/run_backfill_all.sh 2026 2014` |
 | — | combined runner (01 + 04 + 02 in one browser session) | `python/ncaa_mfb_raw_scrape/mfb_run.py` | `scripts/run_mfb_capture.sh` | online | as above | `NCAA_VENDOR=decodo_patchright ./scripts/run_mfb_capture.sh --academic-year 2026 --rosters --max-contests 20` |
 
@@ -46,6 +47,7 @@ for d in 11 12; do
 done
 ./scripts/run_05_datasets.sh --academic-year 2026                                      # offline, once
 ./scripts/run_06_xwalk.sh    --academic-year 2026                                      # offline: ESPN crosswalk
+./scripts/run_07_player_xwalk.sh --seasons 2026                                   # offline: player crosswalk (daily, non-fatal)
 ./scripts/run_03_parse.sh    --academic-year 2026                                      # offline: parsed+enriched json
 ```
 
