@@ -1,0 +1,29 @@
+transport: NCAA_VENDOR=decodo_patchright (canary_vendors.toml)
+[2026-10-16 14:30:02Z] daily mfb start: ay=2027 (fall 2026) max=400 workers=12
+[2026-10-16 14:30:02Z] div=11 wave A: refresh team pages x12
+[2026-10-16 14:42:39Z] div=11 wave B: capture x12
+      1 capture: {'captured': 0, 'skipped': 37, 'failed': 0}
+      8 capture: {'captured': 0, 'skipped': 38, 'failed': 0}
+      3 capture: {'captured': 1, 'skipped': 37, 'failed': 0}
+     12 discovered 455 MFB contests
+[2026-10-16 14:47:28Z] div=12 wave A: refresh team pages x12
+[2026-10-16 14:59:41Z] div=12 wave B: capture x12
+      9 capture: {'captured': 0, 'skipped': 40, 'failed': 0}
+      3 capture: {'captured': 0, 'skipped': 41, 'failed': 0}
+     12 discovered 483 MFB contests
+log -> logs/daily_mfb_datasets_20261016_105947.log  (watch: tail -f logs/daily_mfb_datasets_20261016_105947.log)
+teams: 266
+rosters: 29386 players, 266 teams
+schedule master: 3150 team-games, 819 unique contests
+EXIT=0
+log -> logs/daily_mfb_xwalk_20261016_110030.log  (watch: tail -f logs/daily_mfb_xwalk_20261016_110030.log)
+ay2027: 802/819 matched  [{'match_method': 'score_pair', 'len': 3}, {'match_method': 'score_exact', 'len': 564}, {'match_method': 'single_team', 'len': 22}, {'match_method': 'exact', 'len': 105}, {'match_method': 'unordered_pair', 'len': 1}, {'match_method': 'score_window', 'len': 94}, {'match_method': 'date_window', 'len': 13}]
+EXIT=0
+offline stage: no proxy / transport needed
+log -> logs/player_xwalk_20261016_110035.log  (watch: tail -f logs/player_xwalk_20261016_110035.log)
+mfb 2027: players=29386 matched=24187 (82.31%) name_jersey=23274 name=342 last_jersey=496 jaro_winkler=75 no_espn_team=1844 no_espn_players=3278 ambiguous=3 no_candidate=74
+EXIT=0
+log -> logs/daily_mfb_parse_20261016_110041.log  (watch: tail -f logs/daily_mfb_parse_20261016_110041.log)
+ay2027: {'skipped': 816, 'parsed': 3}
+EXIT=0
+[2026-10-16 15:00:46Z] daily mfb stages done (rc_total=0)
