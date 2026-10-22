@@ -28,3 +28,15 @@ log -> logs/daily_mfb_parse_20261021_105908.log  (watch: tail -f logs/daily_mfb_
 ay2027: {'skipped': 930, 'parsed': 3}
 EXIT=0
 [2026-10-21 14:59:12Z] daily mfb stages done (rc_total=0)
+To github.com:sportsdataverse/ncaa-mfb-football-raw.git
+ ! [rejected]            main -> main (fetch first)
+error: failed to push some refs to 'github.com:sportsdataverse/ncaa-mfb-football-raw.git'
+hint: Updates were rejected because the remote contains work that you do not
+hint: have locally. This is usually caused by another repository pushing to
+hint: the same ref. If you want to integrate the remote changes, use
+hint: 'git pull' before pushing again.
+hint: See the 'Note about fast-forwards' in 'git push --help' for details.
+push rejected (attempt 1); syncing with origin
+ERROR: cannot rebase onto origin/main; commit left local
+ERROR: push failed after 3 attempts
+[2026-10-21 14:59:15Z] daily mfb done EXIT=1

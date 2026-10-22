@@ -27,3 +27,7 @@ log -> logs/daily_mfb_parse_20261021_105908.log  (watch: tail -f logs/daily_mfb_
 ay2027: {'skipped': 930, 'parsed': 3}
 EXIT=0
 [2026-10-21 14:59:12Z] daily mfb stages done (rc_total=0)
+push rejected (attempt 1); syncing with origin
+ERROR: cannot rebase onto origin/main; commit left local
+ERROR: push failed after 3 attempts
+[2026-10-21 14:59:15Z] daily mfb done EXIT=1
