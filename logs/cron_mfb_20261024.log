@@ -30,3 +30,14 @@ log -> logs/daily_mfb_parse_20261024_110440.log  (watch: tail -f logs/daily_mfb_
 ay2027: {'skipped': 937, 'parsed': 7}
 EXIT=0
 [2026-10-24 15:04:45Z] daily mfb stages done (rc_total=0)
+To github.com:sportsdataverse/ncaa-mfb-football-raw.git
+ ! [rejected]            main -> main (non-fast-forward)
+error: failed to push some refs to 'github.com:sportsdataverse/ncaa-mfb-football-raw.git'
+hint: Updates were rejected because the tip of your current branch is behind
+hint: its remote counterpart. If you want to integrate the remote changes,
+hint: use 'git pull' before pushing again.
+hint: See the 'Note about fast-forwards' in 'git push --help' for details.
+push rejected (attempt 1); syncing with origin
+ERROR: cannot rebase onto origin/main; commit left local
+ERROR: push failed after 3 attempts
+[2026-10-24 15:04:48Z] daily mfb done EXIT=1

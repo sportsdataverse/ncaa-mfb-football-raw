@@ -1,0 +1,39 @@
+transport: NCAA_VENDOR=decodo_patchright (canary_vendors.toml)
+[2026-10-25 14:30:03Z] daily mfb start: ay=2027 (fall 2026) max=400 workers=12
+[2026-10-25 14:30:03Z] div=11 wave A: refresh team pages x12
+[2026-10-25 14:41:18Z] div=11 wave B: capture x12
+      1 capture: {'captured': 1, 'skipped': 46, 'failed': 0}
+      1 capture: {'captured': 2, 'skipped': 45, 'failed': 0}
+      3 capture: {'captured': 3, 'skipped': 44, 'failed': 0}
+      2 capture: {'captured': 3, 'skipped': 45, 'failed': 0}
+      2 capture: {'captured': 4, 'skipped': 43, 'failed': 0}
+      1 capture: {'captured': 5, 'skipped': 42, 'failed': 0}
+      1 capture: {'captured': 6, 'skipped': 41, 'failed': 0}
+      1 capture: {'captured': 7, 'skipped': 40, 'failed': 0}
+     12 discovered 566 MFB contests
+[2026-10-25 15:07:45Z] div=12 wave A: refresh team pages x12
+[2026-10-25 15:21:20Z] div=12 wave B: capture x12
+      1 capture: {'captured': 0, 'skipped': 50, 'failed': 0}
+      2 capture: {'captured': 2, 'skipped': 48, 'failed': 0}
+      3 capture: {'captured': 4, 'skipped': 46, 'failed': 0}
+      1 capture: {'captured': 5, 'skipped': 44, 'failed': 0}
+      1 capture: {'captured': 6, 'skipped': 43, 'failed': 0}
+      3 capture: {'captured': 6, 'skipped': 44, 'failed': 0}
+      1 capture: {'captured': 8, 'skipped': 41, 'failed': 0}
+     12 discovered 597 MFB contests
+log -> logs/daily_mfb_datasets_20261025_115548.log  (watch: tail -f logs/daily_mfb_datasets_20261025_115548.log)
+teams: 266
+rosters: 29386 players, 266 teams
+schedule master: 3150 team-games, 1041 unique contests
+EXIT=0
+log -> logs/daily_mfb_xwalk_20261025_115631.log  (watch: tail -f logs/daily_mfb_xwalk_20261025_115631.log)
+ay2027: 1013/1041 matched  [{'match_method': 'score_window', 'len': 102}, {'match_method': 'date_window', 'len': 12}, {'match_method': 'exact', 'len': 203}, {'match_method': 'score_pair', 'len': 3}, {'match_method': 'score_exact', 'len': 638}, {'match_method': 'single_team', 'len': 54}, {'match_method': 'unordered_pair', 'len': 1}]
+EXIT=0
+offline stage: no proxy / transport needed
+log -> logs/player_xwalk_20261025_115641.log  (watch: tail -f logs/player_xwalk_20261025_115641.log)
+mfb 2027: players=29386 matched=24297 (82.68%) name_jersey=23375 name=342 last_jersey=505 jaro_winkler=75 no_espn_team=1844 no_espn_players=3174 ambiguous=1 no_candidate=70
+EXIT=0
+log -> logs/daily_mfb_parse_20261025_115646.log  (watch: tail -f logs/daily_mfb_parse_20261025_115646.log)
+ay2027: {'skipped': 944, 'parsed': 97}
+EXIT=0
+[2026-10-25 15:57:06Z] daily mfb stages done (rc_total=0)
