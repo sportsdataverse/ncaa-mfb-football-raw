@@ -157,7 +157,9 @@ if ! git diff --cached --quiet; then
     if git push -q origin main; then pushed=1; break; fi
     echo "push rejected (attempt ${attempt}); syncing with origin" | tee -a "$LOG"
     git fetch --quiet origin main || true
-    if ! git rebase --merge origin/main >/dev/null 2>&1; then
+    # --autostash: cron appends to a tracked logs/ file all run long, so the tree is never
+    # clean here and a bare rebase refuses ("You have unstaged changes").
+    if ! git rebase --merge --autostash origin/main >/dev/null 2>&1; then
       git rebase --abort >/dev/null 2>&1 || true
       echo "ERROR: cannot rebase onto origin/main; commit left local" | tee -a "$LOG" >&2
       break
