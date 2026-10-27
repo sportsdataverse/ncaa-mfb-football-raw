@@ -5,9 +5,8 @@ from __future__ import annotations
 import gzip
 import json
 
-import polars as pl
-
 import ncaa_mfb_06_xwalk_build as xw
+import polars as pl
 
 
 def test_schedule_side_fills_scores_from_bundles(tmp_path) -> None:
