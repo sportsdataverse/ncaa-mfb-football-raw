@@ -21,7 +21,7 @@ dev = ["pytest>=8.0", "ruff>=0.6"]
 # main ahead of PyPI.
 [tool.uv.sources]
 # pinned 2026-10-21 until REPROCESS runs #1/#2 (sdv-py quality program, WB-nfl-2)
-sportsdataverse = { git = "https://github.com/sportsdataverse/sportsdataverse-py", rev = "c2031afbc72a0e892a19e56a0c03dd1425f76c40" }
+sportsdataverse = { git = "https://github.com/sportsdataverse/sportsdataverse-py", rev = "f94d8cb98bbc17c44f0e019fb3bfad931ce3418b" }
 
 [tool.uv]
 package = false
