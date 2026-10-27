@@ -1,0 +1,2 @@
+ay2027: 1020/1041 matched  [{'match_method': 'score_window', 'len': 107}, {'match_method': 'date_window', 'len': 11}, {'match_method': 'score_exact', 'len': 715}, {'match_method': 'unordered_pair', 'len': 1}, {'match_method': 'exact', 'len': 147}, {'match_method': 'single_team', 'len': 36}, {'match_method': 'score_pair', 'len': 3}]
+EXIT=0
