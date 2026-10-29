@@ -1,0 +1,30 @@
+transport: NCAA_VENDOR=decodo_patchright (canary_vendors.toml)
+[2026-10-29 14:30:06Z] daily mfb start: ay=2027 (fall 2026) max=400 workers=12
+[2026-10-29 14:30:06Z] div=11 wave A: refresh team pages x12
+[2026-10-29 14:40:33Z] div=11 wave B: capture x12
+      5 capture: {'captured': 0, 'skipped': 47, 'failed': 0}
+      5 capture: {'captured': 0, 'skipped': 48, 'failed': 0}
+      1 capture: {'captured': 1, 'skipped': 46, 'failed': 0}
+      1 capture: {'captured': 1, 'skipped': 47, 'failed': 0}
+     12 discovered 570 MFB contests
+[2026-10-29 14:46:03Z] div=12 wave A: refresh team pages x12
+[2026-10-29 14:55:07Z] div=12 wave B: capture x12
+      3 capture: {'captured': 0, 'skipped': 49, 'failed': 0}
+      9 capture: {'captured': 0, 'skipped': 50, 'failed': 0}
+     12 discovered 597 MFB contests
+log -> logs/daily_mfb_datasets_20261029_105517.log  (watch: tail -f logs/daily_mfb_datasets_20261029_105517.log)
+teams: 266
+rosters: 29386 players, 266 teams
+schedule master: 3150 team-games, 1045 unique contests
+EXIT=0
+log -> logs/daily_mfb_xwalk_20261029_105558.log  (watch: tail -f logs/daily_mfb_xwalk_20261029_105558.log)
+ay2027: 1024/1045 matched  [{'match_method': 'score_window', 'len': 109}, {'match_method': 'exact', 'len': 147}, {'match_method': 'unordered_pair', 'len': 1}, {'match_method': 'score_pair', 'len': 3}, {'match_method': 'score_exact', 'len': 717}, {'match_method': 'date_window', 'len': 11}, {'match_method': 'single_team', 'len': 36}]
+EXIT=0
+offline stage: no proxy / transport needed
+log -> logs/player_xwalk_20261029_105603.log  (watch: tail -f logs/player_xwalk_20261029_105603.log)
+mfb 2027: players=29386 matched=24411 (83.07%) name_jersey=23482 name=345 last_jersey=509 jaro_winkler=75 no_espn_team=1730 no_espn_players=3174 ambiguous=1 no_candidate=70
+EXIT=0
+log -> logs/daily_mfb_parse_20261029_105609.log  (watch: tail -f logs/daily_mfb_parse_20261029_105609.log)
+ay2027: {'skipped': 1043, 'parsed': 2}
+EXIT=0
+[2026-10-29 14:56:13Z] daily mfb stages done (rc_total=0)
