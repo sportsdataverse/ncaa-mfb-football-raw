@@ -1,0 +1,54 @@
+transport: NCAA_VENDOR=decodo_patchright (canary_vendors.toml)
+[2026-11-02 15:30:03Z] daily mfb start: ay=2027 (fall 2026) max=400 workers=12
+[2026-11-02 15:30:03Z] div=11 wave A: refresh team pages x12
+WARN daily_mfb_refresh_d11 shard 0 rc=1
+WARN daily_mfb_refresh_d11 shard 1 rc=1
+WARN daily_mfb_refresh_d11 shard 2 rc=1
+WARN daily_mfb_refresh_d11 shard 3 rc=1
+WARN daily_mfb_refresh_d11 shard 4 rc=1
+WARN daily_mfb_refresh_d11 shard 5 rc=1
+WARN daily_mfb_refresh_d11 shard 6 rc=1
+WARN daily_mfb_refresh_d11 shard 7 rc=1
+WARN daily_mfb_refresh_d11 shard 8 rc=1
+WARN daily_mfb_refresh_d11 shard 9 rc=1
+WARN daily_mfb_refresh_d11 shard 10 rc=1
+WARN daily_mfb_refresh_d11 shard 11 rc=1
+[2026-11-02 16:48:57Z] div=11 wave B: capture x12
+      1 capture: {'captured': 0, 'skipped': 47, 'failed': 0}
+     11 capture: {'captured': 0, 'skipped': 48, 'failed': 0}
+     12 discovered 575 MFB contests
+WARN capture div=11 rc=1
+[2026-11-02 16:49:09Z] div=12 wave A: refresh team pages x12
+WARN daily_mfb_refresh_d12 shard 0 rc=1
+WARN daily_mfb_refresh_d12 shard 1 rc=1
+WARN daily_mfb_refresh_d12 shard 2 rc=1
+WARN daily_mfb_refresh_d12 shard 3 rc=1
+WARN daily_mfb_refresh_d12 shard 4 rc=1
+WARN daily_mfb_refresh_d12 shard 5 rc=1
+WARN daily_mfb_refresh_d12 shard 6 rc=1
+WARN daily_mfb_refresh_d12 shard 7 rc=1
+WARN daily_mfb_refresh_d12 shard 8 rc=1
+WARN daily_mfb_refresh_d12 shard 9 rc=1
+WARN daily_mfb_refresh_d12 shard 10 rc=1
+WARN daily_mfb_refresh_d12 shard 11 rc=1
+[2026-11-02 17:57:40Z] div=12 wave B: capture x12
+      1 capture: {'captured': 0, 'skipped': 49, 'failed': 0}
+     11 capture: {'captured': 0, 'skipped': 50, 'failed': 0}
+     12 discovered 599 MFB contests
+WARN capture div=12 rc=1
+log -> logs/daily_mfb_datasets_20261102_125747.log  (watch: tail -f logs/daily_mfb_datasets_20261102_125747.log)
+teams: 266
+rosters: 29386 players, 266 teams
+schedule master: 3150 team-games, 1052 unique contests
+EXIT=0
+log -> logs/daily_mfb_xwalk_20261102_125826.log  (watch: tail -f logs/daily_mfb_xwalk_20261102_125826.log)
+ay2027: 1030/1052 matched  [{'match_method': 'score_exact', 'len': 723}, {'match_method': 'score_pair', 'len': 3}, {'match_method': 'unordered_pair', 'len': 1}, {'match_method': 'exact', 'len': 147}, {'match_method': 'score_window', 'len': 109}, {'match_method': 'date_window', 'len': 11}, {'match_method': 'single_team', 'len': 36}]
+EXIT=0
+offline stage: no proxy / transport needed
+log -> logs/player_xwalk_20261102_125830.log  (watch: tail -f logs/player_xwalk_20261102_125830.log)
+mfb 2027: players=29386 matched=24411 (83.07%) name_jersey=23482 name=345 last_jersey=509 jaro_winkler=75 no_espn_team=1730 no_espn_players=3174 ambiguous=1 no_candidate=70
+EXIT=0
+log -> logs/daily_mfb_parse_20261102_125834.log  (watch: tail -f logs/daily_mfb_parse_20261102_125834.log)
+ay2027: {'skipped': 1052}
+EXIT=0
+[2026-11-02 17:58:35Z] daily mfb stages done (rc_total=1)

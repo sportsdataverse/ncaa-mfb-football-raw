@@ -1,0 +1,19 @@
+transport: NCAA_VENDOR=decodo_patchright (canary_vendors.toml) shard 11/12
+discovered 128 MFB teams (ay=2027 div=12)
+refresh: 0/10 team pages re-fetched, 10 fell back to the saved copy
+Traceback (most recent call last):
+  File "/mnt/sdv_repos/ncaa-mfb-football-raw/python/ncaa_mfb_raw_scrape/mfb_run.py", line 144, in <module>
+    raise SystemExit(main())
+                     ~~~~^^
+  File "/mnt/sdv_repos/ncaa-mfb-football-raw/python/ncaa_mfb_raw_scrape/mfb_run.py", line 114, in main
+    ids = discover_season(
+        args.academic_year,
+    ...<4 lines>...
+        team_shard=(shard_i, shard_n) if args.refresh_discovery else (0, 1),
+    )
+  File "/mnt/sdv_repos/ncaa-mfb-football-raw/python/ncaa_mfb_raw_scrape/mfb_discover.py", line 271, in discover_season
+    raise RuntimeError(
+    ...<2 lines>...
+    )
+RuntimeError: refresh: 10/10 team pages could not be re-fetched (> 50%) -- discovery is stale, failing the run
+EXIT=1
