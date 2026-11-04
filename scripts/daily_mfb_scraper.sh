@@ -31,8 +31,9 @@
 #
 # Discovery (2026-11-04): `scoreboard` reads the division's scoreboard for
 # yesterday, today and the lookback days, then re-fetches only the pages of the
-# teams listed there -- a team page changes only when that team plays, so a
-# Tuesday refreshes ~0 pages instead of 266. `full` is the old every-team
+# teams listed there -- a team page changes only when that team plays. The
+# lookback keeps a Saturday's teams (~100 FBS) in the window through Tuesday;
+# Wednesday-Thursday nights refresh only the midweek games' teams. `full` is the old every-team
 # --refresh-discovery re-crawl (use it to repair a schedule edit or a missed
 # stretch longer than the lookback). Both run single-process; capture still
 # shards in wave B.
