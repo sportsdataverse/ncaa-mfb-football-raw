@@ -160,6 +160,52 @@ def test_team_shards_refresh_disjoint_slices_covering_every_team(tmp_path: Path)
     assert got == {f"{t}00" for t in range(1, 8)}
 
 
+def test_refresh_teams_refetches_only_the_teams_that_played(tmp_path: Path) -> None:
+    tl = "team/inst_team_list?academic_year=2027&conf_id=-1&division=11&sport_code=MFB"
+    pages = {
+        tl: _pad('<a href="/teams/1">a</a><a href="/teams/2">b</a>'),
+        "teams/1": _pad('<a href="/contests/100/box_score">x</a>'),
+        "teams/2": _pad('<a href="/contests/300/box_score">z</a>'),
+    }
+    fetch, calls = _site(pages)
+    discover_season(2027, fetch_fn=fetch, save_dir=tmp_path)
+
+    pages["teams/1"] = _pad('<a href="/contests/100/box_score">x</a><a href="/contests/200/box_score">y</a>')
+    pages["teams/2"] = _pad('<a href="/contests/300/box_score">z</a><a href="/contests/400/box_score">w</a>')
+    calls.clear()
+    got = discover_season(2027, fetch_fn=fetch, save_dir=tmp_path, refresh_teams={"1"})
+    assert got == ["100", "200", "300"]  # team 2 read from disk: its new game waits for its scoreboard
+    assert calls == [("teams/1", True)]  # no team-list or team-2 fetch
+
+
+def test_scoreboard_team_ids_reads_fresh_pages_and_dedups(monkeypatch) -> None:
+    from ncaa_mfb_raw_scrape import mfb_discover
+    from sportsdataverse.scrape.ncaa import scoreboard
+
+    def fake_contests(sport, dates, division=None, *, lookback_days=0, fetch_html=None):
+        assert (sport, dates, division, lookback_days) == ("football", None, "FCS", 2)
+        fetch_html("board/1")
+        fetch_html("board/2")
+        import polars as pl
+
+        return pl.DataFrame({"contest_id": ["9", "8", "9"]})
+
+    monkeypatch.setattr(scoreboard, "ncaa_scoreboard_contests", fake_contests)
+    boards = {"board/1": '<a href="/teams/5">a</a><a href="/teams/6">b</a>', "board/2": '<a href="/teams/5">a</a>'}
+    fetch, calls = _site(boards)
+    assert mfb_discover.scoreboard_team_ids(12, fetch, lookback_days=2) == (["8", "9"], ["5", "6"])
+    assert all(force for _, force in calls)
+
+
+def test_scoreboard_mode_is_single_process_only() -> None:
+    from ncaa_mfb_raw_scrape import mfb_run
+
+    for argv in (["--scoreboard-days", "3", "--shard", "1/4"], ["--scoreboard-days", "3", "--refresh-discovery"]):
+        with pytest.raises(SystemExit) as exc:
+            mfb_run.main(argv)
+        assert exc.value.code == 2
+
+
 def test_sharded_refresh_without_skip_games_is_refused() -> None:
     from ncaa_mfb_raw_scrape import mfb_run
 

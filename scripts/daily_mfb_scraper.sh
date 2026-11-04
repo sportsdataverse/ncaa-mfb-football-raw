@@ -26,6 +26,16 @@
 #   MFB_REFRESH_MAX_STALE_FRAC  fail if more than this share of team pages
 #                     could not be re-fetched           (default 0.5)
 #   MFB_WORKERS       parallel shard processes           (default 1)
+#   MFB_DISCOVERY     scoreboard (default) | full
+#   MFB_SCOREBOARD_LOOKBACK  days of scoreboards before yesterday (default 3)
+#
+# Discovery (2026-11-04): `scoreboard` reads the division's scoreboard for
+# yesterday, today and the lookback days, then re-fetches only the pages of the
+# teams listed there -- a team page changes only when that team plays, so a
+# Tuesday refreshes ~0 pages instead of 266. `full` is the old every-team
+# --refresh-discovery re-crawl (use it to repair a schedule edit or a missed
+# stretch longer than the lookback). Both run single-process; capture still
+# shards in wave B.
 #
 # Single-stream by default: stats.ncaa.org is a hostile host and a normal night
 # has few new contests. MFB_WORKERS=N shards instead -- N separate processes via
@@ -46,6 +56,13 @@ source "scripts/_env.sh"
 
 MAX_CONTESTS="${MFB_MAX_CONTESTS:-400}"
 WORKERS="${MFB_WORKERS:-1}"
+DISCOVERY="${MFB_DISCOVERY:-scoreboard}"
+LOOKBACK="${MFB_SCOREBOARD_LOOKBACK:-3}"
+case "$DISCOVERY" in
+  scoreboard) DISCOVER_ARGS=(--scoreboard-days "${LOOKBACK}") ;;
+  full) DISCOVER_ARGS=(--refresh-discovery) ;;
+  *) echo "ERROR: MFB_DISCOVERY must be scoreboard or full (got '${DISCOVERY}')" >&2; exit 2 ;;
+esac
 if ! [[ "$WORKERS" =~ ^[0-9]+$ ]] || [ "$WORKERS" -lt 1 ] || [ "$WORKERS" -gt 25 ]; then
   echo "ERROR: MFB_WORKERS must be 1-25 (got '${WORKERS}')" >&2
   exit 2
@@ -80,7 +97,7 @@ FALL=$((AY - 1))
 LOG="logs/daily_mfb_$(date -u +%Y%m%d).log"
 mkdir -p logs
 {
-  echo "[$(date -u '+%F %T')Z] daily mfb start: ay=${AY} (fall ${FALL}) max=${MAX_CONTESTS} workers=${WORKERS}"
+  echo "[$(date -u '+%F %T')Z] daily mfb start: ay=${AY} (fall ${FALL}) max=${MAX_CONTESTS} workers=${WORKERS} discovery=${DISCOVERY}"
 
   rc_total=0
   # Divisions 11 (FBS) and 12 (FCS). Game bundles are file-exists resumable, so
@@ -96,13 +113,19 @@ mkdir -p logs
     common=(--out "${ROOT}" --academic-year "${AY}" --division "${div}")
     if [ "$WORKERS" -eq 1 ]; then
       run_stage "daily_mfb_capture_d${div}" python/ncaa_mfb_raw_scrape/mfb_run.py \
-        "${common[@]}" --max-contests "${MAX_CONTESTS}" --refresh-discovery --rosters
+        "${common[@]}" --max-contests "${MAX_CONTESTS}" "${DISCOVER_ARGS[@]}" --rosters
       rc=$?
     else
-      echo "[$(date -u '+%F %T')Z] div=${div} wave A: refresh team pages x${WORKERS}"
-      # --rosters rides wave A: it is the only pass sharded by TEAM. Roster html
-      # already on disk is skipped, so after a season's first run it costs nothing.
-      run_wave "daily_mfb_refresh_d${div}" "${common[@]}" --refresh-discovery --skip-games --rosters
+      # --rosters rides wave A. Roster html already on disk is skipped, so after
+      # a season's first run it costs nothing.
+      if [ "$DISCOVERY" = "scoreboard" ]; then
+        echo "[$(date -u '+%F %T')Z] div=${div} wave A: scoreboard refresh (one process)"
+        run_stage "daily_mfb_refresh_d${div}" python/ncaa_mfb_raw_scrape/mfb_run.py \
+          "${common[@]}" "${DISCOVER_ARGS[@]}" --skip-games --rosters
+      else
+        echo "[$(date -u '+%F %T')Z] div=${div} wave A: refresh team pages x${WORKERS}"
+        run_wave "daily_mfb_refresh_d${div}" "${common[@]}" --refresh-discovery --skip-games --rosters
+      fi
       rc=$?
       # A failed refresh wave means stale pages: capture from them anyway (the
       # games they do list are real), but the run still reports the failure.

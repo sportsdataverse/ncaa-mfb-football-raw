@@ -30,6 +30,7 @@ from ncaa_mfb_raw_scrape.mfb_discover import (
     capture_rosters,
     discover_season,
     discover_teams,
+    scoreboard_team_ids,
     vendor_fetch_fn,
 )
 
@@ -66,6 +67,15 @@ def main(argv: "list[str] | None" = None) -> int:
         "contest after it is played",
     )
     ap.add_argument(
+        "--scoreboard-days",
+        type=int,
+        default=None,
+        metavar="N",
+        help="refresh only the pages of teams on the division's scoreboards for "
+        "yesterday, today and N days before (instead of --refresh-discovery's "
+        "every-team re-crawl); single process only",
+    )
+    ap.add_argument(
         "--shard",
         default="0/1",
         help="i/N parallel-worker shard: worker i of N takes contests[i::N] and a "
@@ -80,6 +90,9 @@ def main(argv: "list[str] | None" = None) -> int:
             "--refresh-discovery with --shard needs --skip-games: refresh the "
             "pages in one sharded pass, then capture in a second pass without it"
         )
+
+    if args.scoreboard_days is not None and (shard_n > 1 or args.refresh_discovery):
+        ap.error("--scoreboard-days runs as one process and replaces --refresh-discovery")
 
     if os.environ.get("NCAA_VENDOR"):
         print(
@@ -109,6 +122,17 @@ def main(argv: "list[str] | None" = None) -> int:
         f"discovered {len(teams)} MFB teams (ay={args.academic_year} div={args.division})",
         flush=True,
     )
+    played = None
+    if args.scoreboard_days is not None:
+        sb_contests, sb_teams = scoreboard_team_ids(
+            args.division, fetch, lookback_days=args.scoreboard_days
+        )
+        played = set(sb_teams) & set(teams)
+        print(
+            f"scoreboard: {len(sb_contests)} contests, {len(played)} division teams "
+            f"to refresh (last {args.scoreboard_days} days + yesterday/today)",
+            flush=True,
+        )
     # With --refresh-discovery this fetches the team list a second time (one
     # page per division) -- accepted over threading the list through.
     ids = discover_season(
@@ -118,6 +142,7 @@ def main(argv: "list[str] | None" = None) -> int:
         save_dir=args.out,
         refresh=args.refresh_discovery,
         team_shard=(shard_i, shard_n) if args.refresh_discovery else (0, 1),
+        refresh_teams=played,
     )
     print(f"discovered {len(ids)} MFB contests", flush=True)
 

@@ -10,7 +10,7 @@ from __future__ import annotations
 import os
 import re
 from pathlib import Path
-from typing import Callable, List, Optional
+from typing import Callable, Collection, List, Optional
 
 FetchFn = Callable[..., str]  # (path, force=False) -> html
 
@@ -63,6 +63,44 @@ def vendor_fetch_fn(
         os.environ["NCAA_VENDOR"], root, shard_i=shard_i, shard_n=shard_n
     )
     return lambda path, force=False: fetcher.fetch_html(path, force=force)
+
+
+#: stats.ncaa.org football division ids -> sdv-py's scoreboard division labels.
+_SCOREBOARD_DIVISION = {11: "FBS", 12: "FCS"}
+
+
+def scoreboard_team_ids(
+    division: int, fetch_fn: FetchFn, *, lookback_days: int = 3
+) -> "tuple[List[str], List[str]]":
+    """Contest and team ids on the division's scoreboards for yesterday, today
+    and ``lookback_days`` before that -- the teams whose pages changed.
+
+    One scoreboard page per date (plus the season-division lookup) replaces
+    re-fetching every team page: a team page only changes once that team plays.
+    Pages are always fetched fresh (``force=True``): a scoreboard saved before
+    kickoff lists the games but never their results.
+
+    Returns:
+        ``(contest_ids, team_ids)``, each sorted and de-duplicated.
+    """
+    from sportsdataverse.scrape.ncaa.scoreboard import ncaa_scoreboard_contests
+
+    pages: "list[str]" = []
+
+    def fetch(path: str) -> str:
+        html = fetch_fn(path, force=True) or ""
+        pages.append(html)
+        return html
+
+    df = ncaa_scoreboard_contests(
+        "football",
+        None,
+        division=_SCOREBOARD_DIVISION[division],
+        lookback_days=lookback_days,
+        fetch_html=fetch,
+    )
+    teams = {t for html in pages for t in _TEAM_ID_RE.findall(html)}
+    return sorted(set(df.get_column("contest_id").to_list())), sorted(teams)
 
 
 def _atomic_write(path: Path, text: str) -> None:
@@ -200,6 +238,7 @@ def discover_season(
     log_every: int = 25,
     refresh: bool = False,
     team_shard: "tuple[int, int]" = (0, 1),
+    refresh_teams: "Optional[Collection[str]]" = None,
 ) -> List[str]:
     """Discover every MFB ``contest_id`` in a season (team list -> team pages -> dedup).
 
@@ -221,6 +260,9 @@ def discover_season(
             team list itself (one writer). The contests returned cover the
             slice alone: a sharded call is for REFRESHING pages, and capture
             must re-discover from disk afterwards to see the whole season.
+        refresh_teams: refresh only these teams' pages (and read the rest from
+            disk) -- the scoreboard mode, see :func:`scoreboard_team_ids`. The
+            team list itself is not re-fetched. Ignored when ``refresh`` is set.
 
     Returns:
         Sorted, de-duplicated list of ``contest_id`` strings.
@@ -243,7 +285,7 @@ def discover_season(
         refresh=refresh and shard_i == 0,
     )[shard_i::shard_n]
     contests: "set[str]" = set()
-    stale = 0
+    stale = refreshed = 0
     for i, team_id in enumerate(teams, 1):
         page_path = (
             Path(save_dir)
@@ -255,21 +297,23 @@ def discover_season(
             if save_dir
             else None
         )
-        html, fresh = _read_or_fetch(page_path, fetch, f"teams/{team_id}", refresh=refresh)
-        stale += refresh and not fresh
+        again = refresh or (refresh_teams is not None and team_id in refresh_teams)
+        html, fresh = _read_or_fetch(page_path, fetch, f"teams/{team_id}", refresh=again)
+        refreshed += again
+        stale += again and not fresh
         contests.update(parse_contest_ids(html))
         if log_every and i % log_every == 0:
             print(f"team pages {i}/{len(teams)}: {len(contests)} contests", flush=True)
-    if refresh:
+    if refreshed:
         max_frac = float(os.environ.get("MFB_REFRESH_MAX_STALE_FRAC", "0.5"))
         print(
-            f"refresh: {len(teams) - stale}/{len(teams)} team pages re-fetched, "
+            f"refresh: {refreshed - stale}/{refreshed} team pages re-fetched, "
             f"{stale} fell back to the saved copy",
             flush=True,
         )
-        if teams and stale / len(teams) > max_frac:
+        if stale / refreshed > max_frac:
             raise RuntimeError(
-                f"refresh: {stale}/{len(teams)} team pages could not be re-fetched "
+                f"refresh: {stale}/{refreshed} team pages could not be re-fetched "
                 f"(> {max_frac:.0%}) -- discovery is stale, failing the run"
             )
     return sorted(contests)
