@@ -1,0 +1,17 @@
+transport: NCAA_VENDOR=decodo_patchright (canary_vendors.toml) shard 0/1
+discovered 138 MFB teams (ay=2027 div=11)
+scoreboard: 58 contests, 115 division teams to refresh (last 3 days + yesterday/today)
+team pages 25/138: 207 contests
+team pages 50/138: 379 contests
+team pages 75/138: 517 contests
+team pages 100/138: 614 contests
+team pages 125/138: 666 contests
+refresh: 115/115 team pages re-fetched, 0 fell back to the saved copy
+discovered 685 MFB contests
+rosters 25/138: {'captured': 0, 'skipped': 25, 'failed': 0}
+rosters 50/138: {'captured': 0, 'skipped': 50, 'failed': 0}
+rosters 75/138: {'captured': 0, 'skipped': 75, 'failed': 0}
+rosters 100/138: {'captured': 0, 'skipped': 100, 'failed': 0}
+rosters 125/138: {'captured': 0, 'skipped': 125, 'failed': 0}
+rosters: {'captured': 0, 'skipped': 138, 'failed': 0}
+EXIT=0
