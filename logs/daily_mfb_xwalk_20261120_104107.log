@@ -1,0 +1,2 @@
+ay2027: 1382/1413 matched  [{'match_method': 'score_window', 'len': 173}, {'match_method': 'score_pair', 'len': 6}, {'match_method': 'unordered_pair', 'len': 1}, {'match_method': 'date_window', 'len': 12}, {'match_method': 'single_team', 'len': 68}, {'match_method': 'score_exact', 'len': 946}, {'match_method': 'exact', 'len': 176}]
+EXIT=0

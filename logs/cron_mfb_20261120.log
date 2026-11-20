@@ -1,0 +1,112 @@
+transport: NCAA_VENDOR=decodo_patchright (canary_vendors.toml)
+[2026-11-20 15:30:04Z] daily mfb start: ay=2027 (fall 2026) max=400 workers=12 discovery=scoreboard
+[2026-11-20 15:30:04Z] div=11 wave A: scoreboard refresh (one process)
+log -> logs/daily_mfb_refresh_d11_20261120_103004.log  (watch: tail -f logs/daily_mfb_refresh_d11_20261120_103004.log)
+transport: NCAA_VENDOR=decodo_patchright (canary_vendors.toml) shard 0/1
+discovered 138 MFB teams (ay=2027 div=11)
+Traceback (most recent call last):
+  File "/mnt/sdv_repos/ncaa-mfb-football-raw/python/ncaa_mfb_raw_scrape/mfb_run.py", line 169, in <module>
+    raise SystemExit(main())
+                     ~~~~^^
+  File "/mnt/sdv_repos/ncaa-mfb-football-raw/python/ncaa_mfb_raw_scrape/mfb_run.py", line 127, in main
+    sb_contests, sb_teams = scoreboard_team_ids(
+                            ~~~~~~~~~~~~~~~~~~~^
+        args.division, fetch, lookback_days=args.scoreboard_days
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "/mnt/sdv_repos/ncaa-mfb-football-raw/python/ncaa_mfb_raw_scrape/mfb_discover.py", line 95, in scoreboard_team_ids
+    df = ncaa_scoreboard_contests(
+        "football",
+    ...<3 lines>...
+        fetch_html=fetch,
+    )
+  File "/mnt/sdv_repos/sdv-py/sportsdataverse/scrape/ncaa/scoreboard.py", line 187, in ncaa_scoreboard_contests
+    df = _run(fetch_html)
+  File "/mnt/sdv_repos/sdv-py/sportsdataverse/scrape/ncaa/scoreboard.py", line 180, in _run
+    page = fetch(_scoreboard_path(sid, d))
+  File "/mnt/sdv_repos/ncaa-mfb-football-raw/python/ncaa_mfb_raw_scrape/mfb_discover.py", line 91, in fetch
+    html = fetch_fn(path, force=True) or ""
+           ~~~~~~~~^^^^^^^^^^^^^^^^^^
+  File "/mnt/sdv_repos/ncaa-mfb-football-raw/python/ncaa_mfb_raw_scrape/mfb_discover.py", line 65, in <lambda>
+    return lambda path, force=False: fetcher.fetch_html(path, force=force)
+                                     ~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^
+  File "/mnt/sdv_repos/sdv-py/sportsdataverse/mbb/mbb_ncaa_fetch.py", line 1370, in fetch_html
+    text = self._get_with_rotation(url)
+  File "/mnt/sdv_repos/sdv-py/sportsdataverse/mbb/mbb_ncaa_fetch.py", line 1292, in _get_with_rotation
+    raise AssetFetchError(
+        f"NCAA fetch failed after rotating proxies (pool exhausted, {attempts} attempts): {url}: {last_err}"
+    )
+sportsdataverse.errors.AssetFetchError: NCAA fetch failed after rotating proxies (pool exhausted, 52 attempts): https://stats.ncaa.org/season_divisions/18904/scoreboards?utf8=%E2%9C%93&season_division_id=&game_date=11%2F16%2F2026&conference_id=0&tournament_id=&commit=Submit: Page.goto: net::ERR_HTTP_RESPONSE_CODE_FAILURE at https://stats.ncaa.org/season_divisions/18904/scoreboards?utf8=%E2%9C%93&season_division_id=&game_date=11%2F16%2F2026&conference_id=0&tournament_id=&commit=Submit
+Call log:
+  - navigating to "https://stats.ncaa.org/season_divisions/18904/scoreboards?utf8=%E2%9C%93&season_division_id=&game_date=11%2F16%2F2026&conference_id=0&tournament_id=&commit=Submit", waiting until "domcontentloaded"
+
+EXIT=1
+[2026-11-20 15:35:13Z] div=11 wave B: capture x12
+      1 capture: {'captured': 0, 'skipped': 62, 'failed': 0}
+     11 capture: {'captured': 0, 'skipped': 63, 'failed': 0}
+     12 discovered 755 MFB contests
+WARN capture div=11 rc=1
+[2026-11-20 15:35:23Z] div=12 wave A: scoreboard refresh (one process)
+log -> logs/daily_mfb_refresh_d12_20261120_103523.log  (watch: tail -f logs/daily_mfb_refresh_d12_20261120_103523.log)
+transport: NCAA_VENDOR=decodo_patchright (canary_vendors.toml) shard 0/1
+discovered 128 MFB teams (ay=2027 div=12)
+Traceback (most recent call last):
+  File "/mnt/sdv_repos/ncaa-mfb-football-raw/python/ncaa_mfb_raw_scrape/mfb_run.py", line 169, in <module>
+    raise SystemExit(main())
+                     ~~~~^^
+  File "/mnt/sdv_repos/ncaa-mfb-football-raw/python/ncaa_mfb_raw_scrape/mfb_run.py", line 127, in main
+    sb_contests, sb_teams = scoreboard_team_ids(
+                            ~~~~~~~~~~~~~~~~~~~^
+        args.division, fetch, lookback_days=args.scoreboard_days
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "/mnt/sdv_repos/ncaa-mfb-football-raw/python/ncaa_mfb_raw_scrape/mfb_discover.py", line 95, in scoreboard_team_ids
+    df = ncaa_scoreboard_contests(
+        "football",
+    ...<3 lines>...
+        fetch_html=fetch,
+    )
+  File "/mnt/sdv_repos/sdv-py/sportsdataverse/scrape/ncaa/scoreboard.py", line 187, in ncaa_scoreboard_contests
+    df = _run(fetch_html)
+  File "/mnt/sdv_repos/sdv-py/sportsdataverse/scrape/ncaa/scoreboard.py", line 180, in _run
+    page = fetch(_scoreboard_path(sid, d))
+  File "/mnt/sdv_repos/ncaa-mfb-football-raw/python/ncaa_mfb_raw_scrape/mfb_discover.py", line 91, in fetch
+    html = fetch_fn(path, force=True) or ""
+           ~~~~~~~~^^^^^^^^^^^^^^^^^^
+  File "/mnt/sdv_repos/ncaa-mfb-football-raw/python/ncaa_mfb_raw_scrape/mfb_discover.py", line 65, in <lambda>
+    return lambda path, force=False: fetcher.fetch_html(path, force=force)
+                                     ~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^
+  File "/mnt/sdv_repos/sdv-py/sportsdataverse/mbb/mbb_ncaa_fetch.py", line 1370, in fetch_html
+    text = self._get_with_rotation(url)
+  File "/mnt/sdv_repos/sdv-py/sportsdataverse/mbb/mbb_ncaa_fetch.py", line 1292, in _get_with_rotation
+    raise AssetFetchError(
+        f"NCAA fetch failed after rotating proxies (pool exhausted, {attempts} attempts): {url}: {last_err}"
+    )
+sportsdataverse.errors.AssetFetchError: NCAA fetch failed after rotating proxies (pool exhausted, 52 attempts): https://stats.ncaa.org/season_divisions/18905/scoreboards?utf8=%E2%9C%93&season_division_id=&game_date=11%2F16%2F2026&conference_id=0&tournament_id=&commit=Submit: Page.goto: net::ERR_HTTP_RESPONSE_CODE_FAILURE at https://stats.ncaa.org/season_divisions/18905/scoreboards?utf8=%E2%9C%93&season_division_id=&game_date=11%2F16%2F2026&conference_id=0&tournament_id=&commit=Submit
+Call log:
+  - navigating to "https://stats.ncaa.org/season_divisions/18905/scoreboards?utf8=%E2%9C%93&season_division_id=&game_date=11%2F16%2F2026&conference_id=0&tournament_id=&commit=Submit", waiting until "domcontentloaded"
+
+EXIT=1
+[2026-11-20 15:40:10Z] div=12 wave B: capture x12
+     11 capture: {'captured': 0, 'skipped': 65, 'failed': 0}
+      1 capture: {'captured': 0, 'skipped': 66, 'failed': 0}
+     12 discovered 781 MFB contests
+WARN capture div=12 rc=1
+log -> logs/daily_mfb_datasets_20261120_104022.log  (watch: tail -f logs/daily_mfb_datasets_20261120_104022.log)
+teams: 266
+rosters: 29386 players, 266 teams
+schedule master: 3150 team-games, 1413 unique contests
+EXIT=0
+log -> logs/daily_mfb_xwalk_20261120_104107.log  (watch: tail -f logs/daily_mfb_xwalk_20261120_104107.log)
+ay2027: 1382/1413 matched  [{'match_method': 'score_window', 'len': 173}, {'match_method': 'score_pair', 'len': 6}, {'match_method': 'unordered_pair', 'len': 1}, {'match_method': 'date_window', 'len': 12}, {'match_method': 'single_team', 'len': 68}, {'match_method': 'score_exact', 'len': 946}, {'match_method': 'exact', 'len': 176}]
+EXIT=0
+offline stage: no proxy / transport needed
+log -> logs/player_xwalk_20261120_104112.log  (watch: tail -f logs/player_xwalk_20261120_104112.log)
+mfb 2027: players=29386 matched=24411 (83.07%) name_jersey=23482 name=345 last_jersey=509 jaro_winkler=75 no_espn_team=1632 no_espn_players=3272 ambiguous=1 no_candidate=70
+EXIT=0
+log -> logs/daily_mfb_parse_20261120_104118.log  (watch: tail -f logs/daily_mfb_parse_20261120_104118.log)
+ay2027: {'skipped': 1413}
+EXIT=0
+[2026-11-20 15:41:19Z] daily mfb stages done (rc_total=1)
