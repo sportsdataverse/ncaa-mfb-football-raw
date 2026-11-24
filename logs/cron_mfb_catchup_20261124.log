@@ -1,0 +1,77 @@
+transport: NCAA_VENDOR=decodo_patchright (canary_vendors.toml)
+[2026-11-24 10:04:21Z] daily mfb start: ay=2027 (fall 2026) max=400 workers=12 discovery=scoreboard
+[2026-11-24 10:04:21Z] div=11 wave A: scoreboard refresh (one process)
+log -> logs/daily_mfb_refresh_d11_20261124_050421.log  (watch: tail -f logs/daily_mfb_refresh_d11_20261124_050421.log)
+transport: NCAA_VENDOR=decodo_patchright (canary_vendors.toml) shard 0/1
+discovered 138 MFB teams (ay=2027 div=11)
+scoreboard: 70 contests, 136 division teams to refresh (last 7 days + yesterday/today)
+team pages 25/138: 251 contests
+team pages 50/138: 457 contests
+team pages 75/138: 627 contests
+team pages 100/138: 744 contests
+team pages 125/138: 803 contests
+refresh: 136/136 team pages re-fetched, 0 fell back to the saved copy
+discovered 822 MFB contests
+rosters 25/138: {'captured': 0, 'skipped': 25, 'failed': 0}
+rosters 50/138: {'captured': 0, 'skipped': 50, 'failed': 0}
+rosters 75/138: {'captured': 0, 'skipped': 75, 'failed': 0}
+rosters 100/138: {'captured': 0, 'skipped': 100, 'failed': 0}
+rosters 125/138: {'captured': 0, 'skipped': 125, 'failed': 0}
+rosters: {'captured': 0, 'skipped': 138, 'failed': 0}
+EXIT=0
+[2026-11-24 10:46:17Z] div=11 wave B: capture x12
+      1 capture: {'captured': 1, 'skipped': 67, 'failed': 0}
+      1 capture: {'captured': 3, 'skipped': 65, 'failed': 0}
+      3 capture: {'captured': 5, 'skipped': 64, 'failed': 0}
+      2 capture: {'captured': 6, 'skipped': 62, 'failed': 0}
+      2 capture: {'captured': 6, 'skipped': 63, 'failed': 0}
+      1 capture: {'captured': 7, 'skipped': 62, 'failed': 0}
+      1 capture: {'captured': 8, 'skipped': 60, 'failed': 0}
+      1 capture: {'captured': 9, 'skipped': 59, 'failed': 0}
+     12 discovered 822 MFB contests
+[2026-11-24 11:02:27Z] div=12 wave A: scoreboard refresh (one process)
+log -> logs/daily_mfb_refresh_d12_20261124_060227.log  (watch: tail -f logs/daily_mfb_refresh_d12_20261124_060227.log)
+transport: NCAA_VENDOR=decodo_patchright (canary_vendors.toml) shard 0/1
+discovered 128 MFB teams (ay=2027 div=12)
+scoreboard: 64 contests, 124 division teams to refresh (last 7 days + yesterday/today)
+team pages 25/128: 266 contests
+team pages 50/128: 489 contests
+team pages 75/128: 664 contests
+team pages 100/128: 781 contests
+team pages 125/128: 842 contests
+refresh: 124/124 team pages re-fetched, 0 fell back to the saved copy
+discovered 845 MFB contests
+rosters 25/128: {'captured': 0, 'skipped': 25, 'failed': 0}
+rosters 50/128: {'captured': 0, 'skipped': 50, 'failed': 0}
+rosters 75/128: {'captured': 0, 'skipped': 75, 'failed': 0}
+rosters 100/128: {'captured': 0, 'skipped': 100, 'failed': 0}
+rosters 125/128: {'captured': 0, 'skipped': 125, 'failed': 0}
+rosters: {'captured': 0, 'skipped': 128, 'failed': 0}
+EXIT=0
+[2026-11-24 11:43:26Z] div=12 wave B: capture x12
+      1 capture: {'captured': 10, 'skipped': 60, 'failed': 0}
+      1 capture: {'captured': 2, 'skipped': 68, 'failed': 0}
+      1 capture: {'captured': 2, 'skipped': 69, 'failed': 0}
+      2 capture: {'captured': 3, 'skipped': 67, 'failed': 0}
+      1 capture: {'captured': 4, 'skipped': 67, 'failed': 0}
+      1 capture: {'captured': 5, 'skipped': 66, 'failed': 0}
+      3 capture: {'captured': 6, 'skipped': 64, 'failed': 0}
+      1 capture: {'captured': 6, 'skipped': 65, 'failed': 0}
+      1 capture: {'captured': 7, 'skipped': 64, 'failed': 0}
+     12 discovered 845 MFB contests
+log -> logs/daily_mfb_datasets_20261124_070709.log  (watch: tail -f logs/daily_mfb_datasets_20261124_070709.log)
+teams: 266
+rosters: 29386 players, 266 teams
+schedule master: 3187 team-games, 1540 unique contests
+EXIT=0
+log -> logs/daily_mfb_xwalk_20261124_070818.log  (watch: tail -f logs/daily_mfb_xwalk_20261124_070818.log)
+ay2027: 1509/1540 matched  [{'match_method': 'score_exact', 'len': 1024}, {'match_method': 'score_window', 'len': 193}, {'match_method': 'exact', 'len': 200}, {'match_method': 'single_team', 'len': 66}, {'match_method': 'date_window', 'len': 19}, {'match_method': 'score_pair', 'len': 6}, {'match_method': 'unordered_pair', 'len': 1}]
+EXIT=0
+offline stage: no proxy / transport needed
+log -> logs/player_xwalk_20261124_070832.log  (watch: tail -f logs/player_xwalk_20261124_070832.log)
+mfb 2027: players=29386 matched=24954 (84.92%) name_jersey=24000 name=353 last_jersey=525 jaro_winkler=76 no_espn_team=1301 no_espn_players=3057 ambiguous=2 no_candidate=72
+EXIT=0
+log -> logs/daily_mfb_parse_20261124_070842.log  (watch: tail -f logs/daily_mfb_parse_20261124_070842.log)
+ay2027: {'skipped': 1413, 'parsed': 127}
+EXIT=0
+[2026-11-24 12:09:24Z] daily mfb stages done (rc_total=0)
